@@ -130,23 +130,23 @@ void vel_callback(geometry_msgs::TwistConstPtr msg) {
   vel_x_old = vel_x;
   vel_y_old = vel_y;
   vth_z_old = vth_z;
-  double delta_x = msg->linear.x - vel_x_old;
-  if (abs(vel_x_old) < 0.2 && abs(delta_x) > 0.05) {
+  // double delta_x = msg->linear.x - vel_x_old;
+  // if (abs(vel_x_old) < 0.2 && abs(delta_x) > 0.05) {
     vel_x = msg->linear.x;
-  }
-  if (abs(vel_x_old) >= 0.2 && abs(delta_x) > 0.1) {
-    vel_x = msg->linear.x;
-  }
+  // }
+  // if (abs(vel_x_old) >= 0.2 && abs(delta_x) > 0.1) {
+  //   vel_x = msg->linear.x;
+  // }
   
   vel_y = 0.3 * msg->linear.y;
   
-  double delta_z = msg->angular.z - vth_z_old;
-  if (abs(vth_z_old) < 0.2 && abs(delta_z) > 0.05) {
+  // double delta_z = msg->angular.z - vth_z_old;
+  // if (abs(vth_z_old) < 0.2 && abs(delta_z) > 0.05) {
     vth_z = msg->angular.z;
-  }
-  if (abs(vth_z_old) >= 0.2 && abs(delta_z) > 0.1) {
-    vth_z = msg->angular.z;
-  }
+  // }
+  // if (abs(vth_z_old) >= 0.2 && abs(delta_z) > 0.1) {
+  //   vth_z = msg->angular.z;
+  // }
 }
 
 void leg_odom_callback(nav_msgs::OdometryConstPtr msg) {
@@ -219,68 +219,68 @@ int main(int argc, char** argv) {
 
   ros::Rate loop_rate(50);
   while (ros::ok()) {
-    char buff[512] = {0};
-    uint8_t msg_len = 0;
-    // 帧头
-    buff[msg_len++] = 14;
-    buff[msg_len++] = 0;
-    buff[msg_len++] = 0;
-    buff[msg_len++] = 0;
+    // char buff[512] = {0};
+    // uint8_t msg_len = 0;
+    // // 帧头
+    // buff[msg_len++] = 14;
+    // buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
 
-    buff[msg_len++] = 0;
-    buff[msg_len++] = 0;
-    buff[msg_len++] = 0;
-    buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
 
-    buff[msg_len++] = 1;
-    buff[msg_len++] = 0;
-    buff[msg_len++] = 0;
-    buff[msg_len++] = 0;
+    // buff[msg_len++] = 1;
+    // buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
+    // buff[msg_len++] = 0;
 
-    if (in_charge_region) {
-      std::cout << "in_charge_region : " << in_charge_region << endl;
-      std::cout << "april------" << robot_apriltag_currnet_x << "     "
-                << robot_apriltag_currnet_y << "   "
-                << robot_apriltag_currnet_yaw << endl;
-    }
-    if (in_charge_region)  // in apriltag rigion
-    {
-      // if the value didn't update
-      if (robot_apriltag_currnet_x == robot_apriltag_currnet_x_last &&
-          robot_apriltag_currnet_y == robot_apriltag_currnet_y_last &&
-          robot_apriltag_currnet_yaw == robot_apriltag_currnet_yaw_last) {
-        robot_apriltag_currnet_x = robot_apriltag_currnet_y =
-            robot_apriltag_currnet_yaw = 0.0;
-      } else {
-        robot_apriltag_currnet_x_last = robot_apriltag_currnet_x;
-        robot_apriltag_currnet_y_last = robot_apriltag_currnet_y;
-        robot_apriltag_currnet_yaw_last = robot_apriltag_currnet_yaw;
-      }
-      robot_currnet_x = robot_apriltag_currnet_x;
-      robot_currnet_y = robot_apriltag_currnet_y;
-      robot_currnet_yaw = robot_apriltag_currnet_yaw;
-    } else {
-      robot_currnet_x = robot_lidar_currnet_x;
-      robot_currnet_y = robot_lidar_currnet_y;
-      robot_currnet_yaw = robot_lidar_currnet_yaw;
-    }
+    // if (in_charge_region) {
+    //   std::cout << "in_charge_region : " << in_charge_region << endl;
+    //   std::cout << "april------" << robot_apriltag_currnet_x << "     "
+    //             << robot_apriltag_currnet_y << "   "
+    //             << robot_apriltag_currnet_yaw << endl;
+    // }
+    // if (in_charge_region)  // in apriltag rigion
+    // {
+    //   // if the value didn't update
+    //   if (robot_apriltag_currnet_x == robot_apriltag_currnet_x_last &&
+    //       robot_apriltag_currnet_y == robot_apriltag_currnet_y_last &&
+    //       robot_apriltag_currnet_yaw == robot_apriltag_currnet_yaw_last) {
+    //     robot_apriltag_currnet_x = robot_apriltag_currnet_y =
+    //         robot_apriltag_currnet_yaw = 0.0;
+    //   } else {
+    //     robot_apriltag_currnet_x_last = robot_apriltag_currnet_x;
+    //     robot_apriltag_currnet_y_last = robot_apriltag_currnet_y;
+    //     robot_apriltag_currnet_yaw_last = robot_apriltag_currnet_yaw;
+    //   }
+    //   robot_currnet_x = robot_apriltag_currnet_x;
+    //   robot_currnet_y = robot_apriltag_currnet_y;
+    //   robot_currnet_yaw = robot_apriltag_currnet_yaw;
+    // } else {
+    //   robot_currnet_x = robot_lidar_currnet_x;
+    //   robot_currnet_y = robot_lidar_currnet_y;
+    //   robot_currnet_yaw = robot_lidar_currnet_yaw;
+    // }
     // 以下开始为消息
-    msg_len += sprintf(buff + msg_len, "%.3f", vel_x);               // 0
-    msg_len += sprintf(buff + msg_len, ",%.3f", vel_y);              // 1
-    msg_len += sprintf(buff + msg_len, ",%.3f", vth_z);              // 2
-    msg_len += sprintf(buff + msg_len, ",%d", 0);                    // 3
-    msg_len += sprintf(buff + msg_len, ",%d", 0);                    // 4
-    msg_len += sprintf(buff + msg_len, ",%d", 0);                    // 5
-    msg_len += sprintf(buff + msg_len, ",%.3f", 0.0);                // 6
-    msg_len += sprintf(buff + msg_len, ",%.3f", robot_currnet_x);    // 7
-    msg_len += sprintf(buff + msg_len, ",%.3f", robot_currnet_y);    // 8
-    msg_len += sprintf(buff + msg_len, ",%.3f", robot_currnet_yaw);  // 9
-    msg_len += sprintf(buff + msg_len, ",%d", in_charge_region);     // 10
-    msg_len += sprintf(buff + msg_len, ",%.3f", ball_position_.x);   // 11
-    msg_len += sprintf(buff + msg_len, ",%.3f", ball_position_.y);   // 12
-    msg_len += sprintf(buff + msg_len, ",%.3f", ball_position_.z);   // 13
+    // msg_len += sprintf(buff + msg_len, "%.3f", vel_x);               // 0
+    // msg_len += sprintf(buff + msg_len, ",%.3f", vel_y);              // 1
+    // msg_len += sprintf(buff + msg_len, ",%.3f", vth_z);              // 2
+    // msg_len += sprintf(buff + msg_len, ",%d", 0);                    // 3
+    // msg_len += sprintf(buff + msg_len, ",%d", 0);                    // 4
+    // msg_len += sprintf(buff + msg_len, ",%d", 0);                    // 5
+    // msg_len += sprintf(buff + msg_len, ",%.3f", 0.0);                // 6
+    // msg_len += sprintf(buff + msg_len, ",%.3f", robot_currnet_x);    // 7
+    // msg_len += sprintf(buff + msg_len, ",%.3f", robot_currnet_y);    // 8
+    // msg_len += sprintf(buff + msg_len, ",%.3f", robot_currnet_yaw);  // 9
+    // msg_len += sprintf(buff + msg_len, ",%d", in_charge_region);     // 10
+    // msg_len += sprintf(buff + msg_len, ",%.3f", ball_position_.x);   // 11
+    // msg_len += sprintf(buff + msg_len, ",%.3f", ball_position_.y);   // 12
+    // msg_len += sprintf(buff + msg_len, ",%.3f", ball_position_.z);   // 13
 
-    buff[4] = msg_len - 12;  // 消息的长度填充到第二个字节
+    // buff[4] = msg_len - 12;  // 消息的长度填充到第二个字节
     // input_->sendPacket((uint8_t*)buff, msg_len);
 
     // 速度V
