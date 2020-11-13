@@ -1,0 +1,25 @@
+<launch>
+
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
+    <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch"/>
+
+    <!--定位相关-->
+    <include file="$(find ndt_localization)/launch/ndt_localization.launch"/>
+
+    <!--导航相关-->
+    <include file="$(find csc_nav2d_working)/launch/ball_track_navigation.launch"/>
+    
+    <!--通信相关-->
+    <include file="$(find ros2qnx)/launch/ros2qnx.launch"/>
+  
+
+    <!--RVIZ-->
+    <!-- <node name="navigation_rviz" pkg="rviz" type="rviz" args=" -d $(find csc_nav2d_working)/rviz/navigation.rviz" /> -->
+
+    <!--发布静态TF变换-->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="-0.4 0 -0.15 0 0 0  velodyne base_link" />
+
+
+</launch>
+
+<!-- ulimit -n 4096  -->

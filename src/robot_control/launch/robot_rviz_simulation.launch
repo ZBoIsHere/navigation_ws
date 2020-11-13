@@ -1,0 +1,9 @@
+<launch>
+  <arg name="model" />
+  <arg name="gui" default="true" />
+  <param name="robot_description"  textfile="$(find mini)/urdf/mini.urdf" />
+  <param name="use_gui" value="$(arg gui)" />
+  <node  name="jointpublish"  pkg="robot_control"  type="jointpublish" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mini)/urdf.rviz" />
+</launch>

@@ -1,0 +1,8 @@
+obstacle_range: 10  
+raytrace_range: 10  
+footprint: [[0.35,-0.18], [0.35,0.18], [-0.43,0.18], [-0.43,-0.18]]
+#robot_radius: ir_of_robot  
+inflation_radius: 0.55
+max_obstacle_height: 10  
+min_obstacle_height: -10s
+map_type: costmap

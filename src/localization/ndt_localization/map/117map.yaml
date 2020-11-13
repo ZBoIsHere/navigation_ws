@@ -1,0 +1,7 @@
+image: 117map.pgm
+resolution: 0.050000
+origin: [-14.750000, -24.750000, 0.000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+
