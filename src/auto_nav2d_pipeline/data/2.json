@@ -1,0 +1,27 @@
+{
+    "camera_pose": {
+        "tilt": 0, 
+        "zoom": 0, 
+        "pan": 0
+    }, 
+    "order": 2, 
+    "robot_pose": {
+        "pos_z": 0.33916513396124837, 
+        "pos_x": -1.5737408501899024, 
+        "pos_y": 4.3649594989344935, 
+        "ori_x": 0.013164319064308825, 
+        "ori_y": -0.005622838155176168, 
+        "ori_z": 0.7077154267277443, 
+        "ori_w": 0.7063525742617638
+    }, 
+    "option": {
+        "speed_up": false, 
+        "perform": false, 
+        "crawl": false, 
+        "walking_bricks": false, 
+        "up_stair": false, 
+        "down_stair": false, 
+        "middle_point": false,
+        "jump1": true
+    }
+}
