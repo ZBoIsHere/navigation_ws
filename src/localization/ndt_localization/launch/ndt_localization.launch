@@ -1,9 +1,10 @@
 <launch>
   <param name="use_sim_time" value="false" />
+  <arg name="map_id" />
 
   <node pkg="ndt_localization" type="ndt_localization_node" name="ndt_localization_node" output="screen">
     <rosparam file="$(find ndt_localization)/params/test.yaml" command="load" />
-    <param name="global_map_file" value="$(find ndt_localization)/map/new430.pcd"/>
+    <param name="global_map_file" value="$(find ndt_localization)/map/$(arg map_id).pcd"/>
   </node>
-  <node name="MapServer" pkg="map_server" type="map_server" args="$(find ndt_localization)/map/new430.yaml"/>  
+  <node name="MapServer" pkg="map_server" type="map_server" args="$(find ndt_localization)/map/$(arg map_id).yaml"/>
 </launch>
