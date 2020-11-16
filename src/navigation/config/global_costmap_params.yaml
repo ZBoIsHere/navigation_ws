@@ -13,5 +13,6 @@ global_costmap:
 
   plugins:
     - {name: static_layer, type: "costmap_2d::StaticLayer"}
-    - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+    - {name: obstacle_layer1, type: "costmap_2d::ObstacleLayer"}
+    - {name: obstacle_layer2, type: "costmap_2d::ObstacleLayer"}
     - {name: global_inflation_layer, type: "costmap_2d::InflationLayer"}
