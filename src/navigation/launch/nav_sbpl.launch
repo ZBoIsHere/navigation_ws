@@ -17,7 +17,7 @@
 
       <rosparam file="$(find sbpl_lattice_planner)/launch/move_base/sbpl_global_params.yaml" command="load" />
       <param name="base_global_planner" value="SBPLLatticePlanner" />
-      <param name="SBPLLatticePlanner/primitive_filename" value="$(find sbpl_lattice_planner)/matlab/mprim/map12.mprim" />
+      <param name="SBPLLatticePlanner/primitive_filename" value="$(find sbpl_lattice_planner)/matlab/mprim/new430.mprim" />
       <param name="planner_frequency" value="0.5" />
       <param name="planner_patience" value="15.0" />
 
