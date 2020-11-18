@@ -46,9 +46,9 @@ obstacle_layer2:
 global_inflation_layer:
   enabled: true
   cost_scaling_factor: 1.75
-  inflation_radius: 1.0
+  inflation_radius: 0.5
 
 local_inflation_layer:
   enabled: true
   cost_scaling_factor: 5.0
-  inflation_radius: 0.5
+  inflation_radius: 0.3

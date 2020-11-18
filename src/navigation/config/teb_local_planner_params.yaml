@@ -57,7 +57,7 @@ TebLocalPlannerROS:
   no_outer_iterations: 4
   optimization_activate: true
   optimization_verbose: false
-  penalty_epsilon: 0.1
+  penalty_epsilon: 0.01
 
   weight_max_vel_x: 1
   weight_max_vel_y: 1
@@ -71,11 +71,11 @@ TebLocalPlannerROS:
   weight_shortest_path: 1
   weight_obstacle: 0.9
   weight_inflation: 5
-  weight_viapoint: 5
+  weight_viapoint: 7
   weight_adapt_factor: 2
 
   # Homotopy Class Planner
-  enable_homotopy_class_planning: true
+  enable_homotopy_class_planning: false
   enable_multithreading: true
   simple_exploration: false
   max_number_classes: 4
