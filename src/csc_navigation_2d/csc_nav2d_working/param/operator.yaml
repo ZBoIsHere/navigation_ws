@@ -1,4 +1,0 @@
-#不能小于0.2m/s，否则车子会停止，因为小于最低速度了
-max_velocity: 1.0
-#mMaxAngleVelocity: 0.6
-mMaxAngleVelocity: 1.0
