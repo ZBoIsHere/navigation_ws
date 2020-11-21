@@ -1,6 +1,4 @@
-# footprint: [[0.51, -0.25], [0.51, 0.25], [-0.51, 0.25], [-0.51, -0.25]] # Pro
-# footprint: [[0.45,-0.225], [0.45,0.225], [-0.45,0.225], [-0.45,-0.225]] # JYL
-footprint: [[0.343,0.18], [0.343,-0.18], [-0.38,-0.18], [-0.38,0.18]] # Mini
+footprint: [[0.343,0.18], [0.343,-0.18], [-0.38,-0.18], [-0.38,0.18]] # MINI
 publish_frequency: 1.0
 transform_tolerance: 1.0
 map_type: costmap
@@ -19,7 +17,7 @@ obstacle_layer1:
   laser_scan_sensor:
     data_type: LaserScan
     # topic `scan ` was published by the driver of velodyne
-    # topic `scan1` was published by the driver of velodyne
+    # topic `scan1` was published by the driver of pointcloud_to_laserscan
     topic: /scan1
     sensor_frame: base_link
     marking: true
@@ -35,7 +33,6 @@ obstacle_layer2:
   laser_scan_sensor:
     data_type: LaserScan
     # topic `scan ` was published by the driver of velodyne
-    # topic `scan1` was published by the driver of velodyne
     # topic `scan2` was published by the driver of d435
     topic: /scan2
     sensor_frame: base_link

@@ -60,6 +60,7 @@ public:
     tf::TransformListener tf_listener_;
 
     tf::TransformBroadcaster odom_map_tf_broadcaster_;
+    tf::TransformListener base_laser_tf_listener_;
 
     ros::Publisher pub_current_pose_;
     geometry_msgs::PoseStamped msg_current_pose_;

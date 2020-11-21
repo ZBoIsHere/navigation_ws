@@ -28,11 +28,7 @@ TebLocalPlannerROS:
   use_proportional_saturation: true
   footprint_model:
     type: "polygon"
-    # static stand w/ length * width = 1.10 * 0.50 (Pro)
-    # static stand w/ length * width = 1.00 * 0.46 (JYL)
-    # vertices: [[0.51, -0.25], [0.51, 0.25], [-0.51, 0.25], [-0.51, -0.25]] # Pro
-    # vertices: [[0.45,-0.225], [0.45,0.225], [-0.45,0.225], [-0.45,-0.225]] # JYL
-    vertices: [[0.343,0.18], [0.343,-0.18], [-0.38,-0.18], [-0.38,0.18]]
+    vertices: [[0.45,-0.225], [0.45,0.225], [-0.45,0.225], [-0.45,-0.225]] # JYL
 
   # GoalTolerance
   yaw_goal_tolerance: 0.02
