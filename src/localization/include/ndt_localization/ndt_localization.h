@@ -29,7 +29,6 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int16.h>
 
-#include "ground_filter.hpp"
 #include "user_protocol.h"
 #include "utils.hpp"
 
@@ -161,7 +160,7 @@ public:
 
     std::string map_file;
     bool is_filter_ground;
-    utils::RayGroundFilter filter;
+    // utils::RayGroundFilter filter;
     ros::Publisher pub_localPC_handled;
 
 

@@ -55,9 +55,6 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
-  # ${CUDA_INCLUDE_DIRS}
-  ../../common/user_protocol/include
-  ../../common/utils/include
 )
 
 
