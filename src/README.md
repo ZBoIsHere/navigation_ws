@@ -14,7 +14,7 @@ $ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
 ```
 
 ### 测试前配置参数
-- Footprint: MIN、JYL、Pro
+- Footprint: MINI、JYL
 - 地图替换
 - 速度/加速度限制
 - 膨胀系数
