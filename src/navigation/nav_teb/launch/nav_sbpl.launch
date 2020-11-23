@@ -1,5 +1,5 @@
 <launch>
-  <arg name="robot_type" default="JYL" />
+  <arg name="robot_type" default="MINI" />
   <arg name="if_real_test" default="true" />
   <arg name="map_and_mprim_id" default="new430" />
 
@@ -7,8 +7,8 @@
   <!-- 驱动 -->
   <group if="$(arg if_real_test)">
     <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
-    <include file="$(find ros2qnx)/launch/ros2qnx.launch"/>
-    <node name="qnx2ros" pkg="qnx2ros" type="qnx2ros" output="screen"></node>
+    <!-- <include file="$(find ros2qnx)/launch/ros2qnx.launch"/> -->
+    <!-- <node name="qnx2ros" pkg="qnx2ros" type="qnx2ros" output="screen"></node> -->
   </group>
 
   <!-- MINI 参数 -->

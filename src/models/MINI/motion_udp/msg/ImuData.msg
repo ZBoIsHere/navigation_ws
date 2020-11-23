@@ -1,9 +1,0 @@
-float32 angle_roll
-float32 angle_pitch
-float32 angle_yaw
-float32 angular_velocity_roll
-float32 angular_velocity_pitch
-float32 angular_velocity_yaw
-float32 acc_x
-float32 acc_y
-float32 acc_z

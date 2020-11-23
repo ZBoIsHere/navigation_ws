@@ -1,5 +1,0 @@
-<launch>
-    <!-- Odometry -->
-    <node name="qnx2ros" pkg="qnx2ros" type="qnx2ros" output="screen"></node>
-    <param name="filter_size" value="1" />
-</launch>
