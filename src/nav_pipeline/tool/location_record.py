@@ -16,8 +16,8 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from geometry_msgs.msg import PoseStamped
+from pathlib import Path
 
-# from hik_ptz_camera.srv import PtzStatus
 import json
 import os
 import tf
@@ -95,9 +95,11 @@ class LocationRecorder(QWidget):
             "camera_pose": self.camera_record_pose,
             "option": self.option,
         }
-        os.system("mkdir -p ~/DeepNavi/src/auto_nav2d_pipeline/data")
+        data_dir = str(Path(__file__).parent.absolute()) + "/../data"
+        os.system("mkdir -p " + data_dir)
+        data_dir = data_dir + "/%d.json"
         with open(
-            "/home/ysc/DeepNavi/src/auto_nav2d_pipeline/data/%d.json" % order, "w+"
+            data_dir % order, "w+"
         ) as out:
             json.dump(new_record, out, indent=4)
 

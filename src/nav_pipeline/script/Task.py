@@ -17,7 +17,7 @@ import numpy as np
 import tf
 from RobotCommander import RobotCommander
 import threading
-
+from pathlib import Path
 
 class Task:
     """
@@ -87,7 +87,7 @@ class Task:
         """
             Construct TaskPoint list from json files in data folder.
         """
-        folder = "/home/ysc/DeepNavi/src/auto_nav2d_pipeline/data"
+        folder = str(Path(__file__).parent.absolute()) + "/../data"
         task_json = None
         if os.path.exists(folder):
             task_json = os.listdir(folder)
