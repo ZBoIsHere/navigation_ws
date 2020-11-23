@@ -4,7 +4,7 @@
 #include <sensor_msgs/JointState.h>
 #include <robot_state_publisher/robot_state_publisher.h>
 
-#include <motion_udp/ContactData.h>
+// #include <motion_udp/ContactData.h>
 #include <motion_udp/ImuData.h>
 #include <motion_udp/JointData.h>
 #include <motion_udp/JointType.h>
