@@ -147,7 +147,6 @@ void NDTLocalization::initialPoseCB(const geometry_msgs::PoseWithCovarianceStamp
     pose_init_ = true;
    }
    newScan_Pose = init_Pose;
-
 }
 
 void NDTLocalization::init_pose_with_param()
@@ -264,10 +263,10 @@ void NDTLocalization::pointCloud_process( )
 
     PointCloudT::Ptr output_cloud(new PointCloudT());
     ndt_.setInputSource(scan_ptr);
-    ndt_.align(*output_cloud, newScan_Pose );
+    ndt_.align(*output_cloud, newScan_Pose);
 
     newScan_Pose = ndt_.getFinalTransformation();
-    delta_newScanPose = last_tf.inverse() *newScan_Pose;
+    delta_newScanPose = last_tf.inverse() * newScan_Pose;
     // base_tf = final_tf * tf_btol_.inverse();
     base_tf = newScan_Pose;
     // TODO need to transform from base to lidar
@@ -291,7 +290,7 @@ void NDTLocalization::pointCloud_process( )
     
     tf::Quaternion tmp_q;
     tmp_q.setRPY(current_pose_.roll, current_pose_.pitch, current_pose_.yaw);
-    tf::Transform map_to_laser(tmp_q, tf::Vector3(current_pose_.x, current_pose_.y, current_pose_.z));
+    tf::Transform map_to_laser(tmp_q, tf::Vector3(current_pose_.x, current_pose_.y, current_pose_.z + 0.35));
     // tf_broadcaster_.sendTransform(tf::StampedTransform(map_to_laser, ros::Time::now(), param_map_frame_, param_laser_frame_));
 
     tf::StampedTransform base_to_laser;
