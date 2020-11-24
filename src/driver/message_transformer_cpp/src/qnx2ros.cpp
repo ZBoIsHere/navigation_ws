@@ -89,9 +89,7 @@ int main(int argc, char **argv) {
   while (ros::ok()) {
     recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
                         (struct sockaddr *)&addr_client, (socklen_t *)&len);
-    
-    if ((recv_num != sizeof(RobotStateUpload) + 12)) 
-      continue;
+    // if ((recv_num != sizeof(RobotStateUpload) + 12)) continue;
     cout << "recvfrom." << endl;
     DataReceived *dr = (DataReceived *)(recv_buf);
     RobotStateUpload *robot_state = &dr->data;
