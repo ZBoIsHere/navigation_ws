@@ -43,6 +43,7 @@ class Topic2UDPConverter:
         _offset = 0
         data = array.array("c")
         data.extend(" " * 12)
+        # 三个整数占用 12Byte
         struct.pack_into("<3i", data, _offset, self.command_code, 0, 1)
         _offset = data.__len__()
 
@@ -62,13 +63,12 @@ class Topic2UDPConverter:
                 raise Exception("Invalid struct format!")
                 exit(1)
             data.extend(" " * len)
-            print ("struct.pack_into('<" + value + "',data,_offset,msg" + key + ")")
-            exec ("struct.pack_into('<" + value + "',data,_offset,msg" + key + ")")
+            print ("struct.pack_into('<" + value + "', data, _offset, msg" + key + ")")
+            exec ("struct.pack_into('<" + value + "', data, _offset, msg" + key + ")")
             _offset += len
         # put packet_size.
         struct.pack_into("<i", data, 4, data.__len__() - 12)
         self.client.sendto(data, self.server_addr)
-
 
 class UDP2TopicConverter:
     def __init__(self, local_port):
@@ -211,8 +211,8 @@ if __name__ == "__main__":
                     UDP2TopicConverter(local_port=config["local_port"])
                 )
                 udp_coverter_list[-1].add_topic(config)
-    # print "Size of topic_coverter_list: ", len(topic_coverter_list)
-    # print "Size of udp_coverter_list: ", len(udp_coverter_list)
+    print "Size of topic_coverter_list: ", len(topic_coverter_list)
+    print "Size of udp_coverter_list:   ", len(udp_coverter_list)
     for converter in udp_coverter_list:
         converter.run()
 

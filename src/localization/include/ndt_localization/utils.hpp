@@ -117,7 +117,6 @@ double distance2points(const geometry_msgs::Point p1,
       std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2)));
 }
 
-// TODO::验证正确性，增加RPY2Quaternion的变换
 std::map<std::string, double> Quaternion2RPY(double x, double y, double z,
                                              double w) {
   double roll, pitch, yaw;

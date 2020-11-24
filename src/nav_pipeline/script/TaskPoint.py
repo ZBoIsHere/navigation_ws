@@ -246,7 +246,7 @@ class TaskPoint:
             rospy.sleep(4.0)
         # robot_commander.dance()
         # print("[{}]shoot image and send out.".format(self.name))
-        # rospy.sleep(5.0) #TODO: hardcode
+        # rospy.sleep(5.0)
         # robot_commander.dance()
         with RobotCommander() as robot_commander:
             robot_commander.motion_start_stop()

@@ -281,10 +281,8 @@ void NDTLocalization::pointCloud_process() {
 
   newScan_Pose = ndt_.getFinalTransformation();
   delta_newScanPose = last_tf.inverse() * newScan_Pose;
-  // base_tf = final_tf * tf_btol_.inverse();
   base_tf = newScan_Pose;
-  // TODO need to transform from base to lidar
-  //  base_tf = transform * base_tf;
+
   tf::Matrix3x3 mat_b;  //旋转矩阵
   mat_b.setValue(
       static_cast<double>(base_tf(0, 0)), static_cast<double>(base_tf(0, 1)),
