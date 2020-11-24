@@ -1,4 +1,4 @@
-### 安装依赖项和编译工具
+### 依赖项和编译工具
 ```bash
 # 依赖包
 $ sudo apt-get install ros-kinetic-navigation
@@ -13,7 +13,7 @@ $ catkin clean
 $ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
 ```
 
-### 测试前配置参数
+### 配置参数
 - Footprint: MINI、JYL
 - 地图替换
 - 速度/加速度限制
@@ -47,7 +47,7 @@ $ sudo black auto_nav2d_pipeline
 $ find . -name '*.DS_Store' -delete
 ```
 
-### 运动控制固件修改
+### 固件修改
 1. FTP (Transmit) 修改文件: 用户名 ntuser，密码 ntuser
 2. telnet root登陆 192.168.1.120/60，`chmod 777` 添加可执行权限
    ```
@@ -57,7 +57,6 @@ $ find . -name '*.DS_Store' -delete
 
 ### 常用指令
 ```bash
-# 时空信息
 $ rosrun rqt_tf_tree rqt_tf_tree
 $ rosrun tf tf_echo from to
 $ rqt_graph
@@ -68,18 +67,20 @@ $ scp -r src/ ysc@192.168.1.102:~/DeepNavi/
 ```
 
 ### Issues & TODO
-- 有时走直线时身体倾斜
-  - 角速度指令?
-- TODO: **速度曲线** vel_x
-- 运动规划的仿真: towr & xpp & ifopt
-- TEB优化不收敛
-  - 权重调节
-  - **路径穿越障碍物**
-    - Solution: 全局地图添加障碍物层
-  - **局部地图抖动**
-    - Solution: 局部地图参考系从`odom`转换到`map`
-    - TODO: 融合 IMU 定位
-- 侧向振荡问题
-  - Better:
-    - **减小 acc_x**
-    - **平滑 cmd_vel_x**
+- 检测到碰撞立即停止
+  ```yaml
+  <param name="controller_patience" value="0.0" />
+  <param name="planner_frequency" value="0.0" />
+
+  <param name="recovery_behavior_enabled" value="false" />
+  <param name="clearing_rotation_allowed" value="false" />
+  ```
+- message_transformer `timeout!`
+  ```txt
+  Inbound TCP/IP connection failed: connection from sender terminated before handshake header received. 0 bytes were received. Please check sender for additional details.
+  ```
+- BT Design
+- Elevation_mapping/Octomap/STVL using LIDAR or D435
+- How to disable local costmap?
+- PCD convert to costmap
+- Elevation_map convert to costmap
