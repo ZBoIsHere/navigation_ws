@@ -19,11 +19,8 @@ from RobotCommander import RobotCommander
 import threading
 from pathlib import Path
 
-class Task:
-    """
-        The task entity.
-    """
 
+class Task:
     def __init__(self):
         self.taskPoints = []
         self.currentIndex = 0
@@ -84,9 +81,6 @@ class Task:
         return t1["order"] < t2["order"]
 
     def loadTaskpoints(self):
-        """
-            Construct TaskPoint list from json files in data folder.
-        """
         folder = str(Path(__file__).parent.absolute()) + "/../data"
         task_json = None
         if os.path.exists(folder):
@@ -105,9 +99,6 @@ class Task:
             self.taskPoints.append(TaskPoint(waypoint_record))
 
     def filterUnrelatedData(self, task_json):
-        """
-            Filter out json file with no "%Y-%m-%d-%H-%M-%S" patten.
-        """
         filtered = []
         for file_name in task_json:
             if re.sub("[\d,-]", "", file_name) == ".json":
@@ -115,9 +106,6 @@ class Task:
         task_json = filtered
 
     def run(self):
-        """
-            Main loop.
-        """
         while not rospy.is_shutdown():
             self.robot_transfer.task_transfer(
                 self.taskPoints[self.src_ind], self.taskPoints[self.des_ind]
@@ -128,11 +116,6 @@ class Task:
 
 
 class TaskInit:
-    """
-        1. Get current robot pose.
-        2. Find the closest TaskPoint in taskPoints to current pose.
-    """
-
     def __init__(self, pose_topic="/ndt/current_pose"):
         self.initialPose = None
         self.pose_topic = pose_topic

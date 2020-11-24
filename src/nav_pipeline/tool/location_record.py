@@ -98,9 +98,7 @@ class LocationRecorder(QWidget):
         data_dir = str(Path(__file__).parent.absolute()) + "/../data"
         os.system("mkdir -p " + data_dir)
         data_dir = data_dir + "/%d.json"
-        with open(
-            data_dir % order, "w+"
-        ) as out:
+        with open(data_dir % order, "w+") as out:
             json.dump(new_record, out, indent=4)
 
     def listen_tf(self):
@@ -124,9 +122,6 @@ class LocationRecorder(QWidget):
             return False
 
     def update_camera_state(self):
-        """
-            Call ptz_status to get camera pan-tilt-zoom info.
-        """
         record_camera = False
         if record_camera:
             rospy.wait_for_service("ptz_status")

@@ -17,7 +17,7 @@ from geometry_msgs.msg import PoseStamped
 
 class PoseRecorder:
     """
-        PoseRecoder subscribe to the "/current_robot_pose"('/ndt/current_pose') topic and save it to an json file with timestamp. 
+    PoseRecoder subscribe to the "/current_robot_pose"('/ndt/current_pose') topic and save it to an json file with timestamp.
     """
 
     def __init__(self, pose_topic: str = "/ndt/current_pose"):

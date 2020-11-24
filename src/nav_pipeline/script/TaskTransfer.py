@@ -16,10 +16,6 @@ from RobotCommander import RobotCommander
 
 
 class TaskTransfer:
-    """
-        TaskTransfer is resposible for fire the robot to go to next task point.
-    """
-
     def __init__(self):
         # self.moveToClient = actionlib.SimpleActionClient(
         #     "MoveTo", MoveToPosition2DAction
@@ -35,9 +31,6 @@ class TaskTransfer:
         return self.moveToClient.get_state() == actionlib.GoalStatus.SUCCEEDED
 
     def task_transfer(self, src_point, des_point):
-        """
-            Transfer robot to next TaskPoint.
-        """
         with RobotCommander() as robot_commander:
             robot_commander.sendCordinate(
                 command_code=51,

@@ -12,11 +12,11 @@
 */
 
 #include <ros/ros.h>
+
 #include "velodyne_pointcloud/convert.h"
 
 /** Main node entry point. */
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   ros::init(argc, argv, "cloud_node");
   ros::NodeHandle node;
   ros::NodeHandle priv_nh("~");

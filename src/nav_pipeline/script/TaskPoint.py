@@ -155,9 +155,6 @@ class TaskPoint:
         return self.yaw
 
     def calDistance(self, other):
-        """
-            For Simplifacation, using 2D distance as the pose distance.
-        """
         return (
             (self.getPosX() - other.getPosX()) ** 2
             + (self.getPosY() - other.getPosY()) ** 2
@@ -240,10 +237,6 @@ class TaskPoint:
             return None
 
     def runTask(self):
-        """
-            When robot successfully tranfer to a new TaskPoint, Correspoing operation task will be triggered.
-            eg. shoot an image.
-        """
         if (
             self.is_middle_point()
         ):  # and not (self.is_down_stair() or self.is_up_stair()):

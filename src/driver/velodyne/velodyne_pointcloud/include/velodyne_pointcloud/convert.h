@@ -1,5 +1,5 @@
-// Copyright (C) 2009, 2010, 2011, 2012, 2019 Austin Robot Technology, Jack O'Quin, Jesse Vera, Joshua Whitley
-// All rights reserved.
+// Copyright (C) 2009, 2010, 2011, 2012, 2019 Austin Robot Technology, Jack
+// O'Quin, Jesse Vera, Joshua Whitley All rights reserved.
 //
 // Software License Agreement (BSD License 2.0)
 //
@@ -39,45 +39,38 @@
 #ifndef VELODYNE_POINTCLOUD_CONVERT_H
 #define VELODYNE_POINTCLOUD_CONVERT_H
 
-#include <ros/ros.h>
 #include <diagnostic_updater/diagnostic_updater.h>
 #include <diagnostic_updater/publisher.h>
-
-#include <sensor_msgs/PointCloud2.h>
-#include <velodyne_pointcloud/rawdata.h>
-#include <velodyne_pointcloud/pointcloudXYZIR.h>
-
 #include <dynamic_reconfigure/server.h>
+#include <ros/ros.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <velodyne_pointcloud/CloudNodeConfig.h>
+#include <velodyne_pointcloud/pointcloudXYZIR.h>
+#include <velodyne_pointcloud/rawdata.h>
 
-namespace velodyne_pointcloud
-{
-class Convert
-{
-public:
+namespace velodyne_pointcloud {
+class Convert {
+ public:
   Convert(ros::NodeHandle node, ros::NodeHandle private_nh);
   ~Convert() {}
 
-private:
-  void callback(
-    velodyne_pointcloud::CloudNodeConfig &config,
-    uint32_t level);
+ private:
+  void callback(velodyne_pointcloud::CloudNodeConfig &config, uint32_t level);
   void processScan(const velodyne_msgs::VelodyneScan::ConstPtr &scanMsg);
 
   // Pointer to dynamic reconfigure service srv_
-  boost::shared_ptr<dynamic_reconfigure::Server<velodyne_pointcloud::
-    CloudNodeConfig> > srv_;
+  boost::shared_ptr<
+      dynamic_reconfigure::Server<velodyne_pointcloud::CloudNodeConfig> >
+      srv_;
 
   boost::shared_ptr<velodyne_rawdata::RawData> data_;
   ros::Subscriber velodyne_scan_;
   ros::Publisher output_;
 
   /// configuration parameters
-  typedef struct
-  {
-    int npackets;                    // number of packets to combine
-  }
-  Config;
+  typedef struct {
+    int npackets;  // number of packets to combine
+  } Config;
   Config config_;
 
   // diagnostics updater
