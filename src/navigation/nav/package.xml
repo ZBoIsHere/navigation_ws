@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-    <name>nav_teb</name>
+    <name>nav</name>
     <version>0.0.1</version>
     <description>A move_base based navigation package</description>
 
@@ -24,6 +24,4 @@
     <run_depend>velodyne_pointcloud</run_depend>
     <run_depend>ndt_localization</run_depend>
     <run_depend>pointcloud_to_laserscan</run_depend>
-    <run_depend>qnx2ros</run_depend>
-    <run_depend>ros2qnx</run_depend>
 </package>

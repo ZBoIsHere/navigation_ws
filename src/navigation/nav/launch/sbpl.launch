@@ -24,10 +24,10 @@
     <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch"/>
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <!-- 代价地图 -->
-      <rosparam file="$(find nav_teb)/config/costmap_common_params_mini.yaml" command="load" ns="global_costmap" />
-      <rosparam file="$(find nav_teb)/config/costmap_common_params_mini.yaml" command="load" ns="local_costmap" />
-      <rosparam file="$(find nav_teb)/config/local_costmap_params.yaml" command="load" />
-      <rosparam file="$(find nav_teb)/config/global_costmap_params.yaml" command="load" />
+      <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
+      <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
       <!-- 轨迹规划 -->
       <rosparam file="$(find sbpl_lattice_planner)/launch/move_base/sbpl_global_params.yaml" command="load" />
       <param name="base_global_planner" value="SBPLLatticePlanner" />
@@ -35,7 +35,7 @@
       <param name="planner_frequency" value="0" />
       <param name="planner_patience" value="10.0" />
       <!-- 轨迹控制 -->
-      <rosparam file="$(find nav_teb)/config/teb_local_planner_params_mini.yaml" command="load" />
+      <rosparam file="$(find nav)/config/teb_local_planner_params_mini.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="controller_frequency" value="5.0" />
       <param name="controller_patience" value="15.0" />
@@ -54,10 +54,10 @@
     <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch"/>
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <!-- 代价地图 -->
-      <rosparam file="$(find nav_teb)/config/costmap_common_params_jyl.yaml" command="load" ns="global_costmap" />
-      <rosparam file="$(find nav_teb)/config/costmap_common_params_jyl.yaml" command="load" ns="local_costmap" />
-      <rosparam file="$(find nav_teb)/config/local_costmap_params.yaml" command="load" />
-      <rosparam file="$(find nav_teb)/config/global_costmap_params.yaml" command="load" />
+      <rosparam file="$(find nav)/config/costmap_common_params_jyl.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find nav)/config/costmap_common_params_jyl.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
+      <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
       <!-- 轨迹规划 -->
       <rosparam file="$(find sbpl_lattice_planner)/launch/move_base/sbpl_global_params.yaml" command="load" />
       <param name="base_global_planner" value="SBPLLatticePlanner" />
@@ -65,7 +65,7 @@
       <param name="planner_frequency" value="0" />
       <param name="planner_patience" value="10.0" />
       <!-- 轨迹控制 -->
-      <rosparam file="$(find nav_teb)/config/teb_local_planner_params_jyl.yaml" command="load" />
+      <rosparam file="$(find nav)/config/teb_local_planner_params_jyl.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="controller_frequency" value="5.0" />
       <param name="controller_patience" value="15.0" />
@@ -80,5 +80,5 @@
   </include>
 
   <!-- RViz -->
-  <node name="navigation_rviz" pkg="rviz" type="rviz" args=" -d $(find nav_teb)/rviz/nav_teb.rviz" />
+  <node name="navigation_rviz" pkg="rviz" type="rviz" args=" -d $(find nav)/rviz/nav.rviz" />
 </launch>

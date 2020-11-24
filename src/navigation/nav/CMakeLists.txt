@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(nav_teb)
+project(nav)
 
 find_package(catkin REQUIRED)
 

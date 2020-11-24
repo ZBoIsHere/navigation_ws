@@ -1,4 +1,4 @@
-#include "moving_average/moving_average.h"
+#include "moving_average.h"
 
 MovingAverage::MovingAverage(unsigned short filterLength)
     : filter_length(filterLength),
