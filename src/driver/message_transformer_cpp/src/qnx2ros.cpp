@@ -2,11 +2,10 @@
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <nav_msgs/Odometry.h>
-#include <sensor_msgs/JointState.h>
-
 #include <netinet/in.h>
 #include <ros/duration.h>
 #include <ros/ros.h>
+#include <sensor_msgs/JointState.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +13,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+
 #include <iomanip>
 #include <iostream>
 
@@ -85,8 +85,7 @@ int main(int argc, char **argv) {
   addr_serv.sin_port = htons(SERV_PORT);              //端口
   addr_serv.sin_addr.s_addr = htonl(INADDR_ANY);
   len = sizeof(addr_serv);
-  if (bind(sock_fd, (struct sockaddr *)&addr_serv, sizeof(addr_serv)) < 0)
-  {
+  if (bind(sock_fd, (struct sockaddr *)&addr_serv, sizeof(addr_serv)) < 0) {
     perror("bind error:");
     exit(1);
   }
@@ -124,7 +123,8 @@ int main(int argc, char **argv) {
         leg_odom_data.child_frame_id = "base_link";
         // Position
         leg_odom_data.header.stamp = ros::Time::now();
-        leg_odom_data.pose.pose.orientation = tf::createQuaternionMsgFromYaw(robot_state->rpy[2] / 180 * PI);
+        leg_odom_data.pose.pose.orientation =
+            tf::createQuaternionMsgFromYaw(robot_state->rpy[2] / 180 * PI);
         leg_odom_data.pose.pose.position.x = robot_state->pos_world[0];
         leg_odom_data.pose.pose.position.y = robot_state->pos_world[1];
         // Velocity
@@ -153,29 +153,29 @@ int main(int argc, char **argv) {
         joint_state_data.position.resize(12);
 
         joint_state_data.name[0] = "LF_Joint";
-        joint_state_data.position[0] = - joint_state->LF_Joint;
+        joint_state_data.position[0] = -joint_state->LF_Joint;
         joint_state_data.name[1] = "LF_Joint_1";
-        joint_state_data.position[1] = - joint_state->LF_Joint_1;
+        joint_state_data.position[1] = -joint_state->LF_Joint_1;
         joint_state_data.name[2] = "LF_Joint_2";
-        joint_state_data.position[2] = - joint_state->LF_Joint_2;
+        joint_state_data.position[2] = -joint_state->LF_Joint_2;
         joint_state_data.name[3] = "LB_Joint";
-        joint_state_data.position[3] = - joint_state->LB_Joint;
+        joint_state_data.position[3] = -joint_state->LB_Joint;
         joint_state_data.name[4] = "LB_Joint_1";
-        joint_state_data.position[4] = - joint_state->LB_Joint_1;
+        joint_state_data.position[4] = -joint_state->LB_Joint_1;
         joint_state_data.name[5] = "LB_Joint_2";
-        joint_state_data.position[5] = - joint_state->LB_Joint_2;
+        joint_state_data.position[5] = -joint_state->LB_Joint_2;
         joint_state_data.name[6] = "RF_Joint";
-        joint_state_data.position[6] = - joint_state->RF_Joint;
+        joint_state_data.position[6] = -joint_state->RF_Joint;
         joint_state_data.name[7] = "RF_Joint_1";
-        joint_state_data.position[7] = - joint_state->RF_Joint_1;
+        joint_state_data.position[7] = -joint_state->RF_Joint_1;
         joint_state_data.name[8] = "RF_Joint_2";
-        joint_state_data.position[8] = - joint_state->RF_Joint_2;
+        joint_state_data.position[8] = -joint_state->RF_Joint_2;
         joint_state_data.name[9] = "RB_Joint";
-        joint_state_data.position[9] = - joint_state->RB_Joint;
+        joint_state_data.position[9] = -joint_state->RB_Joint;
         joint_state_data.name[10] = "RB_Joint_1";
-        joint_state_data.position[10] = - joint_state->RB_Joint_1;
+        joint_state_data.position[10] = -joint_state->RB_Joint_1;
         joint_state_data.name[11] = "RB_Joint_2";
-        joint_state_data.position[11] = - joint_state->RB_Joint_2;
+        joint_state_data.position[11] = -joint_state->RB_Joint_2;
         joint_state_pub.publish(joint_state_data);
       }
     };
