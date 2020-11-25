@@ -141,7 +141,6 @@ int main(int argc, char **argv) {
       }
     };
 
-
     // 发布关节角数据
     if ((recv_num == sizeof(JointStateReceived))) {
       JointStateReceived *dr = (JointStateReceived *)(recv_buf);
@@ -177,12 +176,9 @@ int main(int argc, char **argv) {
         joint_state_data.position[10] = - joint_state->RB_Joint_1;
         joint_state_data.name[11] = "RB_Joint_2";
         joint_state_data.position[11] = - joint_state->RB_Joint_2;
-
         joint_state_pub.publish(joint_state_data);
       }
     };
-    
-    ros::spinOnce();
     loop_rate.sleep();
   }
 

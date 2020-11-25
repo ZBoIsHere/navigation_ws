@@ -1,7 +1,7 @@
 <launch>
   <arg name="robot_type" default="MINI" />
   <arg name="if_real_test" default="true" />
-  <arg name="map_and_mprim_id" default="map24" />
+  <arg name="map_and_mprim_id" default="new430" />
 
 
   <!-- 驱动 -->
@@ -17,6 +17,7 @@
 
   <!-- MINI 参数 -->
   <group if="$(eval arg('robot_type') == 'MINI')">
+    <!-- TF 参数 -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.058 0 0 0 base_link velodyne" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster" args="0.309 0 0.020 0 0.4 0 base_link camera_link" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf_broadcaster" args="0.243 0 0.058 -1.57 0 0 base_link body" />
@@ -51,8 +52,10 @@
 
   <!-- JYL 参数 -->
   <group if="$(eval arg('robot_type') == 'JYL')">
+    <!-- TF 参数 -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.327 0 0.075 0 0 0 base_link velodyne" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster" args="0.372 0 -0.018 0 0.4 0 base_link camera_link" />
+    <!-- URDF -->
     <!-- 导航 -->
     <arg name="mprim_id" value="$(arg map_and_mprim_id)" />
     <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch"/>

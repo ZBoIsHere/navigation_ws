@@ -1,17 +1,5 @@
-#include <actionlib/client/simple_action_client.h>
-#include <geometry_msgs/Accel.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Twist.h>
-#include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
-#include <std_msgs/Bool.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Int32.h>
-#include <std_msgs/String.h>
-#include <tf/tf.h>
-#include <tf/transform_datatypes.h>
-#include <tf/transform_listener.h>
 
 #include <ctime>
 #include <stdlib.h>
@@ -21,7 +9,6 @@
 using namespace std;
 
 boost::shared_ptr<InputSocket> input_;
-int packet_size_ = 0;
 
 double last_time_cmd_vel = 0;
 
@@ -39,7 +26,7 @@ struct DataSend {
 
 void vel_callback(geometry_msgs::TwistConstPtr msg) {
   last_time_cmd_vel = ros::Time::now().toSec();
-  vel_x = msg->linear.x;
+  vel_x = msg->linear.x * 1.20;
   vel_y = msg->linear.y;
   vth_z = msg->angular.z;
 }
@@ -68,7 +55,7 @@ int main(int argc, char** argv) {
       }
       data.code = 291;
       data.cons_code = 0;
-      data.cmd_data = vel_x * 1.20 * 1000;
+      data.cmd_data = vel_x * 1000;
       input_->sendPacket((uint8_t*)&data, sizeof(data));
       data.code = 292;
       data.cons_code = 0;
