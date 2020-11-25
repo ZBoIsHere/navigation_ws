@@ -47,13 +47,14 @@ void vel_callback(geometry_msgs::TwistConstPtr msg) {
 int main(int argc, char** argv) {
   ros::init(argc, argv, "ros2qnx");
   ros::NodeHandle nh;
+  ros::NodeHandle private_nh("~");
 
   ros::Subscriber vel_sub = nh.subscribe("cmd_vel", 10, vel_callback);
 
   DataSend data;
 
   // read data from live socket
-  input_.reset(new InputSocket(nh));
+  input_.reset(new InputSocket(private_nh));
 
   ros::Rate loop_rate(50);
   while (ros::ok()) {

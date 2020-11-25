@@ -22,7 +22,7 @@ using namespace std;
 
 #define SERV_PORT 43897
 #define PI 3.1415926
-geometry_msgs::Quaternion imu_data_yaw;
+
 nav_msgs::Odometry leg_odom_data;
 ros::Publisher leg_odom_pub;
 
@@ -40,6 +40,9 @@ struct RobotStateUpload {
   double battery_volt;
   double driver_temp;
   double motor_temp;
+  int robot_basic_state;
+  int robot_gait_state;
+  int robot_task_state;
 };
 struct DataReceived {
   int code;
@@ -89,32 +92,27 @@ int main(int argc, char **argv) {
   while (ros::ok()) {
     recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
                         (struct sockaddr *)&addr_client, (socklen_t *)&len);
-    // if ((recv_num != sizeof(RobotStateUpload) + 12)) continue;
-    cout << "recvfrom." << endl;
+    
+    if ((recv_num != sizeof(RobotStateUpload) + 12)) continue;
     DataReceived *dr = (DataReceived *)(recv_buf);
     RobotStateUpload *robot_state = &dr->data;
-    if (dr->code != 0x901)
-      continue;
-    cout << "RobotStateUpload." << endl;
-    imu_data_yaw = tf::createQuaternionMsgFromYaw(robot_state->rpy[2] / 180 * PI);
+    if (dr->code != 0x901) continue;
 
     // Position
-    ros::Time current_time = ros::Time::now();
-    leg_odom_data.header.stamp = current_time;
-    leg_odom_data.pose.pose.orientation = imu_data_yaw;
+    leg_odom_data.header.stamp = ros::Time::now();
+    leg_odom_data.pose.pose.orientation = tf::createQuaternionMsgFromYaw(robot_state->rpy[2] / 180 * PI);
     leg_odom_data.pose.pose.position.x = robot_state->pos_world[0];
     leg_odom_data.pose.pose.position.y = robot_state->pos_world[1];
-    leg_odom_data.pose.pose.position.z = 0.0;
 
     // Velocity
-    double theta = robot_state->rpy[2] / 180 * PI;
+    double yaw = robot_state->rpy[2] / 180 * PI;
     filter_vel_x.in(robot_state->vel_world[0]);
     filter_vel_y.in(robot_state->vel_world[1]);
     filter_vel_theta.in(robot_state->rpy_vel[2]);
     leg_odom_data.twist.twist.linear.x =
-        +filter_vel_x.out() * cos(theta) + filter_vel_y.out() * sin(theta);
+        +filter_vel_x.out() * cos(yaw) + filter_vel_y.out() * sin(yaw);
     leg_odom_data.twist.twist.linear.y =
-        -filter_vel_x.out() * sin(theta) + filter_vel_y.out() * cos(theta);
+        -filter_vel_x.out() * sin(yaw) + filter_vel_y.out() * cos(yaw);
     leg_odom_data.twist.twist.angular.z = filter_vel_theta.out();
 
     leg_odom_pub.publish(leg_odom_data);

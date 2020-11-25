@@ -36,10 +36,6 @@ add_library(moving_average
    src/moving_average.cpp
 )
 
-add_library(input_socket
-  src/input.cc
-)
-
 ## Declare a cpp executable
 add_executable(qnx2ros
   src/qnx2ros.cpp
@@ -52,8 +48,8 @@ target_link_libraries(qnx2ros
 
 add_executable(ros2qnx
   src/ros2qnx.cpp
+  src/input.cc
 )
 target_link_libraries(ros2qnx
   ${catkin_LIBRARIES}
-  input_socket
 )
