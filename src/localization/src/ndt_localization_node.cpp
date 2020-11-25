@@ -127,6 +127,7 @@ bool NDTLocalization::init() {
 
   pub_current_pose_ =
       nh_.advertise<geometry_msgs::PoseStamped>("/ndt/current_pose", 10);
+  pub_current_pose_with_cov_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/pose", 1);
   pub_path = nh_.advertise<nav_msgs::Path>("/debug/history_path", 10);
 
   // pub_localPC_handled =
@@ -296,13 +297,13 @@ void NDTLocalization::pointCloud_process() {
   ndt_pose.z = base_tf(2, 3);
   mat_b.getEulerYPR(ndt_pose.yaw, ndt_pose.pitch, ndt_pose.roll);
 
-  pose2GeometryPose(msg_current_pose_.pose, current_pose_);
-  msg_current_pose_.header.stamp =
-      ros::Time::now();  // current pose is under "map_frame"
-  msg_current_pose_.header.frame_id = "map";  //  map
-  pub_current_pose_.publish(msg_current_pose_);
+  // 全局位置
+  current_pose_ = ndt_pose;
 
-  current_pose_ = ndt_pose;  //全局位置current_pose
+  pose2GeometryPose(msg_current_pose_.pose, current_pose_);
+  msg_current_pose_.header.stamp = ros::Time::now();
+  msg_current_pose_.header.frame_id = "map";
+  pub_current_pose_.publish(msg_current_pose_);
 
   tf::Quaternion tmp_q;
   tmp_q.setRPY(current_pose_.roll, current_pose_.pitch, current_pose_.yaw);
@@ -323,6 +324,32 @@ void NDTLocalization::pointCloud_process() {
   tf::Transform laser_to_base = base_to_laser.inverse();
   tf::Transform map_to_base;
   map_to_base.mult(map_to_laser, laser_to_base);
+
+  Eigen::Isometry3d map_to_base_eigen;
+  tf::transformTFToEigen(map_to_base, map_to_base_eigen);
+
+  pose robot_pose;
+  tf::Matrix3x3 R;
+  R.setValue(
+    static_cast<double>(map_to_base_eigen(0, 0)), static_cast<double>(map_to_base_eigen(0, 1)), static_cast<double>(map_to_base_eigen(0, 2)),
+    static_cast<double>(map_to_base_eigen(1, 0)), static_cast<double>(map_to_base_eigen(1, 1)), static_cast<double>(map_to_base_eigen(1, 2)),
+    static_cast<double>(map_to_base_eigen(2, 0)), static_cast<double>(map_to_base_eigen(2, 1)), static_cast<double>(map_to_base_eigen(2, 2)));
+  robot_pose.x = map_to_base_eigen(0, 3);
+  robot_pose.y = map_to_base_eigen(1, 3);
+  robot_pose.z = map_to_base_eigen(2, 3);
+  R.getRPY(robot_pose.roll, robot_pose.pitch, robot_pose.yaw);
+
+  pose2GeometryPose(msg_current_pose_with_cov_.pose.pose, robot_pose);
+  msg_current_pose_with_cov_.header.stamp = ros::Time::now();
+  msg_current_pose_with_cov_.header.frame_id = "map";
+  msg_current_pose_with_cov_.pose.covariance[0] = pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[7] = pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[14]= pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[21]= pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[28]= pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[35]= pow(0.01, 2);
+  pub_current_pose_with_cov_.publish(msg_current_pose_with_cov_);
+
   tf_broadcaster_.sendTransform(tf::StampedTransform(
       map_to_base, ros::Time::now(), param_map_frame_, param_base_frame_));
 
