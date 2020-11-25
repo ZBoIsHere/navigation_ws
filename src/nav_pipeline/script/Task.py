@@ -17,7 +17,6 @@ import numpy as np
 import tf
 from RobotCommander import RobotCommander
 import threading
-from pathlib import Path
 
 
 class Task:
@@ -81,7 +80,7 @@ class Task:
         return t1["order"] < t2["order"]
 
     def loadTaskpoints(self):
-        folder = str(Path(__file__).parent.absolute()) + "/../data"
+        folder = str(os.path.dirname(os.path.abspath(__file__))) + "/../data"
         task_json = None
         if os.path.exists(folder):
             task_json = os.listdir(folder)

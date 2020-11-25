@@ -1,6 +1,6 @@
 ### 依赖项和编译工具
 ```bash
-# 依赖包
+# 安装依赖包与调试工具
 $ sudo apt-get install ros-kinetic-navigation
 $ sudo apt-get install ros-kinetic-navigation-experimental
 $ sudo apt-get install ros-kinetic-teb-local-planner
@@ -8,7 +8,6 @@ $ sudo apt-get install python-catkin-tools
 $ sudo apt-get install ros-kinetic-plotjuggler
 $ sudo apt-get install vim
 $ sudo apt-get install wireshark
-$ sudo pip install pathlib
 # 编译 Release
 $ catkin build
 $ catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release

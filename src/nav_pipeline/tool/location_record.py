@@ -16,7 +16,6 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from geometry_msgs.msg import PoseStamped
-from pathlib import Path
 
 import json
 import os
@@ -95,7 +94,7 @@ class LocationRecorder(QWidget):
             "camera_pose": self.camera_record_pose,
             "option": self.option,
         }
-        data_dir = str(Path(__file__).parent.absolute()) + "/../data"
+        data_dir = str(os.path.dirname(os.path.abspath(__file__))) + "/../data"
         os.system("mkdir -p " + data_dir)
         data_dir = data_dir + "/%d.json"
         with open(data_dir % order, "w+") as out:
