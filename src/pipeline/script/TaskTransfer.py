@@ -9,8 +9,8 @@ Author: Haoyi Han <hanhaoyi@deeprobotics.cn>, Feb, 2020
 import rospy
 import actionlib
 from tf.transformations import *
-from auto_nav2d_pipeline.msg import MoveToPosition2DAction, MoveToPosition2DGoal
-from auto_nav2d_pipeline.msg import MoveBaseAction, MoveBaseGoal
+from pipeline.msg import MoveToPosition2DAction, MoveToPosition2DGoal
+from pipeline.msg import MoveBaseAction, MoveBaseGoal
 from TaskPoint import TaskPoint
 from RobotCommander import RobotCommander
 

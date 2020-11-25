@@ -45,7 +45,7 @@ $ pcl_viewer 0.000000000.pcd
 # C++:
 $ find . -iname '*.h' -o -iname '*.hh' -o -iname '*.hpp' -o -iname '*.c' -o -iname '*.cc' -o -iname '*.cpp' | xargs clang-format -i
 # Python:
-$ sudo black auto_nav2d_pipeline
+$ sudo black pipeline
 # 删除 .DS_Store 文件
 $ find . -name '*.DS_Store' -delete
 ```
