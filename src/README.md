@@ -2,9 +2,12 @@
 ```bash
 # 依赖包
 $ sudo apt-get install ros-kinetic-navigation
+$ sudo apt-get install ros-kinetic-navigation-experimental
 $ sudo apt-get install ros-kinetic-teb-local-planner
 $ sudo apt-get install python-catkin-tools
 $ sudo apt-get install ros-kinetic-plotjuggler
+$ sudo apt-get install vim
+$ sudo apt-get install wireshark
 $ sudo pip install pathlib
 # 编译 Release
 $ catkin build
