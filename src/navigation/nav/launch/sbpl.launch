@@ -7,17 +7,21 @@
   <!-- 驱动 -->
   <group if="$(arg if_real_test)">
     <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
-    <!-- <include file="$(find ros2qnx)/launch/ros2qnx.launch"/> -->
-    <!-- <node name="qnx2ros" pkg="qnx2ros" type="qnx2ros" output="screen"></node> -->
+    <include file="$(find message_transformer_cpp)/launch/message_transformer_cpp.launch"/>
   </group>
+
+  <!-- 定位 -->
+  <include file="$(find ndt_localization)/launch/ndt_localization.launch">
+    <arg name="map_id" value="$(arg map_and_mprim_id)" />
+  </include>
 
   <!-- MINI 参数 -->
   <group if="$(eval arg('robot_type') == 'MINI')">
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.058 0 0 0 base_link velodyne" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster" args="0.309 0 0.020 0 0.4 0 base_link camera_link" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf_broadcaster" args="0.243 0 0.058 -1.57 0 0 base_link body" />
+    <!-- URDF -->
     <param name="robot_description" textfile="$(find mini)/urdf/mini.urdf" />
-    <node name="jointpublish" pkg="robot_control" type="jointpublish" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
     <!-- 导航 -->
     <arg name="mprim_id" value="$(arg map_and_mprim_id)" />
@@ -73,11 +77,6 @@
       <param name="recovery_behavior_enabled" value="false" />
     </node>
   </group>
-
-  <!-- 定位 -->
-  <include file="$(find ndt_localization)/launch/ndt_localization.launch">
-    <arg name="map_id" value="$(arg map_and_mprim_id)" />
-  </include>
 
   <!-- RViz -->
   <node name="navigation_rviz" pkg="rviz" type="rviz" args=" -d $(find nav)/rviz/nav.rviz" />
