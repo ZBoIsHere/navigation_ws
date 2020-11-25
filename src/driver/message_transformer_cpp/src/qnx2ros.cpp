@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
   MovingAverage filter_vel_y(filter_size);
   MovingAverage filter_vel_theta(filter_size);
 
-  ros::Rate loop_rate(50);
+  ros::Rate loop_rate(20);
   while (ros::ok()) {
     recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
                         (struct sockaddr *)&addr_client, (socklen_t *)&len);
