@@ -25,9 +25,7 @@ class LocationRecorder(QWidget):
     def __init__(self):
         super(LocationRecorder, self).__init__()
         self.init_ui()
-        self.current_robot_pose = None
         self.robot_record_pose = None
-        self.camera_record_pose = None
         self.option = None
         self.tf_listener = tf.TransformListener()
         self.show()
@@ -38,19 +36,13 @@ class LocationRecorder(QWidget):
         self.option_layout = QHBoxLayout()
         self.up_stair_checkbox = QCheckBox("上台阶")
         self.down_stair_checkbox = QCheckBox("下台阶")
-        self.middle_point_checkbox = QCheckBox("中间点")
-        self.perform_checkbox = QCheckBox("表演")
         self.crawl_checkbox = QCheckBox("匍匐")
-        self.walking_bricks_checkbox = QCheckBox("走砖块")
         self.speed_up_checkbox = QCheckBox("加速")
 
         self.option_layout.addWidget(self.up_stair_checkbox)
         self.option_layout.addWidget(self.down_stair_checkbox)
-        self.option_layout.addWidget(self.middle_point_checkbox)
         self.option_layout.addWidget(self.speed_up_checkbox)
-        self.option_layout.addWidget(self.perform_checkbox)
         self.option_layout.addWidget(self.crawl_checkbox)
-        self.option_layout.addWidget(self.walking_bricks_checkbox)
 
         self.order_layout = QHBoxLayout()
         self.order_layout.addWidget(QLabel("位点编号:"))
@@ -84,7 +76,6 @@ class LocationRecorder(QWidget):
         new_record = {
             "order": order,
             "robot_pose": self.robot_record_pose,
-            "camera_pose": self.camera_record_pose,
             "option": self.option,
         }
         data_dir = str(os.path.dirname(os.path.abspath(__file__))) + "/../data"
@@ -107,54 +98,27 @@ class LocationRecorder(QWidget):
                 "ori_z": ori[2],
                 "ori_w": ori[3],
             }
-            self.current_robot_pose = msg_dict
+            self.robot_record_pose = msg_dict
             return True
         except tf.Exception as e:
             print "listen to tf failed"
             return False
 
-    def update_camera_state(self):
-        record_camera = False
-        if record_camera:
-            rospy.wait_for_service("ptz_status")
-            try:
-                ptz_status = rospy.ServiceProxy("ptz_status", PtzStatus)
-                resp = ptz_status()
-            except rospy.ServiceException, e:
-                print "Service call failed: %s" % e
-                self.camera_record_pose = None
-            self.camera_record_pose = {
-                "pan": resp.nPTZPan,
-                "tilt": resp.nPTZTilt,
-                "zoom": resp.nPTZZoom,
-            }
-        else:
-            self.camera_record_pose = {"pan": 0, "tilt": 0, "zoom": 0}
-
     def update_option(self):
         self.option = {}
         self.option["up_stair"] = self.up_stair_checkbox.isChecked()
         self.option["down_stair"] = self.down_stair_checkbox.isChecked()
-        self.option["middle_point"] = self.middle_point_checkbox.isChecked()
         self.option["speed_up"] = self.speed_up_checkbox.isChecked()
-
-        self.option["perform"] = self.perform_checkbox.isChecked()
         self.option["crawl"] = self.crawl_checkbox.isChecked()
-        self.option["walking_bricks"] = self.walking_bricks_checkbox.isChecked()
 
     def receive(self):
         while not self.listen_tf():
             rospy.sleep(1.0)
-        self.robot_record_pose = self.current_robot_pose
-        self.update_camera_state()
         self.update_option()
         display_msg = "Robot:\n" + json.dumps(self.robot_record_pose, indent=4) + "\n"
-        display_msg += (
-            "Camera:\n" + json.dumps(self.camera_record_pose, indent=4) + "\n"
-        )
         display_msg += "Option:\n" + json.dumps(self.option, indent=4) + "\n"
-
         self.text_content.setText(display_msg)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

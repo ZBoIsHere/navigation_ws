@@ -35,21 +35,11 @@ class TaskPoint:
                     "ori_z": 0.0,
                     "ori_w": 1.0,
                 },
-                "camera_pose": {"pan": 0, "tilt": 150, "zoom": 0},
                 "option": {
                     "up_stair": False,
                     "down_stair": False,
-                    "middle_point": False,
                     "speed_up": False,
-                    "perform": False,
-                    "jump1": False,
-                    "jump2": False,
                     "crawl": False,
-                    "openDoor": False,
-                    "leaveDoor": False,
-                    "autoCharge": False,
-                    "climbSlope": False,
-                    "walking_bricks": False,
                 },
             }
         self.pre_task_point = None
@@ -69,56 +59,14 @@ class TaskPoint:
     def is_down_stair(self):
         return self.record["option"]["down_stair"]
 
-    def is_middle_point(self):
-        return self.record["option"]["middle_point"]
-
     def is_speed_up(self):
         return self.record["option"]["speed_up"]
 
-    def is_perform(self):
-        return self.record["option"]["perform"]
-
-    def is_jump1(self):
-        if not self.record["option"].has_key("jump1"):
-            return False
-        return self.record["option"]["jump1"]
-
-    def is_jump2(self):
-        if not self.record["option"].has_key("jump2"):
-            return False
-        return self.record["option"]["jump2"]
-
     def is_crawl(self):
-        if not self.record["option"].has_key("crawl"):
-            return False
         return self.record["option"]["crawl"]
-
-    def is_openDoor(self):
-        if not self.record["option"].has_key("openDoor"):
-            return False
-        return self.record["option"]["openDoor"]
-
-    def is_leaveDoor(self):
-        if not self.record["option"].has_key("leaveDoor"):
-            return False
-        return self.record["option"]["leaveDoor"]
-
-    def is_autoCharge(self):
-        if not self.record["option"].has_key("autoCharge"):
-            return False
-        return self.record["option"]["autoCharge"]
-
-    def is_climbSlope(self):
-        if not self.record["option"].has_key("climbSlope"):
-            return False
-        return self.record["option"]["climbSlope"]
-
-    def is_walking_bricks(self):
-        return self.record["option"]["walking_bricks"]
 
     def update(self):
         self.robot_pose = self.record["robot_pose"]
-        self.camera_pose = self.record["camera_pose"]
         pose = []
         pose.append(self.robot_pose["pos_x"])
         pose.append(self.robot_pose["pos_y"])

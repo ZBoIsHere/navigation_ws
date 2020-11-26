@@ -77,44 +77,18 @@ class TaskTransfer:
                 with RobotCommander() as robot_commander:
                     robot_commander.crawl_trait()
                     rospy.sleep(0.1)
-            # openDoor?
+            # TODO speedUp
             if (
                 des_point.getPreTaskPoint()
-                and des_point.getPreTaskPoint().is_openDoor()
+                and des_point.getPreTaskPoint().is_speed_up()
             ):
                 rospy.sleep(0.5)
                 if self.plan_failed():
                     rospy.logerr("Plan failed! Robot may stuck in this place.")
                     continue
-                print "openDoor"
+                print "speedUp"
                 with RobotCommander() as robot_commander:
-                    robot_commander.openDoor_trait()
-                    rospy.sleep(0.1)
-            # leaveDoor?
-            if (
-                des_point.getPreTaskPoint()
-                and des_point.getPreTaskPoint().is_leaveDoor()
-            ):
-                rospy.sleep(0.5)
-                if self.plan_failed():
-                    rospy.logerr("Plan failed! Robot may stuck in this place.")
-                    continue
-                print "leaveDoor"
-                with RobotCommander() as robot_commander:
-                    robot_commander.leaveDoor_trait()
-                    rospy.sleep(0.1)
-            # walking_bricks
-            if (
-                des_point.getPreTaskPoint()
-                and des_point.getPreTaskPoint().is_walking_bricks()
-            ):
-                rospy.sleep(0.5)
-                if self.plan_failed():
-                    rospy.logerr("Plan failed! Robot may stuck in this place.")
-                    continue
-                print "walking_bricks"
-                with RobotCommander() as robot_commander:
-                    robot_commander.walking_bricks_trait()
+                    robot_commander.stand_down_up()
                     rospy.sleep(0.1)
             # down_stair
             if (
@@ -144,7 +118,6 @@ class TaskTransfer:
                     rospy.sleep(0.1)
 
             done = self.moveBaseClient.wait_for_result(timeout=rospy.Duration(300.0))
-
             # Make sure the action succeed.
             not_done = (not done) or (
                 self.moveBaseClient.get_state() != actionlib.GoalStatus.SUCCEEDED
@@ -154,7 +127,7 @@ class TaskTransfer:
         """
         Do something to finish the special action
         """
-        # 
+        # finish down_stair
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
@@ -165,7 +138,7 @@ class TaskTransfer:
                 robot_commander.finish_down_stair_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        # 
+        # finish up_stair
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
@@ -176,7 +149,7 @@ class TaskTransfer:
                 robot_commander.finish_up_stair_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        #
+        # finish crawl
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
@@ -187,14 +160,14 @@ class TaskTransfer:
                 robot_commander.finish_crawl_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        #
+        # TODO finish speedUp
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
-            and des_point.getPreTaskPoint().is_walking_bricks()
+            and des_point.getPreTaskPoint().is_speed_up()
         ):
             print "Finish walking_bricks"
             with RobotCommander() as robot_commander:
-                robot_commander.finish_walking_bricks_trait()
+                robot_commander.stand_down_up()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
