@@ -17,26 +17,26 @@ from RobotCommander import RobotCommander
 
 class TaskTransfer:
     def __init__(self):
-        self.moveToClient = actionlib.SimpleActionClient("move_base", MoveBaseAction)
-        self.moveToClient.wait_for_server()
+        self.moveBaseClient = actionlib.SimpleActionClient("move_base", MoveBaseAction)
+        self.moveBaseClient.wait_for_server()
         rospy.loginfo("Action 'move_base' is up!")
 
     def plan_failed(self):
-        return self.moveToClient.get_state() == actionlib.GoalStatus.ABORTED
+        return self.moveBaseClient.get_state() == actionlib.GoalStatus.ABORTED
 
     def is_action_succeed(self):
-        return self.moveToClient.get_state() == actionlib.GoalStatus.SUCCEEDED
+        return self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
 
     def task_transfer(self, src_point, des_point):
-        '''
-        任务逻辑决策函数
-        '''
+        """
+        Main Decision Function
+        """
         with RobotCommander() as robot_commander:
             robot_commander.sendCordinate(
                 command_code=51,
                 x=src_point.getPosX(),
                 y=src_point.getPosY(),
-                yaw=src_point.getYaw()
+                yaw=src_point.getYaw(),
             )
             print ("sendCordinate")
         des_point.setPreTaskPoint(src_point)
@@ -59,14 +59,14 @@ class TaskTransfer:
         not_done = True
 
         while not_done and not rospy.is_shutdown():
-            '''
-            执行两点间的任务，一直到成功或失败
-            '''
-            self.moveToClient.send_goal(goal_msg)
+            """
+            Do the task from src to des until SUCCEEDED/ABORTED, and trigger the special action
+            """
+            # TODO Need send_goal repeatedly?
+            self.moveBaseClient.send_goal(goal_msg)
             rospy.logwarn(
                 "Transfer ftom [%s] to [%s]" % (src_point.name, des_point.name)
             )
-
             # crawl
             if des_point.getPreTaskPoint() and des_point.getPreTaskPoint().is_crawl():
                 rospy.sleep(0.5)
@@ -142,18 +142,19 @@ class TaskTransfer:
                 with RobotCommander() as robot_commander:
                     robot_commander.up_stair_trait()
                     rospy.sleep(0.1)
-            
-            done = self.moveToClient.wait_for_result(timeout=rospy.Duration(300.0))
-            
+
+            done = self.moveBaseClient.wait_for_result(timeout=rospy.Duration(300.0))
+
             # Make sure the action succeed.
             not_done = (not done) or (
-                self.moveToClient.get_state() != actionlib.GoalStatus.SUCCEEDED
+                self.moveBaseClient.get_state() != actionlib.GoalStatus.SUCCEEDED
             )
-            print "Goal status: ", self.moveToClient.get_state() == actionlib.GoalStatus.SUCCEEDED
-        '''
-        两点间的任务执行完成
-        '''
-        # 到达任务点后结束下楼梯
+            print "Goal status: ", self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
+
+        """
+        Do something to finish the special action
+        """
+        # 
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
@@ -164,7 +165,7 @@ class TaskTransfer:
                 robot_commander.finish_down_stair_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        # 到达任务点后结束上楼梯
+        # 
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
@@ -175,23 +176,7 @@ class TaskTransfer:
                 robot_commander.finish_up_stair_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        # 到达任务点后用延时的方式上斜坡
-        if not self.plan_failed() and des_point.is_climbSlope():
-            rospy.sleep(0.5)
-            if self.plan_failed():
-                rospy.logerr("Plan failed! Robot may stuck in this place.")
-                print "climbSlope"
-            with RobotCommander() as robot_commander:
-                robot_commander.climbSlope_trait()
-                rospy.sleep(18)
-        
-        if not self.plan_failed() and des_point.is_climbSlope():
-            print "Finish climbSlope"
-            with RobotCommander() as robot_commander:
-                robot_commander.finish_climbSlope_trait()
-                rospy.sleep(0.1)
-            rospy.sleep(0.5)
-        
+        #
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
@@ -202,7 +187,7 @@ class TaskTransfer:
                 robot_commander.finish_crawl_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-
+        #
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()

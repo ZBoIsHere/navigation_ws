@@ -141,9 +141,6 @@ class RobotCommander:
     def openDoor_trait(self):
         self.sendSimple(50, 2)
 
-    # def finish_openDoor_trait(self):
-    #     self.sendSimple(50,0)
-
     def leaveDoor_trait(self):
         self.sendSimple(50, 3)
 

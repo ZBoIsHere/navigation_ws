@@ -1,4 +1,3 @@
-//################################################
 #include "ndt_localization/ndt_localization.h"
 
 PointCloudT new_scan;
@@ -21,8 +20,6 @@ bool NDTLocalization::init() {
   pose_init_ = false;
   pub_target_map =
       nh_.advertise<sensor_msgs::PointCloud2>("local_target_map", 10);
-
-  // pthread_mutex_init(&mutex, NULL);
   pnh_.param<bool>("is_filter_ground", is_filter_ground, true);
   pnh_.param<double>("min_scan_range", param_min_scan_range, 1.0);
   pnh_.param<double>("max_scan_range", param_max_scan_range, 100.0);
@@ -84,7 +81,7 @@ bool NDTLocalization::init() {
   tf::StampedTransform transform;
   try {
     ros::Time now = ros::Time::now();
-    ROS_INFO("now: %f", now.toSec());  // base_link       velodyne
+    ROS_INFO("now: %f", now.toSec());
     tf_listener_.waitForTransform(param_base_frame_, param_laser_frame_,
                                   ros::Time(0),
                                   ros::Duration(param_tf_timeout_ * 10),
@@ -101,7 +98,7 @@ bool NDTLocalization::init() {
   double roll, pitch, yaw;
   tf::Matrix3x3(transform.getRotation()).getEulerYPR(yaw, pitch, roll);
   Eigen::AngleAxisf rot_x_btol(roll,
-                               Eigen::Vector3f::UnitX());  //轴角  以x轴为轴
+                               Eigen::Vector3f::UnitX());
   Eigen::AngleAxisf rot_y_btol(pitch, Eigen::Vector3f::UnitY());
   Eigen::AngleAxisf rot_z_btol(yaw, Eigen::Vector3f::UnitZ());
   tf_btol_ =
@@ -118,20 +115,13 @@ bool NDTLocalization::init() {
   load_map(map_file);
 
   while (!pose_init_) {
-    // ROS_WARN("initial pose not set!!!!!!");
     ros::spinOnce();
-    // ROS消息回调处理函数。它俩通常会出现在ROS的主循环中，程序需要不断调用ros::spin()
-    // 或 ros::spinOnce()，
-    //两者区别在于前者调用后不会再返回，也就是你的主程序到这儿就不往下执行了，而后者在调用后还可以继续执行之后的程序。
   }
 
   pub_current_pose_ =
-      nh_.advertise<geometry_msgs::PoseStamped>("/ndt/current_pose", 10);
+      nh_.advertise<geometry_msgs::PoseStamped>("/ndt/current_pose", 1);
   pub_current_pose_with_cov_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/pose", 1);
-  pub_path = nh_.advertise<nav_msgs::Path>("/debug/history_path", 10);
-
-  // pub_localPC_handled =
-  // nh_.advertise<sensor_msgs::PointCloud2>("/velodyne_no_ground", 10);
+  pub_path = nh_.advertise<nav_msgs::Path>("/debug/history_path", 1);
 
   ROS_INFO("End init NDTLocalization");
   return true;
@@ -140,25 +130,25 @@ bool NDTLocalization::init() {
 void NDTLocalization::initialPoseCB(
     const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg) {
   if (!pose_init_) {
-    cout << "received a pose, init!!!!" << endl;
+    cout << "received a pose, init..." << endl;
     init_Pose(0, 3) = msg->pose.pose.position.x;
     init_Pose(1, 3) = msg->pose.pose.position.y;
     init_Pose(2, 3) = 0;
     Eigen::Quaternionf temp(msg->pose.pose.orientation.w,
                             msg->pose.pose.orientation.x,
                             msg->pose.pose.orientation.y,
-                            msg->pose.pose.orientation.z);  // w+xi+yj+zk
+                            msg->pose.pose.orientation.z);
     init_Pose.block(0, 0, 3, 3) = temp.matrix();
     pose_init_ = true;
   } else {
-    cout << "received a pose, reset!!!!" << endl;
+    cout << "received a pose, reset..." << endl;
     init_Pose(0, 3) = msg->pose.pose.position.x;
     init_Pose(1, 3) = msg->pose.pose.position.y;
     init_Pose(2, 3) = 0;
     Eigen::Quaternionf temp(msg->pose.pose.orientation.w,
                             msg->pose.pose.orientation.x,
                             msg->pose.pose.orientation.y,
-                            msg->pose.pose.orientation.z);  // w+xi+yj+zk
+                            msg->pose.pose.orientation.z);
     init_Pose.block(0, 0, 3, 3) = temp.matrix();
     pose_init_ = true;
   }
@@ -202,9 +192,8 @@ bool NDTLocalization::load_map(std::string map_file) {
   msg_globalmap.header.stamp = ros::Time::now();
   msg_globalmap.header.frame_id = "map";
   pub_global_map.publish(msg_globalmap);
-  std::cout << "###Success load map: " << map_file << std::endl;
-  // set NDT target
-
+  std::cout << "Success load map: " << map_file << std::endl;
+  
   PointCloudT::Ptr output_cloud(new PointCloudT());
   ndt_.setTransformationEpsilon(param_ndt_epsilon_);
   ndt_.setStepSize(param_ndt_step_size_);
@@ -214,15 +203,13 @@ bool NDTLocalization::load_map(std::string map_file) {
   ndt_.setInputTarget(map_cloud.makeShared());
   ndt_.align(*output_cloud, Eigen::Matrix4f::Identity());
   ndt_.initCompute();
-
+  
   map_init_ = true;
-  ROS_INFO("&&&&&&&&&&&&Update model pc with %d points!!!!!!!",
-           map_cloud.width);
+  ROS_INFO("Update model pc with %d points", map_cloud.width);
   return true;
 }
 
-void NDTLocalization::update_target_map()  // >>>>>>>>>>更新target地图
-                                           // 只与局部区域做匹配
+void NDTLocalization::update_target_map()
 {
   target_map_ptr->points.clear();
   for (auto point : model_pc_.points) {
@@ -240,7 +227,7 @@ void NDTLocalization::update_target_map()  // >>>>>>>>>>更新target地图
   msg_target_map_ptr->header.frame_id = "map";
   pub_target_map.publish(*msg_target_map_ptr);
 
-  ROS_WARN("update local map with %d points", target_map_ptr->points.size());
+  ROS_WARN("Update local map with %d points", target_map_ptr->points.size());
 }
 
 void NDTLocalization::pub_debug_path() {
@@ -269,7 +256,6 @@ void NDTLocalization::pointCloud_process() {
                                 voxel_leaf_size);
   voxel_grid_filter.setInputCloud(new_scan.makeShared());
   voxel_grid_filter.filter(*scan_ptr);
-  // ROS_WARN("filtered size: %d",scan_ptr->points.size());
 
   Eigen::Matrix4f init_guess;
   Eigen::Matrix4f final_tf;
@@ -284,14 +270,15 @@ void NDTLocalization::pointCloud_process() {
   delta_newScanPose = last_tf.inverse() * newScan_Pose;
   base_tf = newScan_Pose;
 
-  tf::Matrix3x3 mat_b;  //旋转矩阵
+  tf::Matrix3x3 mat_b;
+  // 旋转矩阵
   mat_b.setValue(
       static_cast<double>(base_tf(0, 0)), static_cast<double>(base_tf(0, 1)),
       static_cast<double>(base_tf(0, 2)), static_cast<double>(base_tf(1, 0)),
       static_cast<double>(base_tf(1, 1)), static_cast<double>(base_tf(1, 2)),
       static_cast<double>(base_tf(2, 0)), static_cast<double>(base_tf(2, 1)),
       static_cast<double>(base_tf(2, 2)));
-  //平移
+  // 平移分量
   ndt_pose.x = base_tf(0, 3);
   ndt_pose.y = base_tf(1, 3);
   ndt_pose.z = base_tf(2, 3);
@@ -369,13 +356,12 @@ int main(int argc, char** argv) {
   ros::NodeHandle pnh("~");
 
   NDTLocalization ndt(nh, pnh);
-  ndt.init();  //初始化!!!!!!!!!&&&&&&&&&&&&&&&&&&&
+  ndt.init();
   ros::Subscriber sub_point_cloud_ = nh.subscribe<sensor_msgs::PointCloud2>(
       ndt.param_lidar_topic_, 10, pointCloudCB,
       ros::TransportHints().tcpNoDelay());
 
-  ros::Rate rate(
-      100);  // ros::Rate对象允许你制定循环的频率。它将会记录从上次调用Rate::sleep()到现在为止的时间，并且休眠正确的时间。在这个例子中，设置的频率为10hz。
+  ros::Rate rate(100);
 
   while (ros::ok()) {
     if (newscan_Flag) {
@@ -383,8 +369,8 @@ int main(int argc, char** argv) {
       ndt.pointCloud_process();
     }
 
-    ros::spinOnce();  //查询回调函数中断标志位。执行回调函数。
-    rate.sleep();     //以ros::Rate来延时
+    ros::spinOnce();
+    rate.sleep();
   }
   return 0;
 }

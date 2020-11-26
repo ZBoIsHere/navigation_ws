@@ -33,9 +33,9 @@ class Task:
         self.send_tf_thread.start()
 
     def send_tf(self):
-        '''
-        守护线程 给运动主机实时发布机身 2D位姿
-        '''
+        """
+        Daemon Thread
+        """
         while not rospy.is_shutdown():
             current_tf = self.listen_tf()
             if current_tf:
@@ -44,14 +44,11 @@ class Task:
                         command_code=52,
                         x=current_tf[0],
                         y=current_tf[1],
-                        yaw=current_tf[2]
+                        yaw=current_tf[2],
                     )
             rospy.sleep(0.05)
 
     def listen_tf(self):
-        '''
-        获取机身 2D位姿
-        '''
         try:
             (pos, ori) = self.tf_listener.lookupTransform(
                 "/map", "/base_link", rospy.Duration(0.0)
@@ -66,25 +63,19 @@ class Task:
             return None
 
     def init(self):
-        # 起立准备导航
+        # stand up, read to go
         globalTaskPrepare()
-        # TaskTransfer 用于执行两个任务点间的自主导航
+        # from task_point1 to task_point2
         self.robot_transfer = TaskTransfer()
-        # 加载任务点
         self.loadTaskpoints()
-        # TaskInit 对象仅用来获取最近任务点
+        # only using TaskInit() to get nearest task_point
         task_init = TaskInit()
-        best_index, initial_point = task_init.getBestTaskInd(self.taskPoints)
-        # 先从初始位姿去往最近任务点
-        self.robot_transfer.task_transfer(initial_point, self.taskPoints[best_index])
-        # 任务点总数
+        nearest_index, initial_point = task_init.getBestTaskInd(self.taskPoints)
+        self.robot_transfer.task_transfer(initial_point, self.taskPoints[nearest_index])
+        # total number of the task_points
         self.ntask = self.taskPoints.__len__()
-        # 更新起始任务点和目标任务点索引
-        self.src_index = best_index
-        self.des_index = (best_index + 1) % self.ntask
-
-    def task_cmp(self, t1, t2):
-        return t1["order"] < t2["order"]
+        self.src_index = nearest_index
+        self.des_index = (nearest_index + 1) % self.ntask
 
     def loadTaskpoints(self):
         folder = str(os.path.dirname(os.path.abspath(__file__))) + "/../data"
@@ -104,22 +95,11 @@ class Task:
         for waypoint_record in task_list:
             self.taskPoints.append(TaskPoint(waypoint_record))
 
-    def filterUnrelatedData(self, task_json):
-        filtered = []
-        for file_name in task_json:
-            if re.sub("[\d,-]", "", file_name) == ".json":
-                filtered.append(file_name)
-        task_json = filtered
-
     def run(self):
-        '''
-        调用 TaskTransfer 对象实现任务点间的自主导航
-        '''
         while not rospy.is_shutdown():
             self.robot_transfer.task_transfer(
                 self.taskPoints[self.src_index], self.taskPoints[self.des_index]
             )
-            # self.taskPoints[self.des_index].runTask()
             self.src_index = self.des_index
             self.des_index = (self.des_index + 1) % self.ntask
 

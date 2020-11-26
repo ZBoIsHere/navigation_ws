@@ -15,7 +15,6 @@ from PyQt5.QtWidgets import (
     QTextEdit,
     QCheckBox,
 )
-from geometry_msgs.msg import PoseStamped
 
 import json
 import os
@@ -26,7 +25,6 @@ class LocationRecorder(QWidget):
     def __init__(self):
         super(LocationRecorder, self).__init__()
         self.init_ui()
-        self.poseSub = rospy.Subscriber("/ndt/current_pose", PoseStamped, self.poseCB)
         self.current_robot_pose = None
         self.robot_record_pose = None
         self.camera_record_pose = None
@@ -36,22 +34,20 @@ class LocationRecorder(QWidget):
 
     def init_ui(self):
         self.layout = QVBoxLayout()
+
         self.option_layout = QHBoxLayout()
         self.up_stair_checkbox = QCheckBox("上台阶")
         self.down_stair_checkbox = QCheckBox("下台阶")
         self.middle_point_checkbox = QCheckBox("中间点")
-
         self.perform_checkbox = QCheckBox("表演")
         self.crawl_checkbox = QCheckBox("匍匐")
         self.walking_bricks_checkbox = QCheckBox("走砖块")
-
         self.speed_up_checkbox = QCheckBox("加速")
 
         self.option_layout.addWidget(self.up_stair_checkbox)
         self.option_layout.addWidget(self.down_stair_checkbox)
         self.option_layout.addWidget(self.middle_point_checkbox)
         self.option_layout.addWidget(self.speed_up_checkbox)
-
         self.option_layout.addWidget(self.perform_checkbox)
         self.option_layout.addWidget(self.crawl_checkbox)
         self.option_layout.addWidget(self.walking_bricks_checkbox)
@@ -74,7 +70,6 @@ class LocationRecorder(QWidget):
         self.layout.addLayout(self.order_layout)
         self.layout.addWidget(self.text_content)
         self.layout.addLayout(self.record_layout)
-        # self.layout.addStretch()
         self.setLayout(self.layout)
 
         self.record_button.clicked.connect(self.record)
@@ -85,9 +80,7 @@ class LocationRecorder(QWidget):
         try:
             order = int(order)
         except:
-            # message box some error
             return
-
         new_record = {
             "order": order,
             "robot_pose": self.robot_record_pose,
@@ -162,26 +155,6 @@ class LocationRecorder(QWidget):
         display_msg += "Option:\n" + json.dumps(self.option, indent=4) + "\n"
 
         self.text_content.setText(display_msg)
-
-    def poseCB(self, msg):
-        pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
-        ori = [
-            msg.pose.orientation.x,
-            msg.pose.orientation.y,
-            msg.pose.orientation.z,
-            msg.pose.orientation.w,
-        ]
-        msg_dict = {
-            "pos_x": pos[0],
-            "pos_y": pos[1],
-            "pos_z": pos[2],
-            "ori_x": ori[0],
-            "ori_y": ori[1],
-            "ori_z": ori[2],
-            "ori_w": ori[3],
-        }
-        # self.current_robot_pose = msg_dict
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
