@@ -23,7 +23,6 @@ class TaskPoint:
         pose: the pose of robot in this wappoint.
         name: waypoint name.
     """
-
     def __init__(self, record=None):
         if not record:
             record = {
@@ -35,7 +34,7 @@ class TaskPoint:
                     "ori_x": 0.0,
                     "ori_y": 0.0,
                     "ori_z": 0.0,
-                    "ori_w": 1.0,
+                    "ori_w": 1.0
                 },
                 "camera_pose": {"pan": 0, "tilt": 150, "zoom": 0},
                 "option": {
@@ -51,7 +50,7 @@ class TaskPoint:
                     "leaveDoor": False,
                     "autoCharge": False,
                     "climbSlope": False,
-                    "walking_bricks": False,
+                    "walking_bricks": False
                 },
             }
         self.pre_task_point = None

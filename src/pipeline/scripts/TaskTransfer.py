@@ -17,12 +17,9 @@ from RobotCommander import RobotCommander
 
 class TaskTransfer:
     def __init__(self):
-        # self.moveToClient = actionlib.SimpleActionClient(
-        #     "MoveTo", MoveToPosition2DAction
-        # )
         self.moveToClient = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         self.moveToClient.wait_for_server()
-        rospy.loginfo("Action 'MoveTo' is up!")
+        rospy.loginfo("Action 'move_base' is up!")
 
     def plan_failed(self):
         return self.moveToClient.get_state() == actionlib.GoalStatus.ABORTED

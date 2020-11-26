@@ -24,8 +24,8 @@ class Task:
         self.taskPoints = []
         self.currentIndex = 0
         self.robot_transfer = None
-        self.src_ind = None
-        self.des_ind = None
+        self.src_index = None
+        self.des_index = None
         self.ntask = 0
         self.tf_listener = tf.TransformListener()
         self.send_tf_thread = threading.Thread(target=self.send_tf, name="send_tf")
@@ -33,27 +33,29 @@ class Task:
         self.send_tf_thread.start()
 
     def send_tf(self):
+        '''
+        守护线程 给运动主机实时发布机身 2D位姿
+        '''
         while not rospy.is_shutdown():
             current_tf = self.listen_tf()
             if current_tf:
-                # print("*********************************")
-                # print("send_tf")
                 with RobotCommander(local_port=20003) as robot_commander:
                     robot_commander.sendCordinate(
                         command_code=52,
                         x=current_tf[0],
                         y=current_tf[1],
-                        yaw=current_tf[2],
+                        yaw=current_tf[2]
                     )
             rospy.sleep(0.05)
 
     def listen_tf(self):
+        '''
+        获取机身 2D位姿
+        '''
         try:
             (pos, ori) = self.tf_listener.lookupTransform(
                 "/map", "/base_link", rospy.Duration(0.0)
             )
-            # print "pos: ",pos
-            # print "ori: ",ori
             yaw = tf.transformations.euler_from_quaternion(ori)[2]
             msg_list = [pos[0], pos[1], yaw]
             return msg_list
@@ -64,17 +66,22 @@ class Task:
             return None
 
     def init(self):
+        # 起立准备导航
         globalTaskPrepare()
-        task_init = TaskInit()
+        # TaskTransfer 用于执行两个任务点间的自主导航
         self.robot_transfer = TaskTransfer()
+        # 加载任务点
         self.loadTaskpoints()
-        best_ind, initial_point = task_init.getBestTaskInd(self.taskPoints)
-        # import pdb;pdb.set_trace()
-        # First to transfer to best index point 'self.taskPoints[best_index]'
-        self.robot_transfer.task_transfer(initial_point, self.taskPoints[best_ind])
+        # TaskInit 对象仅用来获取最近任务点
+        task_init = TaskInit()
+        best_index, initial_point = task_init.getBestTaskInd(self.taskPoints)
+        # 先从初始位姿去往最近任务点
+        self.robot_transfer.task_transfer(initial_point, self.taskPoints[best_index])
+        # 任务点总数
         self.ntask = self.taskPoints.__len__()
-        self.src_ind = best_ind
-        self.des_ind = (best_ind + 1) % self.ntask
+        # 更新起始任务点和目标任务点索引
+        self.src_index = best_index
+        self.des_index = (best_index + 1) % self.ntask
 
     def task_cmp(self, t1, t2):
         return t1["order"] < t2["order"]
@@ -86,7 +93,7 @@ class Task:
             task_json = os.listdir(folder)
 
         if not task_json:
-            raise Exception("No valid task point to tranverse!!")
+            raise Exception("No valid task point to tranverse!")
 
         task_list = []
         for i, file_name in enumerate(task_json):
@@ -105,31 +112,22 @@ class Task:
         task_json = filtered
 
     def run(self):
+        '''
+        调用 TaskTransfer 对象实现任务点间的自主导航
+        '''
         while not rospy.is_shutdown():
             self.robot_transfer.task_transfer(
-                self.taskPoints[self.src_ind], self.taskPoints[self.des_ind]
+                self.taskPoints[self.src_index], self.taskPoints[self.des_index]
             )
-            # self.taskPoints[self.des_ind].runTask()
-            self.src_ind = self.des_ind
-            self.des_ind = (self.des_ind + 1) % self.ntask
+            # self.taskPoints[self.des_index].runTask()
+            self.src_index = self.des_index
+            self.des_index = (self.des_index + 1) % self.ntask
 
 
 class TaskInit:
-    def __init__(self, pose_topic="/ndt/current_pose"):
+    def __init__(self):
         self.initialPose = None
-        self.pose_topic = pose_topic
         self.tf_listener = tf.TransformListener()
-
-    def poseCallback(self, msg):
-        self.initialPose = [
-            msg.pose.position.x,
-            msg.pose.position.y,
-            msg.pose.position.z,
-            msg.pose.orientation.x,
-            msg.pose.orientation.y,
-            msg.pose.orientation.z,
-            msg.pose.orientation.w,
-        ]
 
     def listen_tf(self):
         try:
@@ -149,7 +147,6 @@ class TaskInit:
 
     def refreshInitialPose(self):
         self.initialPose = None
-        # rospy.Subscriber(self.pose_topic,PoseStamped,self.poseCallback)
         RATE = 50
         while not self.initialPose:
             self.listen_tf()
@@ -160,7 +157,6 @@ class TaskInit:
         fake_task = TaskPoint()
         fake_task.setRobotPose(self.initialPose)
         dist_list = [fake_task.calDistance(task_point) for task_point in task_points]
-        # import pdb;pdb.set_trace()
         return np.argmin(np.array(dist_list)), fake_task
 
 
