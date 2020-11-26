@@ -165,7 +165,7 @@ class TaskInit:
 
 
 if __name__ == "__main__":
-    rospy.init_node("autonous_2d_navigation")
+    rospy.init_node("autonomous_2d_navigation")
     task = Task()
     task.init()
     task.run()

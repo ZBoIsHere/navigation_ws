@@ -4,5 +4,6 @@
         "array": "cpp",
         "string": "cpp",
         "string_view": "cpp"
-    }
+    },
+    "python.pythonPath": "/usr/local/opt/python@3.8/bin/python3"
 }
