@@ -58,83 +58,26 @@ class TaskTransfer:
 
         while not_done and not rospy.is_shutdown():
             """
-            Do the task from src to des until SUCCEEDED/ABORTED, and trigger the special action
+            Do something REPEATEDLY
             """
-            # TODO Need send_goal repeatedly?
             self.moveBaseClient.send_goal(goal_msg)
             rospy.logwarn(
                 "Transfer from [%s] to [%s]" % (src_point.name, des_point.name)
             )
-
-            # crawl
-            if des_point.getPreTaskPoint() and des_point.getPreTaskPoint().is_crawl():
-                rospy.sleep(0.5)
-                if self.plan_failed():
-                    rospy.logerr("Plan failed! Robot may stuck in this place.")
-                    continue
-                print "Trigger crawl"
-                with RobotCommander() as robot_commander:
-                    robot_commander.crawl_trait()
-                    rospy.sleep(0.1)
-            
-            # up_stair
-            if (
-                des_point.getPreTaskPoint()
-                and des_point.getPreTaskPoint().is_up_stair()
-            ):
-                rospy.sleep(0.5)
-                if self.plan_failed():
-                    rospy.logerr("Plan failed! Robot may stuck in this place.")
-                    continue
-                print "Trigger up stair"
-                with RobotCommander() as robot_commander:
-                    robot_commander.up_stair_trait()
-                    rospy.sleep(0.1)
+            rospy.sleep(0.5)
 
             done = self.moveBaseClient.wait_for_result(timeout=rospy.Duration(5.0))
-            # Make sure the action succeed.
             not_done = (not done) or (
                 self.moveBaseClient.get_state() != actionlib.GoalStatus.SUCCEEDED
             )
-            # print "Goal status: ", self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
 
         """
-        Do something to finish the special action
+        Do something to finish the action, only ONCE
         """
         # finish up_stair
-        if (
-            not self.plan_failed()
-            and des_point.getPreTaskPoint()
-            and des_point.getPreTaskPoint().is_up_stair()
-        ):
-            print "Finish up stair"
+        if not self.plan_failed() and des_point.order_equal_to(5):
+            print "UP..............................."
             with RobotCommander() as robot_commander:
-                robot_commander.finish_up_stair_trait()
+                robot_commander.up_stair_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        
-        # finish crawl
-        if (
-            not self.plan_failed()
-            and des_point.getPreTaskPoint()
-            and des_point.getPreTaskPoint().is_crawl()
-        ):
-            print "Finish crawl"
-            with RobotCommander() as robot_commander:
-                robot_commander.finish_crawl_trait()
-                rospy.sleep(0.1)
-            rospy.sleep(0.5)
-        
-        # others
-        if (
-            not self.plan_failed()
-            and des_point.getPreTaskPoint()
-            and des_point.getPreTaskPoint().is_down_stair()
-        ):
-            print "Finish Others"
-            with RobotCommander() as robot_commander:
-                robot_commander.motion_start_stop()
-                rospy.sleep(0.1)
-            rospy.sleep(0.5)
-        
-        

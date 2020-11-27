@@ -51,7 +51,10 @@ class TaskPoint:
         self.pre_task_point = src_point
 
     def getPreTaskPoint(self):
-        return self.pre_task_point
+        return self.pre_task_point.record["order"]
+
+    def order_equal_to(self, num):
+        return self.record["order"] == num
 
     def is_up_stair(self):
         return self.record["option"]["up_stair"]

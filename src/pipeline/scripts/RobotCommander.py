@@ -145,4 +145,5 @@ def test():
     with RobotCommander() as rc:
         rc.up_stair_trait()
 
-test()
+
+# test()
