@@ -14,7 +14,7 @@ import threading
 
 class RobotCommander:
     """
-    RobotCommander is resposible for command the robot to stop,tread or play.
+    RobotCommander is resposible for command the robot to stop, tread or play.
     """
 
     _command_code = {
