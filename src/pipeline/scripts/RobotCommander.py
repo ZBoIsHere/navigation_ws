@@ -75,9 +75,6 @@ class RobotCommander:
     def stand_down_up(self):
         self.sendSimpleCommand("STAND_UP_DOWN")
 
-    def dance(self):
-        self.sendSimpleCommand("DANCE")
-
     def start_force_mode(self):
         self.sendSimpleCommand("START_FORCE_MODE")
 
@@ -88,7 +85,12 @@ class RobotCommander:
         self.sendSimple(33, int(adjust_rad * 1000))
 
     def up_stair_trait(self):
-        self.sendSimple(7)
+        self.sendSimple(25)
+        rospy.sleep(3)
+        self.motion_start_stop()
+        rospy.sleep(3)
+        self.sendSimple(25)
+        rospy.sleep(7)
 
     def finish_up_stair_trait(self):
         self.sendSimple(7)
@@ -107,50 +109,10 @@ class RobotCommander:
         rospy.sleep(0.1)
         self.sendSimple(3)
 
-    def perform_trait(self):
-        self.sendSimple(3)
-        rospy.sleep(3)
-        self.sendSimple(19)
-        rospy.sleep(13)
-
-    def finish_perform_trait(self):
-        self.sendSimple(3)
-
-    def jump1_trait(self):
-        self.sendSimple(3)
-        rospy.sleep(3)
-
-    def finish_jump1_trait(self):
-        self.sendSimple(3)
-
-    def jump2_trait(self):
-        self.sendSimple(3)
-        rospy.sleep(3)
-        self.sendSimple(8)
-        rospy.sleep(3)
-
-    def finish_jump2_trait(self):
-        self.sendSimple(3)
-
     def crawl_trait(self):
         self.sendSimple(50, 1)
 
     def finish_crawl_trait(self):
-        self.sendSimple(50, 0)
-
-    def openDoor_trait(self):
-        self.sendSimple(50, 2)
-
-    def leaveDoor_trait(self):
-        self.sendSimple(50, 3)
-
-    def finish_leaveDoor_trait(self):
-        self.sendSimple(50, 0)
-
-    def autoCharge_trait(self):
-        self.sendSimple(50, 4)
-
-    def finish_autoCharge_trait(self):
         self.sendSimple(50, 0)
 
     def climbSlope_trait(self):
@@ -181,4 +143,6 @@ robot_commander.__enter__()
 
 def test():
     with RobotCommander() as rc:
-        rc.stand_down_up()
+        rc.up_stair_trait()
+
+test()

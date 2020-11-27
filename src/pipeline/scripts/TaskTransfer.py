@@ -9,7 +9,6 @@ Author: Haoyi Han <hanhaoyi@deeprobotics.cn>, Feb, 2020
 import rospy
 import actionlib
 from tf.transformations import *
-from pipeline.msg import MoveToPosition2DAction, MoveToPosition2DGoal
 from pipeline.msg import MoveBaseAction, MoveBaseGoal
 from TaskPoint import TaskPoint
 from RobotCommander import RobotCommander
@@ -38,7 +37,7 @@ class TaskTransfer:
                 y=src_point.getPosY(),
                 yaw=src_point.getYaw(),
             )
-            print ("sendCordinate")
+            print ("-----------task_transfer-----------")
         des_point.setPreTaskPoint(src_point)
 
         goal_msg = MoveBaseGoal()
@@ -53,7 +52,6 @@ class TaskTransfer:
         goal_msg.target_pose.pose.orientation.z = my_q[2]
         goal_msg.target_pose.pose.orientation.w = my_q[3]
 
-        print "Option:"
         print des_point.record["option"]
 
         not_done = True
@@ -65,44 +63,20 @@ class TaskTransfer:
             # TODO Need send_goal repeatedly?
             self.moveBaseClient.send_goal(goal_msg)
             rospy.logwarn(
-                "Transfer ftom [%s] to [%s]" % (src_point.name, des_point.name)
+                "Transfer from [%s] to [%s]" % (src_point.name, des_point.name)
             )
+
             # crawl
             if des_point.getPreTaskPoint() and des_point.getPreTaskPoint().is_crawl():
                 rospy.sleep(0.5)
                 if self.plan_failed():
                     rospy.logerr("Plan failed! Robot may stuck in this place.")
                     continue
-                print "crawl"
+                print "Trigger crawl"
                 with RobotCommander() as robot_commander:
                     robot_commander.crawl_trait()
                     rospy.sleep(0.1)
-            # TODO speedUp
-            if (
-                des_point.getPreTaskPoint()
-                and des_point.getPreTaskPoint().is_speed_up()
-            ):
-                rospy.sleep(0.5)
-                if self.plan_failed():
-                    rospy.logerr("Plan failed! Robot may stuck in this place.")
-                    continue
-                print "speedUp"
-                with RobotCommander() as robot_commander:
-                    robot_commander.stand_down_up()
-                    rospy.sleep(0.1)
-            # down_stair
-            if (
-                des_point.getPreTaskPoint()
-                and des_point.getPreTaskPoint().is_down_stair()
-            ):
-                rospy.sleep(0.5)
-                if self.plan_failed():
-                    rospy.logerr("Plan failed! Robot may stuck in this place.")
-                    continue
-                print "Down stair trait"
-                with RobotCommander() as robot_commander:
-                    robot_commander.down_stair_trait()
-                    rospy.sleep(0.1)
+            
             # up_stair
             if (
                 des_point.getPreTaskPoint()
@@ -112,62 +86,55 @@ class TaskTransfer:
                 if self.plan_failed():
                     rospy.logerr("Plan failed! Robot may stuck in this place.")
                     continue
-                print "Up stair trait"
+                print "Trigger up stair"
                 with RobotCommander() as robot_commander:
                     robot_commander.up_stair_trait()
                     rospy.sleep(0.1)
 
-            done = self.moveBaseClient.wait_for_result(timeout=rospy.Duration(300.0))
+            done = self.moveBaseClient.wait_for_result(timeout=rospy.Duration(5.0))
             # Make sure the action succeed.
             not_done = (not done) or (
                 self.moveBaseClient.get_state() != actionlib.GoalStatus.SUCCEEDED
             )
-            print "Goal status: ", self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
+            # print "Goal status: ", self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
 
         """
         Do something to finish the special action
         """
-        # finish down_stair
-        if (
-            not self.plan_failed()
-            and des_point.getPreTaskPoint()
-            and des_point.getPreTaskPoint().is_down_stair()
-        ):
-            print "Finish Down stair trait"
-            with RobotCommander() as robot_commander:
-                robot_commander.finish_down_stair_trait()
-                rospy.sleep(0.1)
-            rospy.sleep(0.5)
         # finish up_stair
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
             and des_point.getPreTaskPoint().is_up_stair()
         ):
-            print "Finish Up stair trait"
+            print "Finish up stair"
             with RobotCommander() as robot_commander:
                 robot_commander.finish_up_stair_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
+        
         # finish crawl
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
             and des_point.getPreTaskPoint().is_crawl()
         ):
-            print "Finish Crawl"
+            print "Finish crawl"
             with RobotCommander() as robot_commander:
                 robot_commander.finish_crawl_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        # TODO finish speedUp
+        
+        # others
         if (
             not self.plan_failed()
             and des_point.getPreTaskPoint()
-            and des_point.getPreTaskPoint().is_speed_up()
+            and des_point.getPreTaskPoint().is_down_stair()
         ):
-            print "Finish walking_bricks"
+            print "Finish Others"
             with RobotCommander() as robot_commander:
-                robot_commander.stand_down_up()
+                robot_commander.motion_start_stop()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
+        
+        

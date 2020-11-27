@@ -65,7 +65,6 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate actions in the 'action' folder
 add_action_files(
   FILES
-  MoveToPosition2D.action
   MoveBase.action
 )
 
