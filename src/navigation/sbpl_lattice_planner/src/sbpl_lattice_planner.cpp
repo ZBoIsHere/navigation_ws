@@ -447,6 +447,7 @@ bool SBPLLatticePlanner::makePlan(
     if (ret)
       ROS_DEBUG("Solution is found\n");
     else {
+      // TODO bug?
       ROS_INFO("Solution not found\n");
       publishStats(solution_cost, 0, start, goal);
       return false;

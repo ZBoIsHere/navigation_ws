@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
   leg_odom_pub = nh.advertise<nav_msgs::Odometry>("leg_odom", 1);
   joint_state_pub = nh.advertise<sensor_msgs::JointState>("joint_states", 1);
 
-  ros::Rate loop_rate(50);
+  ros::Rate loop_rate(200);
   while (ros::ok()) {
     recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
                         (struct sockaddr *)&addr_client, (socklen_t *)&len);

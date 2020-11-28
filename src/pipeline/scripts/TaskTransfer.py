@@ -64,17 +64,17 @@ class TaskTransfer:
             rospy.logwarn(
                 "Transfer from [%s] to [%s]" % (src_point.name, des_point.name)
             )
-            rospy.sleep(0.5)
+            rospy.sleep(5)
 
             done = self.moveBaseClient.wait_for_result(timeout=rospy.Duration(5.0))
             not_done = (not done) or (
                 self.moveBaseClient.get_state() != actionlib.GoalStatus.SUCCEEDED
             )
-
+        print "Done transfer from A to B"
+        print des_point.record["order"]
         """
         Do something to finish the action, only ONCE
         """
-        # finish up_stair
         if not self.plan_failed() and des_point.order_equal_to(5):
             print "UP..............................."
             with RobotCommander() as robot_commander:

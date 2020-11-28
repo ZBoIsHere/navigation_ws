@@ -85,12 +85,21 @@ class RobotCommander:
         self.sendSimple(33, int(adjust_rad * 1000))
 
     def up_stair_trait(self):
+        # stop
+        self.motion_start_stop()
+        rospy.sleep(2)
+        # trigger
         self.sendSimple(25)
         rospy.sleep(3)
+        # start
         self.motion_start_stop()
         rospy.sleep(3)
+        # exit up stair
         self.sendSimple(25)
-        rospy.sleep(7)
+        rospy.sleep(10)
+        # start to go
+        self.motion_start_stop()
+        rospy.sleep(6)
 
     def finish_up_stair_trait(self):
         self.sendSimple(7)
