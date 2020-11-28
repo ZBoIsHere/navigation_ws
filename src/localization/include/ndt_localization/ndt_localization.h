@@ -59,7 +59,7 @@ class NDTLocalization {
 
   ros::Publisher pub_current_pose_;
   geometry_msgs::PoseStamped msg_current_pose_;
-  
+
   ros::Publisher pub_current_pose_with_cov_;
   geometry_msgs::PoseWithCovarianceStamped msg_current_pose_with_cov_;
 

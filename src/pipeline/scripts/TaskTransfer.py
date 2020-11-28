@@ -7,6 +7,7 @@ Author: Haoyi Han <hanhaoyi@deeprobotics.cn>, Feb, 2020
 """
 
 import rospy
+import dynamic_reconfigure.client
 import actionlib
 from tf.transformations import *
 from pipeline.msg import MoveBaseAction, MoveBaseGoal
@@ -16,6 +17,21 @@ from RobotCommander import RobotCommander
 
 class TaskTransfer:
     def __init__(self):
+        self.client_teb = dynamic_reconfigure.client.Client(
+            "/move_base/TebLocalPlannerROS"
+        )
+        self.client_global_costmap_1 = dynamic_reconfigure.client.Client(
+            "/move_base/global_costmap/obstacle_layer1"
+        )
+        self.client_global_costmap_2 = dynamic_reconfigure.client.Client(
+            "/move_base/global_costmap/obstacle_layer2"
+        )
+        self.client_local_costmap_1 = dynamic_reconfigure.client.Client(
+            "/move_base/local_costmap/obstacle_layer1"
+        )
+        self.client_local_costmap_2 = dynamic_reconfigure.client.Client(
+            "/move_base/local_costmap/obstacle_layer2"
+        )
         self.moveBaseClient = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         self.moveBaseClient.wait_for_server()
         rospy.loginfo("Action 'move_base' is up!")
@@ -25,6 +41,40 @@ class TaskTransfer:
 
     def is_action_succeed(self):
         return self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
+
+    def set_slow_vel_and_disable_costmap(self):
+        slow_vel_params = {
+            "max_vel_x": 0.1,
+            "max_vel_x_backwards": 0.02,
+            "max_vel_y": 0.08,
+            "max_vel_theta": 0.2,
+            "acc_lim_x": 0.08,
+            "acc_lim_y": 0.03,
+            "acc_lim_theta": 0.1,
+        }
+        disable_costmap_params = {"enabled": False}
+        self.client_teb.update_configuration(slow_vel_params)
+        self.client_global_costmap_1.update_configuration(disable_costmap_params)
+        self.client_global_costmap_2.update_configuration(disable_costmap_params)
+        self.client_local_costmap_1.update_configuration(disable_costmap_params)
+        self.client_local_costmap_2.update_configuration(disable_costmap_params)
+
+    def reset_slow_vel_and_enable_costmap(self):
+        normal_vel_params = {
+            "max_vel_x": 0.5,
+            "max_vel_x_backwards": 0.101,
+            "max_vel_y": 0.2,
+            "max_vel_theta": 0.5,
+            "acc_lim_x": 0.2,
+            "acc_lim_y": 0.11,
+            "acc_lim_theta": 0.3,
+        }
+        enable_costmap_params = {"enabled": True}
+        self.client_teb.update_configuration(normal_vel_params)
+        self.client_global_costmap_1.update_configuration(enable_costmap_params)
+        self.client_global_costmap_2.update_configuration(enable_costmap_params)
+        self.client_local_costmap_1.update_configuration(enable_costmap_params)
+        self.client_local_costmap_2.update_configuration(enable_costmap_params)
 
     def task_transfer(self, src_point, des_point):
         """
@@ -70,14 +120,21 @@ class TaskTransfer:
             not_done = (not done) or (
                 self.moveBaseClient.get_state() != actionlib.GoalStatus.SUCCEEDED
             )
-        print "Done transfer from A to B"
-        print des_point.record["order"]
+
+        print "Done transfer from A to B."
         """
         Do something to finish the action, only ONCE
         """
-        if not self.plan_failed() and des_point.order_equal_to(5):
-            print "UP..............................."
+        if not self.plan_failed() and des_point.order_equal_to(4):
+            print "set_slow_vel_and_disable_costmap"
+            self.set_slow_vel_and_disable_costmap()
+            print "TRY TO UP STAIRS"
             with RobotCommander() as robot_commander:
                 robot_commander.up_stair_trait()
                 rospy.sleep(0.1)
+            rospy.sleep(0.5)
+
+        if not self.plan_failed() and des_point.order_equal_to(5):
+            print "reset_slow_vel_and_enable_costmap"
+            self.reset_slow_vel_and_enable_costmap()
             rospy.sleep(0.5)

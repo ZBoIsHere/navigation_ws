@@ -97,8 +97,7 @@ bool NDTLocalization::init() {
                                transform.getOrigin().getZ());
   double roll, pitch, yaw;
   tf::Matrix3x3(transform.getRotation()).getEulerYPR(yaw, pitch, roll);
-  Eigen::AngleAxisf rot_x_btol(roll,
-                               Eigen::Vector3f::UnitX());
+  Eigen::AngleAxisf rot_x_btol(roll, Eigen::Vector3f::UnitX());
   Eigen::AngleAxisf rot_y_btol(pitch, Eigen::Vector3f::UnitY());
   Eigen::AngleAxisf rot_z_btol(yaw, Eigen::Vector3f::UnitZ());
   tf_btol_ =
@@ -120,7 +119,8 @@ bool NDTLocalization::init() {
 
   pub_current_pose_ =
       nh_.advertise<geometry_msgs::PoseStamped>("/ndt/current_pose", 1);
-  pub_current_pose_with_cov_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/pose", 1);
+  pub_current_pose_with_cov_ =
+      nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/pose", 1);
   pub_path = nh_.advertise<nav_msgs::Path>("/debug/history_path", 1);
 
   ROS_INFO("End init NDTLocalization");
@@ -134,10 +134,9 @@ void NDTLocalization::initialPoseCB(
     init_Pose(0, 3) = msg->pose.pose.position.x;
     init_Pose(1, 3) = msg->pose.pose.position.y;
     init_Pose(2, 3) = 0;
-    Eigen::Quaternionf temp(msg->pose.pose.orientation.w,
-                            msg->pose.pose.orientation.x,
-                            msg->pose.pose.orientation.y,
-                            msg->pose.pose.orientation.z);
+    Eigen::Quaternionf temp(
+        msg->pose.pose.orientation.w, msg->pose.pose.orientation.x,
+        msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
     init_Pose.block(0, 0, 3, 3) = temp.matrix();
     pose_init_ = true;
   } else {
@@ -145,10 +144,9 @@ void NDTLocalization::initialPoseCB(
     init_Pose(0, 3) = msg->pose.pose.position.x;
     init_Pose(1, 3) = msg->pose.pose.position.y;
     init_Pose(2, 3) = 0;
-    Eigen::Quaternionf temp(msg->pose.pose.orientation.w,
-                            msg->pose.pose.orientation.x,
-                            msg->pose.pose.orientation.y,
-                            msg->pose.pose.orientation.z);
+    Eigen::Quaternionf temp(
+        msg->pose.pose.orientation.w, msg->pose.pose.orientation.x,
+        msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
     init_Pose.block(0, 0, 3, 3) = temp.matrix();
     pose_init_ = true;
   }
@@ -193,7 +191,7 @@ bool NDTLocalization::load_map(std::string map_file) {
   msg_globalmap.header.frame_id = "map";
   pub_global_map.publish(msg_globalmap);
   std::cout << "Success load map: " << map_file << std::endl;
-  
+
   PointCloudT::Ptr output_cloud(new PointCloudT());
   ndt_.setTransformationEpsilon(param_ndt_epsilon_);
   ndt_.setStepSize(param_ndt_step_size_);
@@ -203,14 +201,13 @@ bool NDTLocalization::load_map(std::string map_file) {
   ndt_.setInputTarget(map_cloud.makeShared());
   ndt_.align(*output_cloud, Eigen::Matrix4f::Identity());
   ndt_.initCompute();
-  
+
   map_init_ = true;
   ROS_INFO("Update model pc with %d points", map_cloud.width);
   return true;
 }
 
-void NDTLocalization::update_target_map()
-{
+void NDTLocalization::update_target_map() {
   target_map_ptr->points.clear();
   for (auto point : model_pc_.points) {
     double dist = std::sqrt(std::pow(point.x - current_pose_.x, 2) +
@@ -317,10 +314,15 @@ void NDTLocalization::pointCloud_process() {
 
   pose robot_pose;
   tf::Matrix3x3 R;
-  R.setValue(
-    static_cast<double>(map_to_base_eigen(0, 0)), static_cast<double>(map_to_base_eigen(0, 1)), static_cast<double>(map_to_base_eigen(0, 2)),
-    static_cast<double>(map_to_base_eigen(1, 0)), static_cast<double>(map_to_base_eigen(1, 1)), static_cast<double>(map_to_base_eigen(1, 2)),
-    static_cast<double>(map_to_base_eigen(2, 0)), static_cast<double>(map_to_base_eigen(2, 1)), static_cast<double>(map_to_base_eigen(2, 2)));
+  R.setValue(static_cast<double>(map_to_base_eigen(0, 0)),
+             static_cast<double>(map_to_base_eigen(0, 1)),
+             static_cast<double>(map_to_base_eigen(0, 2)),
+             static_cast<double>(map_to_base_eigen(1, 0)),
+             static_cast<double>(map_to_base_eigen(1, 1)),
+             static_cast<double>(map_to_base_eigen(1, 2)),
+             static_cast<double>(map_to_base_eigen(2, 0)),
+             static_cast<double>(map_to_base_eigen(2, 1)),
+             static_cast<double>(map_to_base_eigen(2, 2)));
   robot_pose.x = map_to_base_eigen(0, 3);
   robot_pose.y = map_to_base_eigen(1, 3);
   robot_pose.z = map_to_base_eigen(2, 3);
@@ -331,10 +333,10 @@ void NDTLocalization::pointCloud_process() {
   msg_current_pose_with_cov_.header.frame_id = "map";
   msg_current_pose_with_cov_.pose.covariance[0] = pow(0.01, 2);
   msg_current_pose_with_cov_.pose.covariance[7] = pow(0.01, 2);
-  msg_current_pose_with_cov_.pose.covariance[14]= pow(0.01, 2);
-  msg_current_pose_with_cov_.pose.covariance[21]= pow(0.01, 2);
-  msg_current_pose_with_cov_.pose.covariance[28]= pow(0.01, 2);
-  msg_current_pose_with_cov_.pose.covariance[35]= pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[14] = pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[21] = pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[28] = pow(0.01, 2);
+  msg_current_pose_with_cov_.pose.covariance[35] = pow(0.01, 2);
   pub_current_pose_with_cov_.publish(msg_current_pose_with_cov_);
 
   tf_broadcaster_.sendTransform(tf::StampedTransform(

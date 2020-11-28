@@ -132,10 +132,17 @@ int main(int argc, char **argv) {
         filter_vel_x.in(robot_state->vel_world[0]);
         filter_vel_y.in(robot_state->vel_world[1]);
         filter_vel_theta.in(robot_state->rpy_vel[2]);
-        leg_odom_data.twist.twist.linear.x =
-            +filter_vel_x.out() * cos(yaw) + filter_vel_y.out() * sin(yaw);
-        leg_odom_data.twist.twist.linear.y =
-            -filter_vel_x.out() * sin(yaw) + filter_vel_y.out() * cos(yaw);
+
+        if (true) {
+          leg_odom_data.twist.twist.linear.x =
+              +filter_vel_x.out() * cos(yaw) + filter_vel_y.out() * sin(yaw);
+          leg_odom_data.twist.twist.linear.y =
+              -filter_vel_x.out() * sin(yaw) + filter_vel_y.out() * cos(yaw);
+        } else {
+          leg_odom_data.twist.twist.linear.x = filter_vel_x.out();
+          leg_odom_data.twist.twist.linear.y = filter_vel_y.out();
+        }
+
         leg_odom_data.twist.twist.angular.z = filter_vel_theta.out();
         leg_odom_pub.publish(leg_odom_data);
       }
@@ -158,18 +165,21 @@ int main(int argc, char **argv) {
         joint_state_data.position[1] = -joint_state->LF_Joint_1;
         joint_state_data.name[2] = "LF_Joint_2";
         joint_state_data.position[2] = -joint_state->LF_Joint_2;
-        joint_state_data.name[3] = "LB_Joint";
+
+        joint_state_data.name[3] = "RF_Joint";
         joint_state_data.position[3] = -joint_state->LB_Joint;
-        joint_state_data.name[4] = "LB_Joint_1";
+        joint_state_data.name[4] = "RF_Joint_1";
         joint_state_data.position[4] = -joint_state->LB_Joint_1;
-        joint_state_data.name[5] = "LB_Joint_2";
+        joint_state_data.name[5] = "RF_Joint_2";
         joint_state_data.position[5] = -joint_state->LB_Joint_2;
-        joint_state_data.name[6] = "RF_Joint";
+
+        joint_state_data.name[6] = "LB_Joint";
         joint_state_data.position[6] = -joint_state->RF_Joint;
-        joint_state_data.name[7] = "RF_Joint_1";
+        joint_state_data.name[7] = "LB_Joint_1";
         joint_state_data.position[7] = -joint_state->RF_Joint_1;
-        joint_state_data.name[8] = "RF_Joint_2";
+        joint_state_data.name[8] = "LB_Joint_2";
         joint_state_data.position[8] = -joint_state->RF_Joint_2;
+
         joint_state_data.name[9] = "RB_Joint";
         joint_state_data.position[9] = -joint_state->RB_Joint;
         joint_state_data.name[10] = "RB_Joint_1";

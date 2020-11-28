@@ -74,8 +74,8 @@
       <!-- 轨迹控制 -->
       <rosparam file="$(find nav)/config/teb_local_planner_params_jyl.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="5.0" />
-      <param name="controller_patience" value="15.0" />
+      <param name="controller_frequency" value="10.0" />
+      <param name="controller_patience" value="10.0" />
       <!-- 异常处理 -->
       <param name="recovery_behavior_enabled" value="false" />
     </node>
