@@ -42,7 +42,7 @@ class TaskTransfer:
     def is_action_succeed(self):
         return self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
 
-    def set_slow_vel_and_disable_costmap(self):
+    def set_low_vel(self):
         slow_vel_params = {
             "max_vel_x": 0.1,
             "max_vel_x_backwards": 0.02,
@@ -52,14 +52,9 @@ class TaskTransfer:
             "acc_lim_y": 0.03,
             "acc_lim_theta": 0.1,
         }
-        disable_costmap_params = {"enabled": False}
         self.client_teb.update_configuration(slow_vel_params)
-        self.client_global_costmap_1.update_configuration(disable_costmap_params)
-        self.client_global_costmap_2.update_configuration(disable_costmap_params)
-        self.client_local_costmap_1.update_configuration(disable_costmap_params)
-        self.client_local_costmap_2.update_configuration(disable_costmap_params)
 
-    def reset_slow_vel_and_enable_costmap(self):
+    def reset_vel(self):
         normal_vel_params = {
             "max_vel_x": 0.5,
             "max_vel_x_backwards": 0.101,
@@ -69,12 +64,21 @@ class TaskTransfer:
             "acc_lim_y": 0.11,
             "acc_lim_theta": 0.3,
         }
-        enable_costmap_params = {"enabled": True}
         self.client_teb.update_configuration(normal_vel_params)
-        self.client_global_costmap_1.update_configuration(enable_costmap_params)
-        self.client_global_costmap_2.update_configuration(enable_costmap_params)
-        self.client_local_costmap_1.update_configuration(enable_costmap_params)
-        self.client_local_costmap_2.update_configuration(enable_costmap_params)
+
+    def disable_costmap(self):
+        params = {"enabled": False}
+        self.client_global_costmap_1.update_configuration(params)
+        self.client_global_costmap_2.update_configuration(params)
+        self.client_local_costmap_1.update_configuration(params)
+        self.client_local_costmap_2.update_configuration(params)
+
+    def enable_costmap(self):
+        params = {"enabled": True}
+        self.client_global_costmap_1.update_configuration(params)
+        self.client_global_costmap_2.update_configuration(params)
+        self.client_local_costmap_1.update_configuration(params)
+        self.client_local_costmap_2.update_configuration(params)
 
     def task_transfer(self, src_point, des_point):
         """
@@ -121,20 +125,38 @@ class TaskTransfer:
                 self.moveBaseClient.get_state() != actionlib.GoalStatus.SUCCEEDED
             )
 
-        print "Done transfer from A to B."
         """
         Do something to finish the action, only ONCE
         """
         if not self.plan_failed() and des_point.order_equal_to(4):
-            print "set_slow_vel_and_disable_costmap"
-            self.set_slow_vel_and_disable_costmap()
-            print "TRY TO UP STAIRS"
+            print "START TO UP STAIRS..."
+            print "set_low_vel and disable_costmap"
+            self.set_low_vel()
+            self.disable_costmap()
             with RobotCommander() as robot_commander:
                 robot_commander.up_stair_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-
         if not self.plan_failed() and des_point.order_equal_to(5):
-            print "reset_slow_vel_and_enable_costmap"
-            self.reset_slow_vel_and_enable_costmap()
+            print "Finish UP STAIRS."
+            print "reset_vel and enable_costmap"
+            self.reset_vel()
+            self.enable_costmap()
+            rospy.sleep(0.5)
+
+        if not self.plan_failed() and des_point.order_equal_to(8):
+            print "START TO CRAWL..."
+            print "disable_costmap"
+            self.disable_costmap()
+            with RobotCommander() as robot_commander:
+                robot_commander.crawl_trait()
+                rospy.sleep(0.1)
+            rospy.sleep(0.5)
+        if not self.plan_failed() and des_point.order_equal_to(9):
+            print "Finish CRAWL."
+            print "enable_costmap"
+            self.enable_costmap()
+            with RobotCommander() as robot_commander:
+                robot_commander.finish_crawl_trait()
+                rospy.sleep(0.1)
             rospy.sleep(0.5)

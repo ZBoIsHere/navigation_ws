@@ -119,10 +119,10 @@ class RobotCommander:
         self.sendSimple(3)
 
     def crawl_trait(self):
-        self.sendSimple(50, 1)
+        self.sendSimple(2)
 
     def finish_crawl_trait(self):
-        self.sendSimple(50, 0)
+        self.sendSimple(2)
 
     def climbSlope_trait(self):
         self.sendSimple(50, 5)
@@ -152,7 +152,9 @@ robot_commander.__enter__()
 
 def test():
     with RobotCommander() as rc:
-        rc.up_stair_trait()
+        rc.crawl_trait()
+        rospy.sleep(5)
+        rc.finish_crawl_trait()
 
 
 # test()
