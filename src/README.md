@@ -23,7 +23,7 @@ $ catkin clean
 $ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
 ```
 
-### 新场地建图 (参数调节: `resolution`: 0.1,`ndt_resolution`: 2.0,`ndt_step_size`: 0.2)
+### 新场地建图
 ```bash
 $ roslaunch ndt_mapping ndt_mapping.launch
 $ rosrun map_server map_saver map:=/projected_map
@@ -67,9 +67,7 @@ $ scp -r src/ ysc@192.168.1.102:~/DeepNavi/
   <param name="recovery_behavior_enabled" value="false" />
   <param name="clearing_rotation_allowed" value="false" />
   ```
-- message_transformer `timeout!`
 - BT Design
 - Elevation_mapping/Octomap/STVL using LIDAR or D435
-- How to disable local costmap?
 - PCD convert to costmap
 - Elevation_map convert to costmap
