@@ -144,7 +144,7 @@ class TaskTransfer:
             self.enable_costmap()
             rospy.sleep(0.5)
 
-        if not self.plan_failed() and des_point.order_equal_to(8):
+        if not self.plan_failed() and des_point.order_equal_to(6):
             print "START TO CRAWL..."
             print "disable_costmap"
             self.disable_costmap()
@@ -152,7 +152,7 @@ class TaskTransfer:
                 robot_commander.crawl_trait()
                 rospy.sleep(0.1)
             rospy.sleep(0.5)
-        if not self.plan_failed() and des_point.order_equal_to(9):
+        if not self.plan_failed() and des_point.order_equal_to(7):
             print "Finish CRAWL."
             print "enable_costmap"
             self.enable_costmap()
