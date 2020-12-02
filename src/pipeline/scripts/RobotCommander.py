@@ -148,11 +148,19 @@ robot_commander = RobotCommander(local_port=20002)
 robot_commander.__enter__()
 
 
-def test():
+def crawl_test():
     with RobotCommander() as rc:
         rc.crawl_trait()
-        rospy.sleep(5)
+        rospy.sleep(3)
         rc.finish_crawl_trait()
 
 
-# test()
+def up_stair_test():
+    with RobotCommander() as rc:
+        rc.up_stair_trait()
+        rospy.sleep(3)
+        rc.finish_up_stair_trait()
+
+
+# crawl_test()
+# up_stair_test()
