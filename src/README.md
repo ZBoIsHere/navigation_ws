@@ -33,14 +33,13 @@ $ catkin clean
 $ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
 ```
 
-### 新环境建图
+### 新环境建图 (TODO 流程需要优化)
 
 ```bash
 $ roslaunch ndt_mapping ndt_mapping.launch
-$ rosrun map_server map_saver map:=/projected_map
 $ rosbag record /globalmap/map_full
-$ rosrun pcl_ros bag_to_pcd 2020-XXX.bag /globalmap/map_full .
-$ pcl_viewer 0.000000000.pcd
+$ rosrun map_server map_saver map:=/projected_map
+$ rosrun pcl_ros bag_to_pcd NAME_OF_BAG.bag /globalmap/map_full .
 ```
 
 ### 代码格式化
@@ -56,7 +55,7 @@ $ find . -name '*.DS_Store' -delete
 1. FTP (Transmit) 修改文件: 用户名 ntuser，密码 ntuser
 2. telnet root登陆 192.168.1.120/60，`chmod 777` 添加可执行权限
    ```bash
-   $ ln -sf robot_control_system_ip120 robot_control_system
+   $ ln -sf new_firmware robot_control_system
    ```
 3. `shutdown` 重启
 

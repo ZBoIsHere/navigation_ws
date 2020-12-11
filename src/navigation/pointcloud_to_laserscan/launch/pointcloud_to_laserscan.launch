@@ -3,7 +3,7 @@
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
         <remap from="cloud_in" to="/velodyne_points"/>
         <remap from="scan" to="/scan1"/>
-        <!-- topic `scan` was published by the driver of velodyne -->
+        <!-- topic `scan` was published by the driver of LIDAR -->
         <rosparam>
             target_frame: base_link
             transform_tolerance: 0.01
@@ -26,7 +26,7 @@
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="d435_to_laserscan">
         <remap from="cloud_in" to="/camera/depth/color/points"/>
         <remap from="scan" to="/scan2"/>
-        <!-- topic `scan` was published by the driver of velodyne -->
+        <!-- topic `scan` was published by the driver of LIDAR -->
         <rosparam>
             target_frame: base_link
             transform_tolerance: 0.01

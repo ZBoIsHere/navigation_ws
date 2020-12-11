@@ -102,7 +102,7 @@ bool NDTLocalization::init() {
   Eigen::AngleAxisf rot_z_btol(yaw, Eigen::Vector3f::UnitZ());
   tf_btol_ =
       (tl_btol * rot_z_btol * rot_y_btol * rot_x_btol)
-          .matrix();  // Eigen::Matrix4f tf_btol_;  base_link  to  velodyne
+          .matrix();  // Eigen::Matrix4f tf_btol_;  base_link  to  LIDAR
 
   if (param_init_pose_with_param)
     init_pose_with_param();
