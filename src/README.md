@@ -18,13 +18,10 @@ $ roslaunch realsense2_camera rs_camera.launch
 
 ```bash
 # 安装依赖包与调试工具
-$ sudo apt-get install ros-kinetic-navigation
-$ sudo apt-get install ros-kinetic-navigation-experimental
-$ sudo apt-get install ros-kinetic-teb-local-planner
-$ sudo apt-get install python-catkin-tools
-$ sudo apt-get install ros-kinetic-plotjuggler
-$ sudo apt-get install vim
-$ sudo apt-get install wireshark
+$ sudo apt-get install ros-kinetic-navigation ros-kinetic-navigation-experimental ros-kinetic-teb-local-planner
+$ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim wireshark
+
+$ catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
 # Release 编译
 $ catkin build
 $ catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release

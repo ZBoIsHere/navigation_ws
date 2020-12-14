@@ -1,27 +1,55 @@
-<?xml version="1.0"?>    
-<launch>    
-    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
-        <remap from="cloud_in" to="/velodyne_points"/>
-        <remap from="scan" to="/scan1"/>
-        <!-- topic `scan` was published by the driver of LIDAR -->
-        <rosparam>
-            target_frame: base_link
-            transform_tolerance: 0.01
-            min_height: 0.0
-            max_height: 1.0
+<launch>
+    <arg name="lidar_type" />
 
-            angle_min: -3.1415926 # -M_PI
-            angle_max: 3.1415926 # M_PI
-            angle_increment: 0.003
-            scan_time: 0.1
-            range_min: 0.05
-            range_max: 100
-            use_inf: true
-            inf_epsilon: 1.0
+    <group if="$(eval arg('lidar_type') == 'velodyne')">
+        <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+            <remap from="cloud_in" to="/velodyne_points"/>
+            <remap from="scan" to="/scan1"/>
+            <!-- topic `scan` was published by the driver of LIDAR -->
+            <rosparam>
+                target_frame: base_link
+                transform_tolerance: 0.01
+                min_height: 0.0
+                max_height: 1.0
 
-            concurrency_level: 1
-        </rosparam>
-    </node>
+                angle_min: -3.1415926 # -M_PI
+                angle_max: 3.1415926 # M_PI
+                angle_increment: 0.003
+                scan_time: 0.1
+                range_min: 0.05
+                range_max: 100
+                use_inf: true
+                inf_epsilon: 1.0
+
+                concurrency_level: 1
+            </rosparam>
+        </node>
+    </group>
+
+    <group if="$(eval arg('lidar_type') == 'rslidar')">
+        <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+            <remap from="cloud_in" to="/rslidar_points"/>
+            <remap from="scan" to="/scan1"/>
+            <!-- topic `scan` was published by the driver of LIDAR -->
+            <rosparam>
+                target_frame: base_link
+                transform_tolerance: 0.01
+                min_height: 0.0
+                max_height: 1.0
+
+                angle_min: -3.1415926 # -M_PI
+                angle_max: 3.1415926 # M_PI
+                angle_increment: 0.003
+                scan_time: 0.1
+                range_min: 0.05
+                range_max: 100
+                use_inf: true
+                inf_epsilon: 1.0
+
+                concurrency_level: 1
+            </rosparam>
+        </node>
+    </group>
 
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="d435_to_laserscan">
         <remap from="cloud_in" to="/camera/depth/color/points"/>
