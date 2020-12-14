@@ -33,7 +33,12 @@
   <!-- MINI 参数 -->
   <group if="$(eval arg('robot_type') == 'MINI')">
     <!-- TF 参数 -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.058 0 0 0 base_link velodyne" />
+    <group if="$(eval arg('lidar_type') == 'velodyne')">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.058 0 0 0 base_link velodyne" />
+    </group>
+    <group if="$(eval arg('lidar_type') == 'rslidar')">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.058 0 0 0 base_link rslidar" />
+    </group>
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster" args="0.309 0 -0.120 0 0.36 0 base_link camera_link" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf_broadcaster" args="0.243 0 0.058 -1.57 0 0 base_link body" />
     <!-- URDF -->
@@ -71,7 +76,12 @@
   <!-- JYL 参数 -->
   <group if="$(eval arg('robot_type') == 'JYL')">
     <!-- TF 参数 -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.327 0 0.075 0 0 0 base_link velodyne" />
+    <group if="$(eval arg('lidar_type') == 'velodyne')">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.327 0 0.075 0 0 0 base_link velodyne" />
+    </group>
+    <group if="$(eval arg('lidar_type') == 'rslidar')">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.327 0 0.075 0 0 0 base_link rslidar" />
+    </group>
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster" args="0.372 0 -0.018 0 0.4 0 base_link camera_link" />
     <!-- 导航 -->
     <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch">
