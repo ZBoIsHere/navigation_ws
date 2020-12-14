@@ -1,3 +1,20 @@
+### Issues & TODO
+
+- 检测到碰撞立即停止
+  ```yaml
+  <param name="controller_patience" value="0.0" />
+  <param name="planner_frequency" value="0.0" />
+  <param name="recovery_behavior_enabled" value="false" />
+  <param name="clearing_rotation_allowed" value="false" />
+  ```
+- BT Design
+- Elevation_mapping
+- PCD convert to costmap
+- Elevation_map convert to costmap
+- TEB Bugs
+- Using fixed global path
+- Improve the accuracy of goal
+
 ### WRC 小场景建图与定位@2020/12/02
 
 ```yaml
@@ -23,11 +40,8 @@ $ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim wireshark
 
 $ catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
 # Release 编译
-$ catkin build
-$ catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release
-$ catkin build --mem-limit 4G
-$ catkin clean
 $ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
+$ catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
 ### 新环境建图 (TODO 流程需要优化)
@@ -49,12 +63,13 @@ $ find . -name '*.DS_Store' -delete
 
 ### 固件修改
 
-1. FTP (Transmit) 修改文件: 用户名 ntuser，密码 ntuser
-2. telnet root登陆 192.168.1.120/60，`chmod 777` 添加可执行权限
-   ```bash
-   $ ln -sf new_firmware robot_control_system
-   ```
-3. `shutdown` 重启
+```bash
+$ telnet 192.168.1.120
+$ cd /home/bin
+$ chmod 777 new_firmware
+$ ln -sf new_firmware robot_control_system
+$ shutdown
+```
 
 ### 常用指令
 
@@ -66,19 +81,7 @@ $ rqt_graph
 $ scp -r ysc@192.168.1.102:~/DeepNavi/src .
 # 文件传输 MacBook -> Robot
 $ scp -r src/ ysc@192.168.1.102:~/DeepNavi/
+
+$ rosrun rqt_logger_level rqt_logger_level
+$ rosrun rqt_console rqt_console
 ```
-
-### Issues & TODO
-
-- 检测到碰撞立即停止
-  ```yaml
-  <param name="controller_patience" value="0.0" />
-  <param name="planner_frequency" value="0.0" />
-
-  <param name="recovery_behavior_enabled" value="false" />
-  <param name="clearing_rotation_allowed" value="false" />
-  ```
-- BT Design
-- Elevation_mapping/Octomap/STVL using LIDAR or D435
-- PCD convert to costmap
-- Elevation_map convert to costmap
