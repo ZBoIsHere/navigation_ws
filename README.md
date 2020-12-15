@@ -14,6 +14,7 @@
 - TEB Bugs
 - Using fixed global path
 - Improve the accuracy of goal
+- Improve the accuracy of localization
 
 ### WRC 小场景建图与定位@2020/12/02
 
@@ -39,7 +40,6 @@ $ sudo apt-get install ros-kinetic-navigation ros-kinetic-navigation-experimenta
 $ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim wireshark
 
 $ catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
-# Release 编译
 $ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
 $ catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
@@ -77,11 +77,6 @@ $ shutdown
 $ rosrun rqt_tf_tree rqt_tf_tree
 $ rosrun tf tf_echo from to
 $ rqt_graph
-# 文件传输 Robot -> MacBook
-$ scp -r ysc@192.168.1.102:~/DeepNavi/src .
-# 文件传输 MacBook -> Robot
-$ scp -r src/ ysc@192.168.1.102:~/DeepNavi/
-
-$ rosrun rqt_logger_level rqt_logger_level
-$ rosrun rqt_console rqt_console
+$ rqt_logger_level
+$ rqt_console
 ```
