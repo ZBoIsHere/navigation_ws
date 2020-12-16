@@ -1,3 +1,4 @@
 **/.DS_Store
 
-pipeline/data
+src/pipeline/data
+src/localization/map
