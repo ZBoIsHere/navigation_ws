@@ -27,24 +27,24 @@ voxel_leaf_size: 0.5
 ### 地形图@2020/11/25
 
 ```bash
-$ roslaunch nav sbpl.launch
-$ roslaunch elevation_mapping_demos simple_demo.launch
-$ roslaunch realsense2_camera rs_camera.launch
+# 启动程序
+$ roslaunch nav robot.launch
+# 远程操控
+$ roslaunch nav pc.launch
 ```
 
 ### 依赖项和编译工具
 
 ```bash
-# 安装依赖包与调试工具
+# 依赖
 $ sudo apt-get install ros-kinetic-navigation ros-kinetic-navigation-experimental ros-kinetic-teb-local-planner
-$ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim wireshark
-
+# 工具
+$ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim wireshark htop
+# 编译
 $ catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
-$ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
-$ catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
-### 新环境建图 (TODO 流程需要优化)
+### 新环境建图 (TODO 优化)
 
 ```bash
 $ roslaunch ndt_mapping ndt_mapping.launch
@@ -79,4 +79,6 @@ $ rosrun tf tf_echo from to
 $ rqt_graph
 $ rqt_logger_level
 $ rqt_console
+$ catkin config -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_ARG1=-std=c++11
+$ catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
