@@ -1,5 +1,4 @@
 #imu_topic: "/imu"
-
 use_odom: false
 use_local_target: false
 debug: false
@@ -14,7 +13,6 @@ odom_topic: "/odomImu/odom_imu"
 
 tf_timeout: 1.0
 odom_timeout: 1.5
-
 predict_error_thresh: 0.3
 
 voxel_leaf_size: 0.5
@@ -32,7 +30,7 @@ init_pitch: 0.0
 init_yaw: 0.0
 
 min_scan_range: 1.0  
-max_scan_range: 90
+max_scan_range: 30
 
 length_update_target_map: 3.0
 target_map_radius: 100
