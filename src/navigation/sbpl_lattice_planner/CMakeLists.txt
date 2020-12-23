@@ -5,7 +5,7 @@ project(sbpl_lattice_planner)
 ##############################################################################
 # Find dependencies
 ##############################################################################
-
+set(CMAKE_BUILD_TYPE Release)
 set(THIS_PACKAGE_ROS_DEPS roscpp costmap_2d nav_core pluginlib tf2
   geometry_msgs nav_msgs)
 find_package(catkin REQUIRED COMPONENTS

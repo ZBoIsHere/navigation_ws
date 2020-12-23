@@ -3,9 +3,4 @@ project(nav)
 
 find_package(catkin REQUIRED)
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES teb_local_planner_tutorials
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
-)
+catkin_package()

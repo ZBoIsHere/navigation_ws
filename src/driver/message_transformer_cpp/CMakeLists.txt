@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(message_transformer_cpp)
 
-# add_compile_options(-std=c++11)
 SET(CMAKE_CXX_FLAGS "-std=c++11 -g -O3 ${CMAKE_CXX_FLAGS}")
-
+set(CMAKE_BUILD_TYPE Release)
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -25,8 +24,7 @@ catkin_package(
   ${PCL_OPENMP_PACKAGES}
   DEPENDS
 )
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
+
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
@@ -36,7 +34,6 @@ add_library(moving_average
    src/moving_average.cpp
 )
 
-## Declare a cpp executable
 add_executable(qnx2ros
   src/qnx2ros.cpp
 )

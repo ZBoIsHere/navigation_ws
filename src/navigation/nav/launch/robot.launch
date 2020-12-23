@@ -3,7 +3,7 @@
   <arg name="lidar_type" default="rslidar" />
   <arg name="enable_driver" default="true" />
   <arg name="enable_rviz" default="false" />
-  <arg name="map_id" default="wrc" />
+  <arg name="map_id" default="map" />
   <arg name="mprim_id" default="mprim05" />
 
 
