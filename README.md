@@ -36,7 +36,7 @@
    ```
    具体参数分别对应：
    - 机器人型号: `MINI`/`JYL`
-   - 激光雷达型号 (默认 `rslidar`，如果设置为 `velodyne`，需先删除文件夹 `navigation_ws/src/driver/ros_rslidar-master/` 后解压 `velodyne-master.zip` 文件，并重新编译工作空间): `rslidar`/`velodyne`
+   - 激光雷达型号 (默认 `rslidar`，如果设置为 `velodyne`，需先删除文件夹 `navigation_ws/src/driver/ros_rslidar-master/` 后解压 `velodyne-master.zip` 文件，并重新编译工作空间或者单独编译激光雷达驱动 `$ catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES="velodyne;velodyne_driver;velodyne_laserscan;velodyne_msgs;velodyne_pcl;velodyne_pointcloud"`): `rslidar`/`velodyne`
    - 是否开启激光与通信驱动: `true`/`false`
    - 是否开启 RViz: `true`/`false`
    - 导航地图的名称: `XXX`
