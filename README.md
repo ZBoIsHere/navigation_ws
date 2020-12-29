@@ -1,5 +1,7 @@
 ## 自主导航程序使用说明
 
+注：考虑到运行性能与可靠性，强烈建议**采用主从机方式**调试
+
 1. 安装编译，先进入用户目录 ($ cd ~) 解压导航程序包，然后执行：
    ```bash
    $ sudo apt-get install ros-kinetic-navigation ros-kinetic-navigation-experimental ros-kinetic-teb-local-planner
@@ -40,7 +42,7 @@
    - 是否开启激光与通信驱动: `true`/`false`
    - 是否开启 RViz: `true`/`false`
    - 导航地图的名称: `XXX`
-   - 导航地图的分辨率: `mprim05`/`mprim10`
+   - 导航地图的分辨率: `mprim05`/`mprim10`，对应 5cm/10cm
 3. 调优导航参数，参数文件位于 `navigation_ws/src/navigation/nav/config/`，请务必**在熟悉参数意义的前提下**修改。
 4. 启动导航程序，
    
