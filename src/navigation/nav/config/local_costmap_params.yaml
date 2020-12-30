@@ -15,3 +15,4 @@ local_costmap:
     - {name: obstacle_layer_lidar2scan, type: "costmap_2d::ObstacleLayer"}
     - {name: obstacle_layer_stereo2scan, type: "costmap_2d::ObstacleLayer"}
     - {name: local_inflation_layer, type: "costmap_2d::InflationLayer"}
+    - {name: rgbd_obstacle_layer, type: "spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer"}
