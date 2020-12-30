@@ -18,7 +18,7 @@ TebLocalPlannerROS:
   control_look_ahead_poses: 2
 
   # Robot 全向速度 & 加速度参数配置
-  max_vel_x: 0.5
+  max_vel_x: 0.7
   max_vel_x_backwards: 0.101
   max_vel_y: 0.2
   max_vel_theta: 0.5

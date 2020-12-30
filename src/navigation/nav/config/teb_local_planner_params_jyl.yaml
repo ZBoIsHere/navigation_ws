@@ -4,7 +4,7 @@ TebLocalPlannerROS:
 
   # Trajectory
   teb_autosize: true
-  dt_ref: 0.5
+  dt_ref: 0.7
   dt_hysteresis: 0.1
   min_samples: 3
   global_plan_overwrite_orientation: true
