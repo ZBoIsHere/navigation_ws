@@ -6,16 +6,16 @@ import dynamic_reconfigure.client
 rospy.init_node("myconfig_py", anonymous=True)
 client_teb = dynamic_reconfigure.client.Client("/move_base/TebLocalPlannerROS")
 client_global_costmap_1 = dynamic_reconfigure.client.Client(
-    "/move_base/global_costmap/obstacle_layer1"
+    "/move_base/global_costmap/obstacle_layer_lidar2scan"
 )
 client_global_costmap_2 = dynamic_reconfigure.client.Client(
-    "/move_base/global_costmap/obstacle_layer2"
+    "/move_base/global_costmap/obstacle_layer_stereo2scan"
 )
 client_local_costmap_1 = dynamic_reconfigure.client.Client(
-    "/move_base/local_costmap/obstacle_layer1"
+    "/move_base/local_costmap/obstacle_layer_lidar2scan"
 )
 client_local_costmap_2 = dynamic_reconfigure.client.Client(
-    "/move_base/local_costmap/obstacle_layer2"
+    "/move_base/local_costmap/obstacle_layer_stereo2scan"
 )
 
 slow_vel_params = {

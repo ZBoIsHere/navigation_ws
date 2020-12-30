@@ -8,7 +8,7 @@ static_layer:
   enabled: true
   map_topic: map
 
-obstacle_layer1:
+obstacle_layer_lidar2scan:
   enabled: true
   obstacle_range: 2.5
   raytrace_range: 5.5
@@ -24,7 +24,7 @@ obstacle_layer1:
     clearing: true
     expected_update_rate: 0
 
-obstacle_layer2:
+obstacle_layer_stereo2scan:
   enabled: true
   obstacle_range: 2.5
   raytrace_range: 5.5

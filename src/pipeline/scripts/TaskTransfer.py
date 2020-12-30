@@ -21,16 +21,16 @@ class TaskTransfer:
             "/move_base/TebLocalPlannerROS"
         )
         self.client_global_costmap_1 = dynamic_reconfigure.client.Client(
-            "/move_base/global_costmap/obstacle_layer1"
+            "/move_base/global_costmap/obstacle_layer_lidar2scan"
         )
         self.client_global_costmap_2 = dynamic_reconfigure.client.Client(
-            "/move_base/global_costmap/obstacle_layer2"
+            "/move_base/global_costmap/obstacle_layer_stereo2scan"
         )
         self.client_local_costmap_1 = dynamic_reconfigure.client.Client(
-            "/move_base/local_costmap/obstacle_layer1"
+            "/move_base/local_costmap/obstacle_layer_lidar2scan"
         )
         self.client_local_costmap_2 = dynamic_reconfigure.client.Client(
-            "/move_base/local_costmap/obstacle_layer2"
+            "/move_base/local_costmap/obstacle_layer_stereo2scan"
         )
         self.moveBaseClient = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         self.moveBaseClient.wait_for_server()
