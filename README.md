@@ -89,6 +89,7 @@
 - Using fixed global path
 - Improve the accuracy of goal
 - Improve the accuracy of localization
+- Reduce pointcloud_to_laserscan's %CPU
 
 ### ~~建图参考 (TODO 优化)~~
 

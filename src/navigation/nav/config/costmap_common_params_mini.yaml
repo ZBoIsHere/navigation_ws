@@ -13,6 +13,7 @@ obstacle_layer1:
   obstacle_range: 4
   raytrace_range: 20
   track_unknown_space: true
+  combination_method: 0
   observation_sources: laser_scan_sensor
   laser_scan_sensor:
     data_type: LaserScan
