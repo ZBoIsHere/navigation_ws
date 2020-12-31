@@ -128,35 +128,34 @@ class TaskTransfer:
         """
         Do something to finish the action, only ONCE
         """
-        if not self.plan_failed() and des_point.order_equal_to(4):
-            print "START TO UP STAIRS..."
-            print "set_low_vel and disable_costmap"
-            self.set_low_vel()
-            self.disable_costmap()
-            with RobotCommander() as robot_commander:
-                robot_commander.up_stair_trait()
-                rospy.sleep(0.1)
-            rospy.sleep(0.5)
-        if not self.plan_failed() and des_point.order_equal_to(5):
-            print "Finish UP STAIRS."
-            print "reset_vel and enable_costmap"
-            self.reset_vel()
-            self.enable_costmap()
-            rospy.sleep(0.5)
-
-        if not self.plan_failed() and des_point.order_equal_to(6):
-            print "START TO CRAWL..."
-            print "disable_costmap"
-            self.disable_costmap()
-            with RobotCommander() as robot_commander:
-                robot_commander.crawl_trait()
-                rospy.sleep(0.1)
-            rospy.sleep(0.5)
-        if not self.plan_failed() and des_point.order_equal_to(7):
-            print "Finish CRAWL."
-            print "enable_costmap"
-            self.enable_costmap()
-            with RobotCommander() as robot_commander:
-                robot_commander.finish_crawl_trait()
-                rospy.sleep(0.1)
-            rospy.sleep(0.5)
+        # if not self.plan_failed() and des_point.order_equal_to(4):
+        #     print "START TO UP STAIRS..."
+        #     print "set_low_vel and disable_costmap"
+        #     self.set_low_vel()
+        #     self.disable_costmap()
+        #     with RobotCommander() as robot_commander:
+        #         robot_commander.up_stair_trait()
+        #         rospy.sleep(0.1)
+        #     rospy.sleep(0.5)
+        # if not self.plan_failed() and des_point.order_equal_to(5):
+        #     print "Finish UP STAIRS."
+        #     print "reset_vel and enable_costmap"
+        #     self.reset_vel()
+        #     self.enable_costmap()
+        #     rospy.sleep(0.5)
+        # if not self.plan_failed() and des_point.order_equal_to(6):
+        #     print "START TO CRAWL..."
+        #     print "disable_costmap"
+        #     self.disable_costmap()
+        #     with RobotCommander() as robot_commander:
+        #         robot_commander.crawl_trait()
+        #         rospy.sleep(0.1)
+        #     rospy.sleep(0.5)
+        # if not self.plan_failed() and des_point.order_equal_to(7):
+        #     print "Finish CRAWL."
+        #     print "enable_costmap"
+        #     self.enable_costmap()
+        #     with RobotCommander() as robot_commander:
+        #         robot_commander.finish_crawl_trait()
+        #         rospy.sleep(0.1)
+        #     rospy.sleep(0.5)
