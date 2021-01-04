@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <ros/duration.h>
 #include <ros/ros.h>
+#include <sensor_msgs/Imu.h>
 #include <sensor_msgs/JointState.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 
@@ -26,7 +28,7 @@ using namespace std;
 #define PI 3.1415926
 
 #pragma pack(4)
-struct RobotStateUpload {
+struct RobotState {
   double rpy[3];
   double rpy_vel[3];
   double xyz_acc[3];
@@ -47,10 +49,29 @@ struct RobotStateReceived {
   int code;
   int size;
   int cons_code;
-  struct RobotStateUpload data;
+  struct RobotState data;
 };
 
-struct JointStateUpload {
+struct ImuData {
+  int32_t timestamp;
+  union {
+    float buffer_float[9];
+    uint8_t buffer_byte[3][12];
+    struct {
+      float angle_roll, angle_pitch, angle_yaw;
+      float angular_velocity_roll, angular_velocity_pitch, angular_velocity_yaw;
+      float acc_x, acc_y, acc_z;
+    };
+  };
+};
+struct ImuDataReceived {
+  int code;
+  int size;
+  int cons_code;
+  struct ImuData data;
+};
+
+struct JointState {
   double LF_Joint;
   double LF_Joint_1;
   double LF_Joint_2;
@@ -68,7 +89,7 @@ struct JointStateReceived {
   int code;
   int size;
   int cons_code;
-  struct JointStateUpload data;
+  struct JointState data;
 };
 
 int main(int argc, char **argv) {
@@ -103,21 +124,45 @@ int main(int argc, char **argv) {
   MovingAverage filter_vel_y(filter_size);
   MovingAverage filter_vel_theta(filter_size);
 
-  ros::Publisher leg_odom_pub;
-  ros::Publisher joint_state_pub;
-  leg_odom_pub = nh.advertise<nav_msgs::Odometry>("leg_odom", 1);
-  joint_state_pub = nh.advertise<sensor_msgs::JointState>("joint_states", 1);
+  ros::Publisher leg_odom_pub = nh.advertise<nav_msgs::Odometry>("leg_odom", 1);
+  ros::Publisher joint_state_pub =
+      nh.advertise<sensor_msgs::JointState>("joint_states", 1);
+  ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("/imu/data", 1);
+  ros::Publisher imu_pub_200hz = nh.advertise<sensor_msgs::Imu>("/imu", 1);
 
-  ros::Rate loop_rate(200);
+  std::chrono::steady_clock::time_point start_outer =
+      std::chrono::steady_clock::now();
+  int64_t counter1 = 0;
+  int64_t counter2 = 0;
+  int64_t counter3 = 0;
+  int64_t counter_total = 0;
+  ros::Rate loop_rate(300);
   while (ros::ok()) {
     recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
                         (struct sockaddr *)&addr_client, (socklen_t *)&len);
+    counter_total++;
+
+    std::chrono::duration<double> time_counter =
+        std::chrono::duration_cast<std::chrono::duration<double>>(
+            std::chrono::steady_clock::now() - start_outer);
+    if (time_counter.count() >= 1.0) {
+      std::cout << "counter1: " << counter1 << ". "
+                << "counter2: " << counter2 << ". "
+                << "counter3: " << counter3 << ". "
+                << "counter_total: " << counter_total << " using "
+                << time_counter.count() << " seconds." << std::endl;
+      counter1 = 0;
+      counter2 = 0;
+      counter3 = 0;
+      counter_total = 0;
+      start_outer = std::chrono::steady_clock::now();
+    }
     // 发布里程计数据
     if (recv_num == sizeof(RobotStateReceived)) {
       RobotStateReceived *dr = (RobotStateReceived *)(recv_buf);
-      RobotStateUpload *robot_state = &dr->data;
+      RobotState *robot_state = &dr->data;
       // ROS_INFO_STREAM("CODE: " << dr->code);
-      if (dr->code == 2305) {
+      if (dr->code == 2320) {
         nav_msgs::Odometry leg_odom_data;
         leg_odom_data.header.frame_id = "odom";
         leg_odom_data.child_frame_id = "base_link";
@@ -145,15 +190,26 @@ int main(int argc, char **argv) {
 
         leg_odom_data.twist.twist.angular.z = filter_vel_theta.out();
         leg_odom_pub.publish(leg_odom_data);
-      }
-    };
 
-    // 发布关节角数据
-    if ((recv_num == sizeof(JointStateReceived))) {
+        // IMU
+        sensor_msgs::Imu imu_msg;
+        imu_msg.header.frame_id = "imu";
+        imu_msg.header.stamp = ros::Time::now();
+        imu_msg.angular_velocity.x = robot_state->rpy_vel[0];
+        imu_msg.angular_velocity.y = robot_state->rpy_vel[1];
+        imu_msg.angular_velocity.z = robot_state->rpy_vel[2];
+        imu_msg.linear_acceleration.x = robot_state->xyz_acc[0];
+        imu_msg.linear_acceleration.y = robot_state->xyz_acc[1];
+        imu_msg.linear_acceleration.z = robot_state->xyz_acc[2];
+
+        imu_pub.publish(imu_msg);
+        counter1++;
+      }
+    } else if ((recv_num == sizeof(JointStateReceived))) {
       JointStateReceived *dr = (JointStateReceived *)(recv_buf);
-      JointStateUpload *joint_state = &dr->data;
+      JointState *joint_state = &dr->data;
       // ROS_INFO_STREAM("CODE: " << dr->code);
-      if (dr->code == 2306) {
+      if (dr->code == 2321) {
         sensor_msgs::JointState joint_state_data;
         joint_state_data.header.stamp = ros::Time::now();
         joint_state_data.name.resize(12);
@@ -187,8 +243,25 @@ int main(int argc, char **argv) {
         joint_state_data.name[11] = "RB_Joint_2";
         joint_state_data.position[11] = -joint_state->RB_Joint_2;
         joint_state_pub.publish(joint_state_data);
+        counter2++;
       }
-    };
+    } else {
+      ImuDataReceived *dr = (ImuDataReceived *)(recv_buf);
+      ImuData *imu_data = &dr->data;
+      // ROS_INFO_STREAM("CODE: " << dr->code);
+      sensor_msgs::Imu imu_msg;
+      imu_msg.header.frame_id = "imu";
+      imu_msg.header.stamp = ros::Time::now();
+      imu_msg.angular_velocity.x = imu_data->angular_velocity_roll;
+      imu_msg.angular_velocity.y = imu_data->angular_velocity_pitch;
+      imu_msg.angular_velocity.z = imu_data->angular_velocity_yaw;
+      imu_msg.linear_acceleration.x = imu_data->acc_x;
+      imu_msg.linear_acceleration.y = imu_data->acc_y;
+      imu_msg.linear_acceleration.z = imu_data->acc_z;
+      imu_pub_200hz.publish(imu_msg);
+      counter3++;
+    }
+
     loop_rate.sleep();
   }
 

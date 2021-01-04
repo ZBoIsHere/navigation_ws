@@ -86,10 +86,12 @@
 - PCD convert to costmap
 - Elevation_map convert to costmap
 - TEB Bugs
-- Using fixed global path
+- Use fixed global path
 - Improve the accuracy of goal
-- Improve the accuracy of localization
+- Improve the accuracy of localization using IMU
 - Reduce pointcloud_to_laserscan's %CPU
+- ADD `waitForTransform` before `lookupTransform`
+- hdl_imu + STVL + sbpl + teb
 
 ### ~~建图参考 (TODO 优化)~~
 
