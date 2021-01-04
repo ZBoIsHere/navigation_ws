@@ -136,10 +136,14 @@ int main(int argc, char **argv) {
   int64_t counter2 = 0;
   int64_t counter3 = 0;
   int64_t counter_total = 0;
-  ros::Rate loop_rate(300);
+  ros::Rate loop_rate(500);
   while (ros::ok()) {
-    recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
-                        (struct sockaddr *)&addr_client, (socklen_t *)&len);
+    if ((recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
+                             (struct sockaddr *)&addr_client,
+                             (socklen_t *)&len)) < 0) {
+      perror("recvfrom error:");
+      exit(1);
+    }
     counter_total++;
 
     std::chrono::duration<double> time_counter =
