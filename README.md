@@ -125,3 +125,9 @@ $ shutdown
 # 调试工具
 $ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim wireshark htop
 ```
+
+### UDP
+
+- [Socket Programming](https://www.cs.dartmouth.edu/~campbell/cs60/socketprogramming.html)
+- [sendto() + recvfrom() buffer confusion Datagram](https://stackoverflow.com/questions/30015205/sendto-recvfrom-buffer-confusion-datagram)
+- [UDP sendto() and recvfrom() max buffer size](https://stackoverflow.com/questions/3292281/udp-sendto-and-recvfrom-max-buffer-size)
