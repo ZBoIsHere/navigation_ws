@@ -92,6 +92,9 @@
 - Reduce pointcloud_to_laserscan's %CPU
 - ADD `waitForTransform` before `lookupTransform`
 - hdl_imu + STVL + sbpl + teb
+- `tf1` to `tf2`
+- fix IMU bug for hdl_localization
+- Mini-Doc
 
 ### ~~建图参考 (TODO 优化)~~
 
