@@ -150,11 +150,13 @@ int main(int argc, char **argv) {
         std::chrono::duration_cast<std::chrono::duration<double>>(
             std::chrono::steady_clock::now() - start_outer);
     if (time_counter.count() >= 1.0) {
-      std::cout << "counter1: " << counter1 << ". "
-                << "counter2: " << counter2 << ". "
-                << "counter3: " << counter3 << ". "
-                << "counter_total: " << counter_total << " using "
-                << time_counter.count() << " seconds." << std::endl;
+      if (counter3 < 200) {
+        std::cout << "counter1: " << counter1 << ". "
+                  << "counter2: " << counter2 << ". "
+                  << "counter3: " << counter3 << ". "
+                  << "counter_total: " << counter_total << " using "
+                  << time_counter.count() << " seconds." << std::endl;
+      }
       counter1 = 0;
       counter2 = 0;
       counter3 = 0;
