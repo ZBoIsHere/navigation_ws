@@ -95,6 +95,8 @@
 - `tf1` to `tf2`
 - fix IMU bug for hdl_localization
 - Mini-Doc
+- RSLiDAR 固件、SDK 更新和数据裁剪
+- IMU 标定与初始化
 
 ### ~~建图参考 (TODO 优化)~~
 
