@@ -1,6 +1,6 @@
 <launch>
   <arg name="robot_type" default="MINI" />
-  <arg name="lidar_type" default="rslidar" />
+  <arg name="lidar_type" default="velodyne" />
   <arg name="enable_driver" default="true" />
   <arg name="enable_rviz" default="false" />
   <arg name="map_id" default="map" />
@@ -47,9 +47,9 @@
       <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
     </group>
     <!-- 导航 -->
-    <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch">
+    <!-- <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch">
       <arg name="lidar_type" value="$(arg lidar_type)" />
-    </include>
+    </include> -->
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <!-- 代价地图 -->
       <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="global_costmap" />
@@ -60,13 +60,13 @@
       <rosparam file="$(find sbpl_lattice_planner)/launch/move_base/sbpl_global_params.yaml" command="load" />
       <param name="base_global_planner" value="SBPLLatticePlanner" />
       <param name="SBPLLatticePlanner/primitive_filename" value="$(find sbpl_lattice_planner)/matlab/mprim/$(arg mprim_id).mprim" />
-      <param name="planner_frequency" value="0" />
+      <param name="planner_frequency" value="0.5" />
       <param name="planner_patience" value="10.0" />
       <!-- 轨迹控制 -->
       <rosparam file="$(find nav)/config/teb_local_planner_params_mini.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="5.0" />
-      <param name="controller_patience" value="15.0" />
+      <param name="controller_frequency" value="10.0" />
+      <param name="controller_patience" value="10.0" />
       <!-- 异常处理 -->
       <param name="recovery_behavior_enabled" value="false" />
     </node>

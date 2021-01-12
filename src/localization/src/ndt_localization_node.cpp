@@ -291,7 +291,7 @@ void NDTLocalization::pointCloud_process() {
   tmp_q.setRPY(current_pose_.roll, current_pose_.pitch, current_pose_.yaw);
   tf::Transform map_to_laser(
       tmp_q,
-      tf::Vector3(current_pose_.x, current_pose_.y, current_pose_.z + 0.35));
+      tf::Vector3(current_pose_.x, current_pose_.y, current_pose_.z));
   // tf_broadcaster_.sendTransform(tf::StampedTransform(map_to_laser,
   // ros::Time::now(), param_map_frame_, param_laser_frame_));
 

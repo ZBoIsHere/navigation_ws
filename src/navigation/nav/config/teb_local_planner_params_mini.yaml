@@ -9,7 +9,7 @@ TebLocalPlannerROS:
   min_samples: 3
   global_plan_overwrite_orientation: true
   allow_init_with_backwards_motion: false
-  global_plan_viapoint_sep: 0.4
+  global_plan_viapoint_sep: 0.1
   max_global_plan_lookahead_dist: 3.0
   exact_arc_length: false
   force_reinit_new_goal_dist: 1.0
@@ -18,7 +18,7 @@ TebLocalPlannerROS:
   control_look_ahead_poses: 2
 
   # Robot 全向速度 & 加速度参数配置
-  max_vel_x: 0.7
+  max_vel_x: 0.5
   max_vel_x_backwards: 0.101
   max_vel_y: 0.2
   max_vel_theta: 0.5
