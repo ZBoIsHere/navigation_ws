@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <launch>
   <!-- arguments -->
-  <arg name="nodelet_manager" default="nodelet_manager" />
-  <arg name="points_topic" default="/rslidar_points" />
+  <arg name="map_id" />
+  <arg name="lidar_type" />
+
+  <arg name="nodelet_manager" default="$(arg lidar_type)_nodelet_manager" />
+  <arg name="points_topic" default="/$(arg lidar_type)_points" />
   <arg name="imu_topic" default="/imu" />
   <arg name="odom_child_frame_id" default="base_link" />
 
   <!-- in case you use velodyne_driver, comment out the following line -->
-  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
+  <!-- <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/> -->
 
     <!-- globalmap_server_nodelet -->
     <node pkg="nodelet" type="nodelet" name="globalmap_server_nodelet" args="load hdl_localization/GlobalmapServerNodelet $(arg nodelet_manager)">
-      <param name="globalmap_pcd" value="$(find hdl_localization)/data/map.pcd" />
+      <param name="globalmap_pcd" value="$(find nav)/map/$(arg map_id).pcd" />
       <param name="convert_utm_to_local" value="true" />
       <param name="downsample_resolution" value="0.1" />
     </node>

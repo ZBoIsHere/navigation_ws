@@ -3,7 +3,7 @@
   <arg name="lidar_type" default="velodyne" />
   <arg name="enable_driver" default="true" />
   <arg name="enable_rviz" default="false" />
-  <arg name="map_id" default="map" />
+  <arg name="map_id" default="demo" />
   <arg name="mprim_id" default="mprim05" />
 
 
@@ -25,7 +25,7 @@
   </group>
 
   <!-- 定位 -->
-  <include file="$(find ndt_localization)/launch/ndt_localization.launch">
+  <include file="$(find hdl_localization)/launch/hdl_localization.launch">
     <arg name="map_id" value="$(arg map_id)" />
     <arg name="lidar_type" value="$(arg lidar_type)" />
   </include>
@@ -50,6 +50,7 @@
     <!-- <include file="$(find pointcloud_to_laserscan)/launch/pointcloud_to_laserscan.launch">
       <arg name="lidar_type" value="$(arg lidar_type)" />
     </include> -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find nav)/map/$(arg map_id).yaml"/>
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <!-- 代价地图 -->
       <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="global_costmap" />
@@ -60,13 +61,13 @@
       <rosparam file="$(find sbpl_lattice_planner)/launch/move_base/sbpl_global_params.yaml" command="load" />
       <param name="base_global_planner" value="SBPLLatticePlanner" />
       <param name="SBPLLatticePlanner/primitive_filename" value="$(find sbpl_lattice_planner)/matlab/mprim/$(arg mprim_id).mprim" />
-      <param name="planner_frequency" value="0.5" />
-      <param name="planner_patience" value="10.0" />
+      <param name="planner_frequency" value=".5" />
+      <param name="planner_patience" value ="10" />
       <!-- 轨迹控制 -->
       <rosparam file="$(find nav)/config/teb_local_planner_params_mini.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="10.0" />
-      <param name="controller_patience" value="10.0" />
+      <param name="controller_frequency" value="10" />
+      <param name="controller_patience" value= "10" />
       <!-- 异常处理 -->
       <param name="recovery_behavior_enabled" value="false" />
     </node>
