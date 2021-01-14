@@ -99,6 +99,7 @@
 - IMU 标定与初始化
 - 注释掉 laserscan nodelet
 - 修改雷达点云发布频率 20Hz
+- 降低 `libndt_omp.so` CPU 占用率
 
 ### ~~建图参考 (TODO 优化)~~
 
