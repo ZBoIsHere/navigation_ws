@@ -130,7 +130,7 @@ $ chmod 777 new_firmware
 $ ln -sf new_firmware robot_control_system
 $ shutdown
 # 调试工具
-$ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim wireshark htop
+$ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim htop
 ```
 
 ### UDP
