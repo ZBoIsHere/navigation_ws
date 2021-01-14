@@ -4,7 +4,7 @@
 
 1. 安装编译，先进入用户目录 ($ cd ~) 解压导航程序包，然后执行：
    ```bash
-   $ sudo apt-get install ros-kinetic-navigation ros-kinetic-navigation-experimental ros-kinetic-teb-local-planner ros-kinetic-spatio-temporal-voxel-layer libproj-dev
+   $ sudo apt-get install ros-kinetic-navigation ros-kinetic-navigation-experimental ros-kinetic-teb-local-planner ros-kinetic-spatio-temporal-voxel-layer libproj-dev chrony
    $ cd ~/navigation_ws
    $ catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
    ```
@@ -100,6 +100,7 @@
 - 注释掉 laserscan nodelet
 - 修改雷达点云发布频率 20Hz
 - 降低 `libndt_omp.so` CPU 占用率
+- 时间同步设置 chrony
 
 ### ~~建图参考 (TODO 优化)~~
 
