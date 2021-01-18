@@ -58,16 +58,24 @@
       <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
       <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
       <!-- 轨迹规划 -->
-      <rosparam file="$(find sbpl_lattice_planner)/launch/move_base/sbpl_global_params.yaml" command="load" />
+      <!-- SBPL -->
+      <!-- <rosparam file="$(find sbpl_lattice_planner)/launch/move_base/sbpl_global_params.yaml" command="load" />
       <param name="base_global_planner" value="SBPLLatticePlanner" />
-      <param name="SBPLLatticePlanner/primitive_filename" value="$(find sbpl_lattice_planner)/matlab/mprim/$(arg mprim_id).mprim" />
-      <param name="planner_frequency" value=".5" />
+      <param name="SBPLLatticePlanner/primitive_filename" value="$(find sbpl_lattice_planner)/matlab/mprim/$(arg mprim_id).mprim" /> -->
+      <!-- A* -->
+      <rosparam file="$(find nav)/config/global_planner_params.yaml" command="load" />
+      <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+      <!-- D* -->
+      <!-- <param name="base_global_planner" value="srl_dstar_lite/SrlDstarLite" /> -->
+
+      <param name="planner_frequency" value="0" />
       <param name="planner_patience" value ="10" />
+      <param name="max_planning_retries" value ="5" />
       <!-- 轨迹控制 -->
       <rosparam file="$(find nav)/config/teb_local_planner_params_mini.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="controller_frequency" value="10" />
-      <param name="controller_patience" value= "10" />
+      <param name="controller_patience" value ="10" />
       <!-- 异常处理 -->
       <param name="recovery_behavior_enabled" value="false" />
     </node>

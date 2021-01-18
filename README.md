@@ -101,6 +101,8 @@
 - 修改雷达点云发布频率 20Hz
 - 降低 `libndt_omp.so` CPU 占用率
 - 时间同步设置 chrony
+- waypoint_follower
+- 相机-雷达标定
 
 ### ~~建图参考 (TODO 优化)~~
 

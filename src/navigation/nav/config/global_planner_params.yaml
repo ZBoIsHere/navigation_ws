@@ -14,9 +14,9 @@ GlobalPlanner:                                  # Also see: http://wiki.ros.org/
   planner_costmap_publish_frequency: 0.0        # default 0.0
 
   lethal_cost: 253                              # default 253
-  neutral_cost: 187                             # default 50
-  cost_factor: 0.3493                           # Factor to multiply each cost from costmap by, default 3.0
+  neutral_cost: 158                             # default 50
+  cost_factor: 0.35                           # Factor to multiply each cost from costmap by, default 3.0
 
   publish_potential: true                       # Publish Potential Costmap (this is not like the navfn pointcloud2 potential), default true
-  orientation_mode: 0                           # None=0, Forward=1, Interpolate=2, ForwardThenInterpolate=3, Backward=4, Leftward=5, Rightward=6
+  orientation_mode: 1                           # None=0, Forward=1, Interpolate=2, ForwardThenInterpolate=3, Backward=4, Leftward=5, Rightward=6
   visualize_potential: true
