@@ -1,3 +1,15 @@
+- [自主导航程序使用说明](#自主导航程序使用说明)
+- [版本说明](#版本说明)
+  - [TODO](#todo)
+  - [~~建图参考 (TODO 优化)~~](#建图参考-todo-优化)
+  - [~~常用指令~~](#常用指令)
+  - [UDP](#udp)
+  - [ROS 二进制包](#ros-二进制包)
+    - [如何安装二进制文件](#如何安装二进制文件)
+    - [如何安装库的头文件](#如何安装库的头文件)
+    - [安装 roslaunch 或者普通文件](#安装-roslaunch-或者普通文件)
+    - [安装 Python 程序](#安装-python-程序)
+
 ## 自主导航程序使用说明
 
 注：考虑到运行性能与可靠性，强烈建议用[**主从机方式**](https://blog.csdn.net/Spacegene/article/details/86499467)调试
@@ -142,3 +154,70 @@ $ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim htop
 - [Socket Programming](https://www.cs.dartmouth.edu/~campbell/cs60/socketprogramming.html)
 - [sendto() + recvfrom() buffer confusion Datagram](https://stackoverflow.com/questions/30015205/sendto-recvfrom-buffer-confusion-datagram)
 - [UDP sendto() and recvfrom() max buffer size](https://stackoverflow.com/questions/3292281/udp-sendto-and-recvfrom-max-buffer-size)
+
+### [ROS 二进制包](http://wiki.ros.org/catkin/CMakeLists.txt#Optional_Step:_Specifying_Installable_Targets)
+
+文件类型：
+
+* TARGETS **二进制文件**
+* DIRECTORY **头文件夹/launch文件夹/参数文件夹**
+* FILES **头文件/launch文件/参数文件**
+* PROGRAMS **脚本文件**
+
+
+
+安装路径：
+
+* CATKIN_PACKAGE_BIN_DESTINATION
+* CATKIN_PACKAGE_LIB_DESTINATION
+* CATKIN_PACKAGE_INCLUDE_DESTINATION
+  * CATKIN_GLOBAL_INCLUDE_DESTINATION
+* CATKIN_PACKAGE_SHARE_DESTINATION
+* CATKIN_PACKAGE_PYTHON_DESTINATION
+
+#### 如何安装二进制文件
+
+```cmake
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
+
+install(TARGETS ${PROJECT_NAME}_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+```
+
+#### 如何安装库的头文件
+
+```cmake
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  PATTERN ".svn" EXCLUDE
+)
+install(DIRECTORY include/
+  DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+  PATTERN ".svn" EXCLUDE
+)
+```
+
+#### 安装 roslaunch 或者普通文件
+
+```cmake
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE)
+```
+
+#### 安装 Python 程序
+
+```cmake
+install(TARGETS python_module_library
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+)
+
+catkin_install_python(PROGRAMS scripts/myscript
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+```
