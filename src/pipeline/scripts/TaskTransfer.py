@@ -17,21 +17,21 @@ from RobotCommander import RobotCommander
 
 class TaskTransfer:
     def __init__(self):
-        self.client_teb = dynamic_reconfigure.client.Client(
-            "/move_base/TebLocalPlannerROS"
-        )
-        self.client_global_costmap_1 = dynamic_reconfigure.client.Client(
-            "/move_base/global_costmap/obstacle_layer_lidar2scan"
-        )
-        self.client_global_costmap_2 = dynamic_reconfigure.client.Client(
-            "/move_base/global_costmap/obstacle_layer_stereo2scan"
-        )
-        self.client_local_costmap_1 = dynamic_reconfigure.client.Client(
-            "/move_base/local_costmap/obstacle_layer_lidar2scan"
-        )
-        self.client_local_costmap_2 = dynamic_reconfigure.client.Client(
-            "/move_base/local_costmap/obstacle_layer_stereo2scan"
-        )
+        # self.client_teb = dynamic_reconfigure.client.Client(
+        #     "/move_base/TebLocalPlannerROS"
+        # )
+        # self.client_global_costmap_1 = dynamic_reconfigure.client.Client(
+        #     "/move_base/global_costmap/obstacle_layer_lidar2scan"
+        # )
+        # self.client_global_costmap_2 = dynamic_reconfigure.client.Client(
+        #     "/move_base/global_costmap/obstacle_layer_stereo2scan"
+        # )
+        # self.client_local_costmap_1 = dynamic_reconfigure.client.Client(
+        #     "/move_base/local_costmap/obstacle_layer_lidar2scan"
+        # )
+        # self.client_local_costmap_2 = dynamic_reconfigure.client.Client(
+        #     "/move_base/local_costmap/obstacle_layer_stereo2scan"
+        # )
         self.moveBaseClient = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         self.moveBaseClient.wait_for_server()
         rospy.loginfo("Action 'move_base' is up!")
@@ -42,43 +42,43 @@ class TaskTransfer:
     def is_action_succeed(self):
         return self.moveBaseClient.get_state() == actionlib.GoalStatus.SUCCEEDED
 
-    def set_low_vel(self):
-        slow_vel_params = {
-            "max_vel_x": 0.1,
-            "max_vel_x_backwards": 0.02,
-            "max_vel_y": 0.08,
-            "max_vel_theta": 0.2,
-            "acc_lim_x": 0.08,
-            "acc_lim_y": 0.03,
-            "acc_lim_theta": 0.1,
-        }
-        self.client_teb.update_configuration(slow_vel_params)
+    # def set_low_vel(self):
+    #     slow_vel_params = {
+    #         "max_vel_x": 0.1,
+    #         "max_vel_x_backwards": 0.02,
+    #         "max_vel_y": 0.08,
+    #         "max_vel_theta": 0.2,
+    #         "acc_lim_x": 0.08,
+    #         "acc_lim_y": 0.03,
+    #         "acc_lim_theta": 0.1,
+    #     }
+    #     self.client_teb.update_configuration(slow_vel_params)
 
-    def reset_vel(self):
-        normal_vel_params = {
-            "max_vel_x": 0.5,
-            "max_vel_x_backwards": 0.101,
-            "max_vel_y": 0.2,
-            "max_vel_theta": 0.5,
-            "acc_lim_x": 0.2,
-            "acc_lim_y": 0.11,
-            "acc_lim_theta": 0.3,
-        }
-        self.client_teb.update_configuration(normal_vel_params)
+    # def reset_vel(self):
+    #     normal_vel_params = {
+    #         "max_vel_x": 0.5,
+    #         "max_vel_x_backwards": 0.101,
+    #         "max_vel_y": 0.2,
+    #         "max_vel_theta": 0.5,
+    #         "acc_lim_x": 0.2,
+    #         "acc_lim_y": 0.11,
+    #         "acc_lim_theta": 0.3,
+    #     }
+    #     self.client_teb.update_configuration(normal_vel_params)
 
-    def disable_costmap(self):
-        params = {"enabled": False}
-        self.client_global_costmap_1.update_configuration(params)
-        self.client_global_costmap_2.update_configuration(params)
-        self.client_local_costmap_1.update_configuration(params)
-        self.client_local_costmap_2.update_configuration(params)
+    # def disable_costmap(self):
+    #     params = {"enabled": False}
+    #     self.client_global_costmap_1.update_configuration(params)
+    #     self.client_global_costmap_2.update_configuration(params)
+    #     self.client_local_costmap_1.update_configuration(params)
+    #     self.client_local_costmap_2.update_configuration(params)
 
-    def enable_costmap(self):
-        params = {"enabled": True}
-        self.client_global_costmap_1.update_configuration(params)
-        self.client_global_costmap_2.update_configuration(params)
-        self.client_local_costmap_1.update_configuration(params)
-        self.client_local_costmap_2.update_configuration(params)
+    # def enable_costmap(self):
+    #     params = {"enabled": True}
+    #     self.client_global_costmap_1.update_configuration(params)
+    #     self.client_global_costmap_2.update_configuration(params)
+    #     self.client_local_costmap_1.update_configuration(params)
+    #     self.client_local_costmap_2.update_configuration(params)
 
     def task_transfer(self, src_point, des_point):
         """
