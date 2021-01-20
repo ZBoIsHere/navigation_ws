@@ -793,7 +793,7 @@
     <axis
       xyz="0 0 0" />
   </joint>
-  <link
+  <!-- <link
     name="RealSence_F">
     <inertial>
       <origin
@@ -898,5 +898,5 @@
       link="RealSence_B" />
     <axis
       xyz="0 0 0" />
-  </joint>
+  </joint> -->
 </robot>

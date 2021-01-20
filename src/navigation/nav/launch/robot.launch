@@ -3,7 +3,7 @@
   <arg name="lidar_type" default="velodyne" />
   <arg name="enable_driver" default="true" />
   <arg name="enable_rviz" default="false" />
-  <arg name="map_id" default="demo" />
+  <arg name="map_id" default="map" />
   <arg name="mprim_id" default="mprim05" />
 
 
@@ -34,13 +34,13 @@
   <group if="$(eval arg('robot_type') == 'MINI')">
     <!-- TF 参数 -->
     <group if="$(eval arg('lidar_type') == 'velodyne')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.058 0 0 0 base_link velodyne" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.098 0 0 0 base_link velodyne" />
     </group>
     <group if="$(eval arg('lidar_type') == 'rslidar')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.058 0 0 0 base_link rslidar" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.098 0 0 0 base_link rslidar" />
     </group>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster" args="0.309 0 -0.120 0 0.36 0 base_link camera_link" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf_broadcaster" args="0.243 0 0.058 -1.57 0 0 base_link body" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster"  args="0.309 0 0.033 0 0.36 0 base_link camera_link" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf_broadcaster"    args="0.243 0 0.13 -1.5708 0 0 base_link body" />
     <!-- URDF -->
     <group if="$(arg enable_rviz)">
       <param name="robot_description" textfile="$(find mini)/urdf/mini.urdf" />

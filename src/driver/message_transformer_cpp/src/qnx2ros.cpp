@@ -27,7 +27,6 @@ using namespace std;
 #define SERV_PORT 43897
 #define PI 3.1415926
 
-#pragma pack(4)
 struct RobotState {
   double rpy[3];
   double rpy_vel[3];
@@ -45,6 +44,7 @@ struct RobotState {
   int robot_gait_state;
   int robot_task_state;
 };
+#pragma pack(4)
 struct RobotStateReceived {
   int code;
   int size;
@@ -93,7 +93,6 @@ struct JointStateReceived {
 };
 
 int main(int argc, char **argv) {
-  // 网络初始化
   int sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
   if (sock_fd < 0) {
     perror("socket");
@@ -101,9 +100,9 @@ int main(int argc, char **argv) {
   }
   struct sockaddr_in addr_serv;
   int len;
-  memset(&addr_serv, 0, sizeof(struct sockaddr_in));  //每个字节都用0填充
-  addr_serv.sin_family = AF_INET;                     //使用IPV4地址
-  addr_serv.sin_port = htons(SERV_PORT);              //端口
+  memset(&addr_serv, 0, sizeof(struct sockaddr_in));
+  addr_serv.sin_family = AF_INET;
+  addr_serv.sin_port = htons(SERV_PORT);
   addr_serv.sin_addr.s_addr = htonl(INADDR_ANY);
   len = sizeof(addr_serv);
   if (bind(sock_fd, (struct sockaddr *)&addr_serv, sizeof(addr_serv)) < 0) {
@@ -132,10 +131,10 @@ int main(int argc, char **argv) {
 
   std::chrono::steady_clock::time_point start_outer =
       std::chrono::steady_clock::now();
-  int64_t counter1 = 0;
-  int64_t counter2 = 0;
-  int64_t counter3 = 0;
-  int64_t counter_total = 0;
+  int64_t counter_RobotState = 0;
+  int64_t counter_JointState = 0;
+  int64_t counter_IMURawData = 0;
+  int64_t counter_sum = 0;
   ros::Rate loop_rate(500);
   while (ros::ok()) {
     if ((recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
@@ -144,23 +143,23 @@ int main(int argc, char **argv) {
       perror("recvfrom error:");
       exit(1);
     }
-    counter_total++;
+    counter_sum++;
 
     std::chrono::duration<double> time_counter =
         std::chrono::duration_cast<std::chrono::duration<double>>(
             std::chrono::steady_clock::now() - start_outer);
     if (time_counter.count() >= 1.0) {
-      if (counter3 < 200) {
-        std::cout << "counter1: " << counter1 << ". "
-                  << "counter2: " << counter2 << ". "
-                  << "counter3: " << counter3 << ". "
-                  << "counter_total: " << counter_total << " using "
+      if (counter_IMURawData < 200) {
+        std::cout << "counter_RobotState: " << counter_RobotState << ". "
+                  << "counter_JointState: " << counter_JointState << ". "
+                  << "counter_IMURawData: " << counter_IMURawData << ". "
+                  << "counter_sum: " << counter_sum << " using "
                   << time_counter.count() << " seconds." << std::endl;
       }
-      counter1 = 0;
-      counter2 = 0;
-      counter3 = 0;
-      counter_total = 0;
+      counter_RobotState = 0;
+      counter_JointState = 0;
+      counter_IMURawData = 0;
+      counter_sum = 0;
       start_outer = std::chrono::steady_clock::now();
     }
     // 发布里程计数据
@@ -168,7 +167,7 @@ int main(int argc, char **argv) {
       RobotStateReceived *dr = (RobotStateReceived *)(recv_buf);
       RobotState *robot_state = &dr->data;
       // ROS_INFO_STREAM("CODE: " << dr->code);
-      if (dr->code == 2320) {
+      if (dr->code == 2305) {
         nav_msgs::Odometry leg_odom_data;
         leg_odom_data.header.frame_id = "odom";
         leg_odom_data.child_frame_id = "base_link";
@@ -184,12 +183,12 @@ int main(int argc, char **argv) {
         filter_vel_y.in(robot_state->vel_world[1]);
         filter_vel_theta.in(robot_state->rpy_vel[2]);
 
-        if (true) {
+        if (true) {  // vel_world to vel_base
           leg_odom_data.twist.twist.linear.x =
               +filter_vel_x.out() * cos(yaw) + filter_vel_y.out() * sin(yaw);
           leg_odom_data.twist.twist.linear.y =
               -filter_vel_x.out() * sin(yaw) + filter_vel_y.out() * cos(yaw);
-        } else {
+        } else {  // vel_base
           leg_odom_data.twist.twist.linear.x = filter_vel_x.out();
           leg_odom_data.twist.twist.linear.y = filter_vel_y.out();
         }
@@ -209,13 +208,13 @@ int main(int argc, char **argv) {
         imu_msg.linear_acceleration.z = robot_state->xyz_acc[2];
 
         imu_pub.publish(imu_msg);
-        counter1++;
+        counter_RobotState++;
       }
-    } else if ((recv_num == sizeof(JointStateReceived))) {
+    } else if (recv_num == sizeof(JointStateReceived)) {
       JointStateReceived *dr = (JointStateReceived *)(recv_buf);
       JointState *joint_state = &dr->data;
       // ROS_INFO_STREAM("CODE: " << dr->code);
-      if (dr->code == 2321) {
+      if (dr->code == 2306) {
         sensor_msgs::JointState joint_state_data;
         joint_state_data.header.stamp = ros::Time::now();
         joint_state_data.name.resize(12);
@@ -249,23 +248,30 @@ int main(int argc, char **argv) {
         joint_state_data.name[11] = "RB_Joint_2";
         joint_state_data.position[11] = -joint_state->RB_Joint_2;
         joint_state_pub.publish(joint_state_data);
-        counter2++;
+        counter_JointState++;
       }
-    } else {
+    } else if (recv_num == sizeof(ImuDataReceived)) {
       ImuDataReceived *dr = (ImuDataReceived *)(recv_buf);
       ImuData *imu_data = &dr->data;
       // ROS_INFO_STREAM("CODE: " << dr->code);
-      sensor_msgs::Imu imu_msg;
-      imu_msg.header.frame_id = "imu";
-      imu_msg.header.stamp = ros::Time::now();
-      imu_msg.angular_velocity.x = imu_data->angular_velocity_roll;
-      imu_msg.angular_velocity.y = imu_data->angular_velocity_pitch;
-      imu_msg.angular_velocity.z = imu_data->angular_velocity_yaw;
-      imu_msg.linear_acceleration.x = imu_data->acc_x;
-      imu_msg.linear_acceleration.y = imu_data->acc_y;
-      imu_msg.linear_acceleration.z = imu_data->acc_z;
-      imu_pub_200hz.publish(imu_msg);
-      counter3++;
+      if (dr->code == 67841) {
+        sensor_msgs::Imu imu_msg;
+        imu_msg.header.frame_id = "imu";
+        imu_msg.header.stamp = ros::Time::now();
+        auto q = tf::createQuaternionFromRPY(
+            imu_data->angle_roll, imu_data->angle_pitch, imu_data->angle_yaw);
+        tf::quaternionTFToMsg(q, imu_msg.orientation);
+        imu_msg.angular_velocity.x = imu_data->angular_velocity_roll;
+        imu_msg.angular_velocity.y = imu_data->angular_velocity_pitch;
+        imu_msg.angular_velocity.z = imu_data->angular_velocity_yaw;
+        imu_msg.linear_acceleration.x = imu_data->acc_x;
+        imu_msg.linear_acceleration.y = imu_data->acc_y;
+        imu_msg.linear_acceleration.z = imu_data->acc_z;
+        imu_pub_200hz.publish(imu_msg);
+        counter_IMURawData++;
+      }
+    } else {
+      ROS_INFO_STREAM("UNKNOWN recv_num: " << recv_num);
     }
 
     loop_rate.sleep();

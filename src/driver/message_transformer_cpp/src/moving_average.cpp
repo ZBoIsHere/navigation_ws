@@ -1,6 +1,6 @@
 #include "moving_average.h"
 
-MovingAverage::MovingAverage(unsigned short filterLength)
+MovingAverage::MovingAverage(const int& filterLength)
     : filter_length(filterLength),
       filled(false),
       index(-1),
@@ -11,7 +11,7 @@ MovingAverage::MovingAverage(unsigned short filterLength)
 
 MovingAverage::~MovingAverage() {}
 
-void MovingAverage::in(double x) {
+void MovingAverage::in(const double& x) {
   index = (index + 1) % filter_length;
   sum -= data[index];
   data[index] = x;
@@ -26,4 +26,4 @@ void MovingAverage::in(double x) {
   }
 }
 
-double MovingAverage::out() { return average; }
+double MovingAverage::out() const { return average; }

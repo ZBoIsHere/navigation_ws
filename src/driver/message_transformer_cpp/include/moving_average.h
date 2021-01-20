@@ -5,7 +5,7 @@
 
 class MovingAverage {
  private:
-  unsigned short filter_length;
+  const int filter_length;
   bool filled;
   int index;
   double sum, average;
@@ -16,7 +16,7 @@ class MovingAverage {
    * Creates a new instance of MovingAverage with
    * given filter length.
    */
-  MovingAverage(unsigned short);
+  MovingAverage(const int&);
   /**
    * Releases the memory objects associated with the
    * current MovingAverage instance.
@@ -26,11 +26,11 @@ class MovingAverage {
    * Adds a new element in the Moving Average vector.
    * Updates the current average.
    */
-  void in(double);
+  void in(const double&);
   /**
    * Returns the current average as update after the invocation
    * of MovingAverage::add(double).
    */
-  double out();
+  double out() const;
 };
 #endif
