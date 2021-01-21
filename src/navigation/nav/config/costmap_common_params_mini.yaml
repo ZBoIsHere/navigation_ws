@@ -25,20 +25,32 @@ rgbd_obstacle_layer:
   transform_tolerance:      0.2   # seconds
   mapping_mode:             false # default off, saves map not for navigation
   map_save_duration:        60    # default 60s, how often to autosave
-  observation_sources:      rgbd1_mark rgbd1_clear
-  rgbd1_mark:
+  observation_sources:      lidar_mark d435_mark lidar_clear
+  lidar_mark:
     data_type: PointCloud2
     topic: /velodyne_points
     marking: true
     clearing: false
-    min_obstacle_height: 0.1     # default 0, meters
+    min_obstacle_height: 0.4     # default 0, meters
     max_obstacle_height: 1.0     # default 3, meters
     expected_update_rate: 10.0   # default 0, if not updating at this rate at least, remove from buffer
     observation_persistence: 0.0 # default 0, use all measurements taken during now-value, 0=latest
     inf_is_valid: true           # default false, for laser scans
     voxel_filter: true           # default off, apply voxel filter to sensor, recommend on
     clear_after_reading: true    # default false, clear the buffer after the layer gets readings from it
-  rgbd1_clear:
+  d435_mark:
+    data_type: PointCloud2
+    topic: /camera/depth/color/points
+    marking: true
+    clearing: false
+    min_obstacle_height: 0.4     # default 0, meters
+    max_obstacle_height: 1.0     # default 3, meters
+    expected_update_rate: 10.0   # default 0, if not updating at this rate at least, remove from buffer
+    observation_persistence: 0.0 # default 0, use all measurements taken during now-value, 0=latest
+    inf_is_valid: true           # default false, for laser scans
+    voxel_filter: true           # default off, apply voxel filter to sensor, recommend on
+    clear_after_reading: true    # default false, clear the buffer after the layer gets readings from it
+  lidar_clear:
     enabled: true                #default true, can be toggled on/off with associated service call
     data_type: PointCloud2
     topic: /velodyne_points
