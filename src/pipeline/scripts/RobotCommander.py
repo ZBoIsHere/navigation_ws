@@ -151,4 +151,5 @@ def up_stair_test():
         rospy.sleep(1)
         rc.finish_up_stair_trait()
 
-#up_stair_test()
+
+# up_stair_test()
