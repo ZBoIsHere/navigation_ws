@@ -7,7 +7,7 @@
   - [如何导出 ROS 二进制包](#如何导出-ros-二进制包)
     - [如何安装可执行文件、动态库或静态库等二进制文件](#如何安装可执行文件动态库或静态库等二进制文件)
     - [如何安装库的头文件](#如何安装库的头文件)
-    - [安装 roslaunch 文件、YAML等普通文本文件](#安装-roslaunch-文件yaml等普通文本文件)
+    - [安装 launch、YAML、RViz、地图等普通文本文件](#安装-launchyamlrviz地图等普通文本文件)
     - [安装 Python 程序](#安装-python-程序)
     - [生成 deb 文件](#生成-deb-文件)
 
@@ -202,7 +202,7 @@ install(DIRECTORY include/
 )
 ```
 
-#### 安装 roslaunch 文件、YAML等普通文本文件
+#### 安装 launch、YAML、RViz、地图等普通文本文件
 
 ```cmake
 install(DIRECTORY launch/
@@ -234,3 +234,5 @@ $ fakeroot debian/rules binary
 # $ bloom-generate rosdebian --os-name ubuntu --os-version xenial --ros-distro kinetic
 # $ fakeroot debian/rules binary
 ```
+
+* [How to make a debian from a ROS package](https://gist.github.com/awesomebytes/196eab972a94dd8fcdd69adfe3bd1152)

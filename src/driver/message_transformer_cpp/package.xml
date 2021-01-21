@@ -1,15 +1,11 @@
 <?xml version="1.0"?>
 <package>
-
   <name>message_transformer_cpp</name>
-  <version>0.3.2</version>
-  <description>
-    Contains a set of tutorials that run 2D-Navigation within Stage-Simulator.
-  </description>
-  <maintainer email="sebastian.kasperski@dfki.de">Sebastian Kasperski</maintainer>
-  <license>GPLv3</license>
-  <url type="website">http://wiki.ros.org/csc_nav2d_tutorials</url>
-  <author email="sebastian.kasperski@dfki.de">Sebastian Kasperski</author>
+  <version>0.1.0</version>
+  <description>Communication driver</description>
+  <license>TODO</license>
+  <maintainer email="zhangjixiang@deeprobotics.cn">Zhang Jixiang</maintainer>
+  <author email="zhangjixiang@deeprobotics.cn">Zhang Jixiang</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
@@ -22,5 +18,4 @@
   <run_depend>sensor_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>tf</run_depend>
-
 </package>
