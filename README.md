@@ -4,7 +4,7 @@
   - [~~建图参考 (TODO 优化)~~](#建图参考-todo-优化)
   - [~~常用指令~~](#常用指令)
   - [UDP](#udp)
-  - [ROS 二进制包](#ros-二进制包)
+  - [如何导出 ROS 二进制包](#如何导出-ros-二进制包)
     - [如何安装可执行文件、动态库或静态库等二进制文件](#如何安装可执行文件动态库或静态库等二进制文件)
     - [如何安装库的头文件](#如何安装库的头文件)
     - [安装 roslaunch 文件、YAML等普通文本文件](#安装-roslaunch-文件yaml等普通文本文件)
@@ -156,7 +156,7 @@ $ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim htop
 - [sendto() + recvfrom() buffer confusion Datagram](https://stackoverflow.com/questions/30015205/sendto-recvfrom-buffer-confusion-datagram)
 - [UDP sendto() and recvfrom() max buffer size](https://stackoverflow.com/questions/3292281/udp-sendto-and-recvfrom-max-buffer-size)
 
-### [ROS 二进制包](http://wiki.ros.org/catkin/CMakeLists.txt#Optional_Step:_Specifying_Installable_Targets)
+### [如何导出 ROS 二进制包](http://wiki.ros.org/catkin/CMakeLists.txt#Optional_Step:_Specifying_Installable_Targets)
 
 文件类型：
 
