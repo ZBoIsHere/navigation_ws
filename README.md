@@ -5,10 +5,11 @@
   - [~~常用指令~~](#常用指令)
   - [UDP](#udp)
   - [ROS 二进制包](#ros-二进制包)
-    - [如何安装二进制文件](#如何安装二进制文件)
+    - [如何安装可执行文件、动态库或静态库等二进制文件](#如何安装可执行文件动态库或静态库等二进制文件)
     - [如何安装库的头文件](#如何安装库的头文件)
-    - [安装 roslaunch 或者普通文件](#安装-roslaunch-或者普通文件)
+    - [安装 roslaunch 文件、YAML等普通文本文件](#安装-roslaunch-文件yaml等普通文本文件)
     - [安装 Python 程序](#安装-python-程序)
+    - [生成 deb 文件](#生成-deb-文件)
 
 ## 自主导航程序使用说明
 
@@ -164,8 +165,6 @@ $ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim htop
 * FILES **头文件/launch文件/参数文件**
 * PROGRAMS **脚本文件**
 
-
-
 安装路径：
 
 * CATKIN_PACKAGE_BIN_DESTINATION
@@ -175,7 +174,8 @@ $ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim htop
 * CATKIN_PACKAGE_SHARE_DESTINATION
 * CATKIN_PACKAGE_PYTHON_DESTINATION
 
-#### 如何安装二进制文件
+下面通过修改 `CMakeLists.txt` 指定生成 deb 安装包需要的内容：
+#### 如何安装可执行文件、动态库或静态库等二进制文件
 
 ```cmake
 install(TARGETS ${PROJECT_NAME}
@@ -202,12 +202,14 @@ install(DIRECTORY include/
 )
 ```
 
-#### 安装 roslaunch 或者普通文件
+#### 安装 roslaunch 文件、YAML等普通文本文件
 
 ```cmake
 install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
   PATTERN ".svn" EXCLUDE)
+install(FILES nodelet_velodyne.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 ```
 
 #### 安装 Python 程序
@@ -220,4 +222,15 @@ install(TARGETS python_module_library
 
 catkin_install_python(PROGRAMS scripts/myscript
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+```
+
+#### 生成 deb 文件
+
+```bash
+$ sudo apt-get install python-bloom
+$ cd path/to/your/catkin/package
+$ bloom-generate rosdebian
+$ fakeroot debian/rules binary
+# $ bloom-generate rosdebian --os-name ubuntu --os-version xenial --ros-distro kinetic
+# $ fakeroot debian/rules binary
 ```
