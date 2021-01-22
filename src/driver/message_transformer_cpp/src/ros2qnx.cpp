@@ -26,7 +26,7 @@ struct DataSend {
 
 void vel_callback(geometry_msgs::TwistConstPtr msg) {
   last_time_cmd_vel = ros::Time::now().toSec();
-  vel_x = msg->linear.x * 1.20;
+  vel_x = msg->linear.x;
   vel_y = msg->linear.y;
   vth_z = msg->angular.z;
 }
