@@ -90,6 +90,8 @@ class RobotCommander:
 
     def finish_up_stair_trait(self):
         self.sendSimple(26)
+        rospy.sleep(0.5)
+        self.sendSimple(26)
         self.sendSimple(7)
 
     def down_stair_trait(self):

@@ -119,6 +119,9 @@ int main(int argc, char **argv) {
 
   int filter_size;
   nh.param<int>("filter_size", filter_size, 1);
+  bool is_vel_world;
+  nh.param<bool>("is_vel_world", is_vel_world, true);
+
   MovingAverage filter_vel_x(filter_size);
   MovingAverage filter_vel_y(filter_size);
   MovingAverage filter_vel_theta(filter_size);
@@ -183,7 +186,7 @@ int main(int argc, char **argv) {
         filter_vel_y.in(robot_state->vel_world[1]);
         filter_vel_theta.in(robot_state->rpy_vel[2]);
 
-        if (true) {  // vel_world to vel_base
+        if (is_vel_world) {  // vel_world to vel_base
           leg_odom_data.twist.twist.linear.x =
               +filter_vel_x.out() * cos(yaw) + filter_vel_y.out() * sin(yaw);
           leg_odom_data.twist.twist.linear.y =
