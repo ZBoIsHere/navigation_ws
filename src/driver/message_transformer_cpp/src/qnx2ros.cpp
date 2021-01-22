@@ -116,11 +116,12 @@ int main(int argc, char **argv) {
   // ROS 节点
   ros::init(argc, argv, "qnx2ros");
   ros::NodeHandle nh;
+  ros::NodeHandle private_nh("~");
 
   int filter_size;
-  nh.param<int>("filter_size", filter_size, 1);
+  private_nh.param<int>("filter_size", filter_size, 1);
   bool is_vel_world;
-  nh.param<bool>("is_vel_world", is_vel_world, true);
+  private_nh.param<bool>("is_vel_world", is_vel_world, true);
 
   MovingAverage filter_vel_x(filter_size);
   MovingAverage filter_vel_y(filter_size);

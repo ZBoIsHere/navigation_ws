@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
   ros::Subscriber vel_sub = nh.subscribe("cmd_vel", 10, vel_callback);
   double vel_x_factor;
-  nh.param<double>("vel_x_factor", vel_x_factor, 1.0);
+  private_nh.param<double>("vel_x_factor", vel_x_factor, 1.0);
 
   input_.reset(new InputSocket(private_nh));
 
