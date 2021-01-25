@@ -17,7 +17,7 @@
 
 1. 安装编译，先进入用户目录 ($ cd ~) 解压导航程序包，然后执行：
    ```bash
-   $ sudo apt-get install ros-kinetic-navigation ros-kinetic-navigation-experimental ros-kinetic-teb-local-planner ros-kinetic-spatio-temporal-voxel-layer libproj-dev chrony
+   $ sudo apt-get install ros-$ROS_DISTRO-navigation ros-$ROS_DISTRO-navigation-experimental ros-$ROS_DISTRO-teb-local-planner ros-$ROS_DISTRO-spatio-temporal-voxel-layer libproj-dev chrony
    $ cd ~/navigation_ws
    $ catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
    ```
@@ -147,7 +147,7 @@ $ chmod 777 new_firmware
 $ ln -sf new_firmware robot_control_system
 $ shutdown
 # 调试工具
-$ sudo apt-get install ros-kinetic-plotjuggler python-catkin-tools vim htop
+$ sudo apt-get install ros-$ROS_DISTRO-plotjuggler python-catkin-tools vim htop
 ```
 
 ### UDP

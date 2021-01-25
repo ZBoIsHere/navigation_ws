@@ -58,6 +58,7 @@ public:
     initialpose_sub = nh.subscribe("/initialpose", 8, &HdlLocalizationNodelet::initialpose_callback, this);
 
     pose_pub = nh.advertise<nav_msgs::Odometry>("/odom", 5, false);
+    pose_with_cov_pub = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/odom_elevation", 5, false);
     aligned_pub = nh.advertise<sensor_msgs::PointCloud2>("/aligned_points", 5, false);
   }
 
@@ -269,6 +270,24 @@ private:
     odom.twist.twist.angular.z = 0.0;
 
     pose_pub.publish(odom);
+
+    // elevation_mapping
+    geometry_msgs::PoseWithCovarianceStamped msg_pose_with_cov;
+    msg_pose_with_cov.header.stamp = stamp;
+    msg_pose_with_cov.header.frame_id = "map";
+
+    msg_pose_with_cov.pose.pose.position.x = pose(0, 3);
+    msg_pose_with_cov.pose.pose.position.y = pose(1, 3);
+    msg_pose_with_cov.pose.pose.position.z = pose(2, 3);
+    msg_pose_with_cov.pose.pose.orientation = odom_trans.transform.rotation;
+    msg_pose_with_cov.pose.covariance[0] = pow(0.01, 2);
+    msg_pose_with_cov.pose.covariance[7] = pow(0.01, 2);
+    msg_pose_with_cov.pose.covariance[14] = pow(0.02, 2);
+    msg_pose_with_cov.pose.covariance[21] = pow(0.01, 2);
+    msg_pose_with_cov.pose.covariance[28] = pow(0.01, 2);
+    msg_pose_with_cov.pose.covariance[35] = pow(0.01, 2);
+
+    pose_with_cov_pub.publish(msg_pose_with_cov);
   }
 
   /**
@@ -317,6 +336,7 @@ private:
   ros::Subscriber initialpose_sub;
 
   ros::Publisher pose_pub;
+  ros::Publisher pose_with_cov_pub;
   ros::Publisher aligned_pub;
   tf::TransformBroadcaster pose_broadcaster;
   tf::TransformListener tf_listener;

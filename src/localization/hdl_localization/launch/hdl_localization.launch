@@ -16,7 +16,7 @@
     <node pkg="nodelet" type="nodelet" name="globalmap_server_nodelet" args="load hdl_localization/GlobalmapServerNodelet $(arg nodelet_manager)">
       <param name="globalmap_pcd" value="$(find nav)/map/$(arg map_id).pcd" />
       <param name="convert_utm_to_local" value="true" />
-      <param name="downsample_resolution" value="0.1" />
+      <param name="downsample_resolution" value="0.2" />
     </node>
 
     <!-- hdl_localization_nodelet -->
@@ -34,7 +34,7 @@
         <!-- if NDT is slow for your PC, try DIRECT1 serach method, which is a bit unstable but extremely fast -->
         <param name="ndt_neighbor_search_method" value="DIRECT1" />
         <param name="ndt_resolution" value="1.0" />
-        <param name="downsample_resolution" value="0.1" />
+        <param name="downsample_resolution" value="0.2" />
         <!-- if "specify_init_pose" is true, pose estimator will be initialized with the following params -->
         <!-- otherwise, you need to input an initial pose with "2D Pose Estimate" on rviz" -->
         <param name="specify_init_pose" value="false" />
