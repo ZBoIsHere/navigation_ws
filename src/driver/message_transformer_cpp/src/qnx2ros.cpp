@@ -204,8 +204,9 @@ int main(int argc, char **argv) {
         sensor_msgs::Imu imu_msg;
         imu_msg.header.frame_id = "imu";
         imu_msg.header.stamp = ros::Time::now();
-        auto q = tf::createQuaternionFromRPY(
-            robot_state->rpy[0], robot_state->rpy[1], robot_state->rpy[2]);
+        auto q = tf::createQuaternionFromRPY(robot_state->rpy[0] / 180 * PI,
+                                             robot_state->rpy[1] / 180 * PI,
+                                             robot_state->rpy[2] / 180 * PI);
         tf::quaternionTFToMsg(q, imu_msg.orientation);
         imu_msg.angular_velocity.x = robot_state->rpy_vel[0];
         imu_msg.angular_velocity.y = robot_state->rpy_vel[1];
@@ -265,8 +266,9 @@ int main(int argc, char **argv) {
         sensor_msgs::Imu imu_msg;
         imu_msg.header.frame_id = "imu";
         imu_msg.header.stamp = ros::Time::now();
-        auto q = tf::createQuaternionFromRPY(
-            imu_data->angle_roll, imu_data->angle_pitch, imu_data->angle_yaw);
+        auto q = tf::createQuaternionFromRPY(imu_data->angle_roll / 180 * PI,
+                                             imu_data->angle_pitch / 180 * PI,
+                                             imu_data->angle_yaw / 180 * PI);
         tf::quaternionTFToMsg(q, imu_msg.orientation);
         imu_msg.angular_velocity.x = imu_data->angular_velocity_roll;
         imu_msg.angular_velocity.y = imu_data->angular_velocity_pitch;
