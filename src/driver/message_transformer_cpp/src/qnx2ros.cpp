@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
   int64_t counter_JointState = 0;
   int64_t counter_IMURawData = 0;
   int64_t counter_sum = 0;
-  ros::Rate loop_rate(500);
+  ros::Rate loop_rate(1000);
   while (ros::ok()) {
     if ((recv_num = recvfrom(sock_fd, recv_buf, sizeof(recv_buf), 0,
                              (struct sockaddr *)&addr_client,
@@ -177,10 +177,13 @@ int main(int argc, char **argv) {
         leg_odom_data.child_frame_id = "base_link";
         // Position
         leg_odom_data.header.stamp = ros::Time::now();
-        leg_odom_data.pose.pose.orientation =
-            tf::createQuaternionMsgFromYaw(robot_state->rpy[2] / 180 * PI);
+        auto q = tf::createQuaternionFromRPY(robot_state->rpy[0] / 180 * PI,
+                                             robot_state->rpy[1] / 180 * PI,
+                                             robot_state->rpy[2] / 180 * PI);
+        tf::quaternionTFToMsg(q, leg_odom_data.pose.pose.orientation);
         leg_odom_data.pose.pose.position.x = robot_state->pos_world[0];
         leg_odom_data.pose.pose.position.y = robot_state->pos_world[1];
+        leg_odom_data.pose.pose.position.z = robot_state->pos_world[2];
         // Velocity
         double yaw = robot_state->rpy[2] / 180 * PI;
         filter_vel_x.in(robot_state->vel_world[0]);
@@ -204,9 +207,7 @@ int main(int argc, char **argv) {
         sensor_msgs::Imu imu_msg;
         imu_msg.header.frame_id = "imu";
         imu_msg.header.stamp = ros::Time::now();
-        auto q = tf::createQuaternionFromRPY(robot_state->rpy[0] / 180 * PI,
-                                             robot_state->rpy[1] / 180 * PI,
-                                             robot_state->rpy[2] / 180 * PI);
+        
         tf::quaternionTFToMsg(q, imu_msg.orientation);
         imu_msg.angular_velocity.x = robot_state->rpy_vel[0];
         imu_msg.angular_velocity.y = robot_state->rpy_vel[1];
