@@ -21,27 +21,22 @@ catkin_package(
   sensor_msgs
   std_msgs
   tf
-  ${PCL_OPENMP_PACKAGES}
   DEPENDS
 )
 
 include_directories(
-  include
   ${catkin_INCLUDE_DIRS}
 )
 
 add_executable(receiver
   src/receiver.cpp
-  src/moving_average.cpp
 )
 target_link_libraries(receiver
   ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
 )
 
 add_executable(sender
   src/sender.cpp
-  src/input.cc
 )
 target_link_libraries(sender
   ${catkin_LIBRARIES}

@@ -1,14 +1,14 @@
+#include <arpa/inet.h>
 #include <geometry_msgs/Twist.h>
+#include <netinet/in.h>
 #include <ros/ros.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 #include <ctime>
 
-#include "input.h"
-
 using namespace std;
-
-boost::shared_ptr<InputSocket> input_;
 
 double last_time_cmd_vel = 0;
 
@@ -31,18 +31,31 @@ void vel_callback(geometry_msgs::TwistConstPtr msg) {
   vth_z = msg->angular.z;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   ros::init(argc, argv, "sender");
   ros::NodeHandle nh;
   ros::NodeHandle private_nh("~");
 
   ros::Subscriber vel_sub = nh.subscribe("cmd_vel", 10, vel_callback);
-  double vel_x_factor;
-  private_nh.param<double>("vel_x_factor", vel_x_factor, 1.0);
 
-  input_.reset(new InputSocket(private_nh));
+  int remote_port;
+  std::string remote_ip;
+  private_nh.param<int>("remote_port", remote_port, 43893);
+  private_nh.param("remote_ip", remote_ip, std::string(""));
+
+  int sockfd;
+  if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    perror("socket creation failed");
+    return 0;
+  }
+  sockaddr_in remote_addr;
+  memset(&remote_addr, 0, sizeof(remote_addr));
+  remote_addr.sin_family = AF_INET;
+  remote_addr.sin_port = htons(remote_port);
+  remote_addr.sin_addr.s_addr = inet_addr(remote_ip.c_str());
 
   DataSend data;
+  ssize_t nbytes;
   ros::Rate loop_rate(50);
   while (ros::ok()) {
     // 速度V
@@ -55,21 +68,39 @@ int main(int argc, char** argv) {
       data.code = 290;
       data.cons_code = 0;
       data.cmd_data = vth_z * 1000;
-      input_->sendPacket((uint8_t*)&data, sizeof(data));
-
+      nbytes = sendto(sockfd, (uint8_t *)&data, sizeof(data), 0,
+                      (struct sockaddr *)&remote_addr, sizeof(remote_addr));
+      if (nbytes < 0) {
+        perror("sendfail");
+        ROS_INFO("sendfail");
+        return 0;
+      }
       data.code = 291;
       data.cons_code = 0;
-      data.cmd_data = vel_x * 1000 * vel_x_factor;
-      input_->sendPacket((uint8_t*)&data, sizeof(data));
+      data.cmd_data = vel_x * 1000;
+      nbytes = sendto(sockfd, (uint8_t *)&data, sizeof(data), 0,
+                      (struct sockaddr *)&remote_addr, sizeof(remote_addr));
+      if (nbytes < 0) {
+        perror("sendfail");
+        ROS_INFO("sendfail");
+        return 0;
+      }
 
       data.code = 292;
       data.cons_code = 0;
       data.cmd_data = vel_y * 1000;
-      input_->sendPacket((uint8_t*)&data, sizeof(data));
+      nbytes = sendto(sockfd, (uint8_t *)&data, sizeof(data), 0,
+                      (struct sockaddr *)&remote_addr, sizeof(remote_addr));
+      if (nbytes < 0) {
+        perror("sendfail");
+        ROS_INFO("sendfail");
+        return 0;
+      }
     }
 
     ros::spinOnce();
     loop_rate.sleep();
   }
+  close(sockfd);
   return 0;
 }

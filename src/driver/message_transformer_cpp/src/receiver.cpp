@@ -19,7 +19,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include "moving_average.h"
 #include "tf/transform_datatypes.h"
 
 using namespace std;
@@ -123,16 +122,10 @@ int main(int argc, char **argv) {
   ros::NodeHandle nh;
   ros::NodeHandle private_nh("~");
 
-  int filter_size;
-  private_nh.param<int>("filter_size", filter_size, 1);
-  bool is_vel_world;
-  private_nh.param<bool>("is_vel_world", is_vel_world, true);
+  bool use_vel_world;
+  private_nh.param<bool>("use_vel_world", use_vel_world, true);
   int code_id;
-  private_nh.param<bool>("code_id", code_id, 2305);
-
-  MovingAverage filter_vel_x(filter_size);
-  MovingAverage filter_vel_y(filter_size);
-  MovingAverage filter_vel_theta(filter_size);
+  private_nh.param<int>("code_id", code_id, 2305);
 
   ros::Publisher leg_odom_pub = nh.advertise<nav_msgs::Odometry>("leg_odom", 1);
   ros::Publisher joint_state_pub =
@@ -192,21 +185,20 @@ int main(int argc, char **argv) {
         leg_odom_data.pose.pose.position.z = robot_state->pos_world[2];
         // Velocity
         double yaw = robot_state->rpy[2] / 180 * PI;
-        filter_vel_x.in(robot_state->vel_world[0]);
-        filter_vel_y.in(robot_state->vel_world[1]);
-        filter_vel_theta.in(robot_state->rpy_vel[2]);
 
-        if (is_vel_world) {  // vel_world to vel_base
+        if (use_vel_world) {  // vel_world to vel_base
           leg_odom_data.twist.twist.linear.x =
-              +filter_vel_x.out() * cos(yaw) + filter_vel_y.out() * sin(yaw);
+              +robot_state->vel_world[0] * cos(yaw) +
+              robot_state->vel_world[1] * sin(yaw);
           leg_odom_data.twist.twist.linear.y =
-              -filter_vel_x.out() * sin(yaw) + filter_vel_y.out() * cos(yaw);
+              -robot_state->vel_world[0] * sin(yaw) +
+              robot_state->vel_world[1] * cos(yaw);
         } else {  // vel_base
-          leg_odom_data.twist.twist.linear.x = filter_vel_x.out();
-          leg_odom_data.twist.twist.linear.y = filter_vel_y.out();
+          leg_odom_data.twist.twist.linear.x = robot_state->vel_world[0];
+          leg_odom_data.twist.twist.linear.y = robot_state->vel_world[1];
         }
 
-        leg_odom_data.twist.twist.angular.z = filter_vel_theta.out();
+        leg_odom_data.twist.twist.angular.z = robot_state->rpy_vel[2];
         leg_odom_pub.publish(leg_odom_data);
 
         // IMU

@@ -1,12 +1,9 @@
 <launch>
     <node name="receiver" pkg="message_transformer_cpp" type="receiver" output="screen" >
-        <param name="filter_size" value="1" />
-        <param name="is_vel_world" value="false" />
+        <param name="use_vel_world" value="false" />
         <param name="code_id" value="2305" />
     </node>
     <node name="sender" pkg="message_transformer_cpp" type="sender" output="screen" >
-        <param name="vel_x_factor" value="1.0" />
-        <param name="local_port" value="43894"/>
         <param name="remote_port" value="43893"/>
         <param name="remote_ip" value="192.168.1.120"/>
     </node>
