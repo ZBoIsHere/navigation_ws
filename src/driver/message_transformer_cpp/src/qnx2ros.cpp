@@ -27,6 +27,11 @@ using namespace std;
 #define SERV_PORT 43897
 #define PI 3.1415926
 
+/* If use QNX host, please uncomment the following line */
+// #define USE_QNX_HOST
+#ifdef USE_QNX_HOST
+#pragma pack(4)
+#endif
 struct RobotState {
   double rpy[3];
   double rpy_vel[3];
@@ -122,6 +127,8 @@ int main(int argc, char **argv) {
   private_nh.param<int>("filter_size", filter_size, 1);
   bool is_vel_world;
   private_nh.param<bool>("is_vel_world", is_vel_world, true);
+  int code_id;
+  private_nh.param<bool>("code_id", code_id, 2305);
 
   MovingAverage filter_vel_x(filter_size);
   MovingAverage filter_vel_y(filter_size);
@@ -170,8 +177,7 @@ int main(int argc, char **argv) {
     if (recv_num == sizeof(RobotStateReceived)) {
       RobotStateReceived *dr = (RobotStateReceived *)(recv_buf);
       RobotState *robot_state = &dr->data;
-      // ROS_INFO_STREAM("CODE: " << dr->code);
-      if (dr->code == 2305) {
+      if (dr->code == code_id) {
         nav_msgs::Odometry leg_odom_data;
         leg_odom_data.header.frame_id = "odom";
         leg_odom_data.child_frame_id = "base_link";
@@ -207,7 +213,7 @@ int main(int argc, char **argv) {
         sensor_msgs::Imu imu_msg;
         imu_msg.header.frame_id = "imu";
         imu_msg.header.stamp = ros::Time::now();
-        
+
         tf::quaternionTFToMsg(q, imu_msg.orientation);
         imu_msg.angular_velocity.x = robot_state->rpy_vel[0];
         imu_msg.angular_velocity.y = robot_state->rpy_vel[1];
@@ -222,8 +228,7 @@ int main(int argc, char **argv) {
     } else if (recv_num == sizeof(JointStateReceived)) {
       JointStateReceived *dr = (JointStateReceived *)(recv_buf);
       JointState *joint_state = &dr->data;
-      // ROS_INFO_STREAM("CODE: " << dr->code);
-      if (dr->code == 2306) {
+      if (dr->code == (code_id + 1)) {
         sensor_msgs::JointState joint_state_data;
         joint_state_data.header.stamp = ros::Time::now();
         joint_state_data.name.resize(12);
@@ -262,7 +267,6 @@ int main(int argc, char **argv) {
     } else if (recv_num == sizeof(ImuDataReceived)) {
       ImuDataReceived *dr = (ImuDataReceived *)(recv_buf);
       ImuData *imu_data = &dr->data;
-      // ROS_INFO_STREAM("CODE: " << dr->code);
       if (dr->code == 67841) {
         sensor_msgs::Imu imu_msg;
         imu_msg.header.frame_id = "imu";

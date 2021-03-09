@@ -2,6 +2,7 @@
     <node name="qnx2ros" pkg="message_transformer_cpp" type="qnx2ros" output="screen" >
         <param name="filter_size" value="1" />
         <param name="is_vel_world" value="false" />
+        <param name="code_id" value="2305" />
     </node>
     <node name="ros2qnx" pkg="message_transformer_cpp" type="ros2qnx" output="screen" >
         <param name="vel_x_factor" value="1.0" />

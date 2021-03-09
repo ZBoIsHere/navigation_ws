@@ -13,5 +13,5 @@ global_costmap:
 
   plugins:
     - {name: static_layer, type: "costmap_2d::StaticLayer"}
-    - {name: rgbd_obstacle_layer, type: "spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer"}
+    - {name: stvl_obstacle_layer, type: "spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer"}
     - {name: global_inflation_layer, type: "costmap_2d::InflationLayer"}

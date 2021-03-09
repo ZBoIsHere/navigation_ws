@@ -206,7 +206,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.05000000074505806
       Style: Boxes
-      Topic: /move_base/local_costmap/rgbd_obstacle_layer/voxel_grid
+      Topic: /move_base/local_costmap/stvl_obstacle_layer/voxel_grid
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true

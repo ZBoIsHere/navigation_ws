@@ -12,5 +12,5 @@ local_costmap:
 
 
   plugins:
-    - {name: rgbd_obstacle_layer, type: "spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer"}
+    - {name: stvl_obstacle_layer, type: "spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer"}
     - {name: local_inflation_layer, type: "costmap_2d::InflationLayer"}

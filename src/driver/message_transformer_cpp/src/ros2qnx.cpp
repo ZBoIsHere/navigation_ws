@@ -51,7 +51,6 @@ int main(int argc, char** argv) {
         vel_x = 0;
         vel_y = 0;
         vth_z = 0;
-        // ROS_WARN("STOP! cmd_vel commands over 0.3s.");
       }
       data.code = 290;
       data.cons_code = 0;
