@@ -30,24 +30,24 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(qnx2ros
-  src/qnx2ros.cpp
+add_executable(receiver
+  src/receiver.cpp
   src/moving_average.cpp
 )
-target_link_libraries(qnx2ros
+target_link_libraries(receiver
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
 
-add_executable(ros2qnx
-  src/ros2qnx.cpp
+add_executable(sender
+  src/sender.cpp
   src/input.cc
 )
-target_link_libraries(ros2qnx
+target_link_libraries(sender
   ${catkin_LIBRARIES}
 )
 
-install(TARGETS qnx2ros ros2qnx
+install(TARGETS receiver sender
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}

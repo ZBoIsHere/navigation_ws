@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
   struct sockaddr_in addr_client;
 
   // ROS 节点
-  ros::init(argc, argv, "qnx2ros");
+  ros::init(argc, argv, "receiver");
   ros::NodeHandle nh;
   ros::NodeHandle private_nh("~");
 
