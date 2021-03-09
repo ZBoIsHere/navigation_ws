@@ -31,8 +31,8 @@ TebLocalPlannerROS:
     vertices: [[0.343,0.18], [0.343,-0.18], [-0.38,-0.18], [-0.38,0.18]] # MINI
 
   # GoalTolerance
-  yaw_goal_tolerance: 0.15
-  xy_goal_tolerance: 0.15
+  yaw_goal_tolerance: 0.3
+  xy_goal_tolerance: 0.3
   free_goal_vel: false
 
   # Obstacles
@@ -67,7 +67,7 @@ TebLocalPlannerROS:
   weight_shortest_path: 1
   weight_obstacle: 5
   weight_inflation: 5
-  weight_viapoint: 7
+  weight_viapoint: 2
   weight_adapt_factor: 2
 
   # Homotopy Class Planner
