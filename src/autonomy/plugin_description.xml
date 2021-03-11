@@ -1,0 +1,9 @@
+<library path="lib/libautonomy">
+  <class name="autonomy/Autonomy"
+         type="autonomy::Autonomy"
+         base_class_type="rviz::Panel">
+    <description>
+      A panel widget for waypoints.
+    </description>
+  </class>
+</library>
