@@ -41,13 +41,12 @@ class Autonomy : public rviz::Panel {
   QPushButton* btn_save_;
   QPushButton* btn_run_;
   QPushButton* btn_stop_;
-  QLabel* show_added_waypoint_;
-  QLabel* show_total_waypoint_;
+  QLabel* mid_gui_label_;
 
-  json j_;
-  int from_id_;
-  int next_id_;
-  int count_waypoints_;
+  json added_j_;
+  int counter_;
+
+  json fixed_j_;
 };
 
 }  // end namespace autonomy

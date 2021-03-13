@@ -1,12 +1,15 @@
 #include "autonomy/autonomy.h"
 
-#include <QLabel>
+#include <ros/package.h>
+
+#include <fstream>
 #include <iostream>
 #include <string>
 
 namespace autonomy {
-Autonomy::Autonomy(QWidget* parent)
-    : rviz::Panel(parent), from_id_(0), next_id_(0), count_waypoints_(0) {
+Autonomy::Autonomy(QWidget* parent) : rviz::Panel(parent), counter_(0) {
+  added_j_[std::to_string(0)]["total"] = 0;
+
   btn_add_ = new QPushButton(this);
   btn_add_->setText("Add");
   btn_save_ = new QPushButton(this);
@@ -21,19 +24,13 @@ Autonomy::Autonomy(QWidget* parent)
   connect(btn_run_, SIGNAL(clicked()), this, SLOT(runAutonomy()));
   connect(btn_stop_, SIGNAL(clicked()), this, SLOT(stopAutonomy()));
 
-  show_added_waypoint_ = new QLabel("0");
-  show_total_waypoint_ = new QLabel("0");
+  mid_gui_label_ = new QLabel("");
 
   auto* top = new QHBoxLayout;
   top->addWidget(btn_add_);
   top->addWidget(btn_save_);
-
   auto* mid = new QHBoxLayout;
-  mid->addWidget(new QLabel("Added:"));
-  mid->addWidget(show_added_waypoint_);
-  mid->addWidget(new QLabel("Total:"));
-  mid->addWidget(show_total_waypoint_);
-
+  mid->addWidget(mid_gui_label_);
   auto* bot = new QHBoxLayout;
   bot->addWidget(btn_run_);
   bot->addWidget(btn_stop_);
@@ -51,28 +48,51 @@ Autonomy::Autonomy(QWidget* parent)
 }
 
 void Autonomy::addOneWaypoint() {
-  next_id_ = from_id_ + 1;
-  j_[std::to_string(from_id_)]["x"] = 1.0;
-  j_[std::to_string(from_id_)]["y"] = 2.0;
-  j_[std::to_string(from_id_)]["theta"] = 3.0;
-  j_[std::to_string(from_id_)]["next"] = next_id_;
-  ++from_id_;
-  ++count_waypoints_;
+  ++counter_;
+  added_j_[std::to_string(counter_)]["x"] = 1.0;
+  added_j_[std::to_string(counter_)]["y"] = 2.0;
+  added_j_[std::to_string(counter_)]["theta"] = 3.0;
+  added_j_[std::to_string(counter_)]["next"] = counter_ + 1;
 
-  std::string added_id = std::to_string(from_id_);
-  QString added_str = QString::fromUtf8(added_id.c_str());
-  show_added_waypoint_->setText(added_str);
+  added_j_[std::to_string(0)]["total"] = counter_;
 
-  std::string count_id = std::to_string(count_waypoints_);
-  QString count_str = QString::fromUtf8(count_id.c_str());
-  show_total_waypoint_->setText(count_str);
+  std::string added_id = "ADD No. " + std::to_string(counter_) + " Waypoint.";
+  QString added_info = QString::fromUtf8(added_id.c_str());
+  mid_gui_label_->clear();
+  mid_gui_label_->setText(added_info);
 }
 
 void Autonomy::saveAllWaypoints() {
-  std::cout << std::setw(4) << j_ << std::endl;
+  std::string path_package = ros::package::getPath("autonomy");
+  // LOOP CLOSURE
+  added_j_[std::to_string(counter_)]["next"] = 1;
+  std::string path_file = path_package + "/data/waypoints.json";
+  std::ofstream o(path_file);
+  o << std::setw(4) << added_j_ << std::endl;
+
+  std::string count_id = "SAVED " + std::to_string(counter_) + " Waypoints.";
+  QString count_info = QString::fromUtf8(count_id.c_str());
+  mid_gui_label_->clear();
+  mid_gui_label_->setText(count_info);
 }
 
-void Autonomy::runAutonomy() {}
+void Autonomy::runAutonomy() {
+  std::string path_package = ros::package::getPath("autonomy");
+  std::string path_file = path_package + "/data/waypoints.json";
+  std::ifstream i(path_file);
+  i >> fixed_j_;
+
+  int totol = fixed_j_["0"]["total"];
+  std::string total_id = "LOADED " + std::to_string(totol) + " Waypoints.";
+  QString total_str = QString::fromUtf8(total_id.c_str());
+  mid_gui_label_->clear();
+  mid_gui_label_->setText(total_str);
+
+  added_j_.clear();
+  counter_ = 0;
+
+  std::cout << std::setw(4) << fixed_j_ << std::endl;
+}
 
 void Autonomy::stopAutonomy() {}
 
