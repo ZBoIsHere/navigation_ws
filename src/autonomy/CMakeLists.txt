@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rviz
   tf_conversions
+  tf2
   trajectory_msgs
   visualization_msgs
 )
