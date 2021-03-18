@@ -1,6 +1,8 @@
 #ifndef AUTONOMY_H
 #define AUTONOMY_H
 
+#include <actionlib/client/simple_action_client.h>
+#include <move_base_msgs/MoveBaseAction.h>
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <rviz/panel.h>
@@ -17,6 +19,8 @@
 #include "autonomy/json.hpp"
 
 using json = nlohmann::json;
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
+    MoveBaseClient;
 
 class QPushButton;
 class QLabel;
@@ -37,18 +41,20 @@ class Autonomy : public rviz::Panel {
   void saveAllWaypoints();
   void runAutonomy();
   void stopAutonomy();
-  void showAllWaypoints();
+  void showWaypoints();
   void visualization(const json&);
-  void showInformation(const std::string&);
+  void showString(const std::string&);
+  void tick();
 
  protected:
-  QPushButton* button_add_;
-  QPushButton* button_save_;
-  QPushButton* button_run_;
-  QPushButton* button_stop_;
-  QLabel* mid_gui_label_;
+  QPushButton* button_add;
+  QPushButton* button_save;
+  QPushButton* button_run;
+  QPushButton* button_stop;
+  QLabel* mid_label;
 
-  int counter_;
+  int counter_teach_;
+  int counter_repeat_;
   json added_j_;
   json fixed_j_;
 
@@ -57,7 +63,9 @@ class Autonomy : public rviz::Panel {
   tf2_ros::Buffer tfBuffer_;
   tf2_ros::TransformListener tfListener_;
 
-  enum FSM_EXEC_STATE { NO_WAY, NORMAL, RECORD, REPEAT };
+  MoveBaseClient ac_;
+
+  enum FSM_EXEC_STATE { NO_WAY, NORMAL, TEACH, REPEAT };
   FSM_EXEC_STATE exec_state_;
 };
 

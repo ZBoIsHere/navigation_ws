@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   trajectory_msgs
   visualization_msgs
   behaviortree_cpp_v3
+  move_base_msgs
+  actionlib
 )
 catkin_package()
 

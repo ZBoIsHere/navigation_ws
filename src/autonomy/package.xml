@@ -30,25 +30,31 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>geometry_msgs</build_depend>
+  <build_depend>actionlib</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rviz</build_depend>
   <build_depend>tf_conversions</build_depend>
   <build_depend>trajectory_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
+  <build_depend>move_base_msgs</build_depend>
   <build_depend>behaviortree_cpp_v3</build_depend>
   <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>actionlib</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rviz</build_export_depend>
   <build_export_depend>tf_conversions</build_export_depend>
   <build_export_depend>trajectory_msgs</build_export_depend>
   <build_export_depend>visualization_msgs</build_export_depend>
+  <build_export_depend>move_base_msgs</build_export_depend>
   <build_export_depend>behaviortree_cpp_v3</build_export_depend>
   <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>actionlib</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rviz</exec_depend>
   <exec_depend>tf_conversions</exec_depend>
   <exec_depend>trajectory_msgs</exec_depend>
   <exec_depend>visualization_msgs</exec_depend>
+  <exec_depend>move_base_msgs</exec_depend>
   <exec_depend>behaviortree_cpp_v3</exec_depend>
 
 

@@ -14,34 +14,36 @@
 namespace autonomy {
 Autonomy::Autonomy(QWidget* parent)
     : rviz::Panel(parent),
-      counter_(0),
+      counter_teach_(0),
+      counter_repeat_(1),
       tfListener_(tfBuffer_),
-      exec_state_(NO_WAY) {
+      exec_state_(NO_WAY),
+      ac_("move_base", true) {
   added_j_[std::to_string(0)]["total"] = 0;
 
-  button_add_ = new QPushButton(this);
-  button_add_->setText("Add");
-  button_save_ = new QPushButton(this);
-  button_save_->setText("Save");
-  button_run_ = new QPushButton(this);
-  button_run_->setText("Run");
-  button_stop_ = new QPushButton(this);
-  button_stop_->setText("Stop");
-  connect(button_add_, SIGNAL(clicked()), this, SLOT(addOneWaypoint()));
-  connect(button_save_, SIGNAL(clicked()), this, SLOT(saveAllWaypoints()));
-  connect(button_run_, SIGNAL(clicked()), this, SLOT(runAutonomy()));
-  connect(button_stop_, SIGNAL(clicked()), this, SLOT(stopAutonomy()));
+  button_add = new QPushButton(this);
+  button_add->setText("Add");
+  button_save = new QPushButton(this);
+  button_save->setText("Save");
+  button_run = new QPushButton(this);
+  button_run->setText("Run");
+  button_stop = new QPushButton(this);
+  button_stop->setText("Stop");
+  connect(button_add, SIGNAL(clicked()), this, SLOT(addOneWaypoint()));
+  connect(button_save, SIGNAL(clicked()), this, SLOT(saveAllWaypoints()));
+  connect(button_run, SIGNAL(clicked()), this, SLOT(runAutonomy()));
+  connect(button_stop, SIGNAL(clicked()), this, SLOT(stopAutonomy()));
 
-  mid_gui_label_ = new QLabel("");
+  mid_label = new QLabel("");
 
   auto* top = new QHBoxLayout;
-  top->addWidget(button_add_);
-  top->addWidget(button_save_);
+  top->addWidget(button_add);
+  top->addWidget(button_save);
   auto* mid = new QHBoxLayout;
-  mid->addWidget(mid_gui_label_);
+  mid->addWidget(mid_label);
   auto* bot = new QHBoxLayout;
-  bot->addWidget(button_run_);
-  bot->addWidget(button_stop_);
+  bot->addWidget(button_run);
+  bot->addWidget(button_stop);
 
   auto* layout = new QVBoxLayout;
   layout->addLayout(top);
@@ -49,13 +51,14 @@ Autonomy::Autonomy(QWidget* parent)
   layout->addLayout(bot);
   setLayout(layout);
 
-  button_add_->setEnabled(true);
-  button_save_->setEnabled(true);
-  button_run_->setEnabled(true);
-  button_stop_->setEnabled(true);
+  button_add->setEnabled(true);
+  button_save->setEnabled(true);
+  button_run->setEnabled(true);
+  button_stop->setEnabled(true);
 
   QTimer* output_timer = new QTimer(this);
-  connect(output_timer, SIGNAL(timeout()), this, SLOT(showAllWaypoints()));
+  connect(output_timer, SIGNAL(timeout()), this, SLOT(showWaypoints()));
+  connect(output_timer, SIGNAL(timeout()), this, SLOT(tick()));
   output_timer->start(100);
 
   waypoints_publisher_ =
@@ -65,19 +68,19 @@ Autonomy::Autonomy(QWidget* parent)
   std::ifstream i(path_file);
   if (!i || (i.peek() == std::ifstream::traits_type::eof())) {
     std::string s = "FIND 0 Waypoint";
-    showInformation(s);
+    showString(s);
     exec_state_ = NO_WAY;
   } else {
     i >> fixed_j_;
     int totol = fixed_j_["0"]["total"];
     std::string s = "FIND " + std::to_string(totol) + " Waypoints.";
-    showInformation(s);
+    showString(s);
     exec_state_ = NORMAL;
   }
 }
 
 void Autonomy::addOneWaypoint() {
-  exec_state_ = RECORD;
+  exec_state_ = TEACH;
   geometry_msgs::TransformStamped transformStamped;
   try {
     transformStamped =
@@ -93,30 +96,30 @@ void Autonomy::addOneWaypoint() {
   double roll, pitch, yaw;
   m.getRPY(roll, pitch, yaw);
 
-  ++counter_;
-  added_j_[std::to_string(counter_)]["x"] =
+  ++counter_teach_;
+  added_j_[std::to_string(counter_teach_)]["x"] =
       transformStamped.transform.translation.x;
-  added_j_[std::to_string(counter_)]["y"] =
+  added_j_[std::to_string(counter_teach_)]["y"] =
       transformStamped.transform.translation.y;
-  added_j_[std::to_string(counter_)]["z"] =
+  added_j_[std::to_string(counter_teach_)]["z"] =
       transformStamped.transform.translation.z;
-  added_j_[std::to_string(counter_)]["theta"] = yaw;
-  added_j_[std::to_string(counter_)]["next"] = counter_ + 1;
-  added_j_[std::to_string(0)]["total"] = counter_;
+  added_j_[std::to_string(counter_teach_)]["theta"] = yaw;
+  added_j_[std::to_string(counter_teach_)]["next"] = counter_teach_ + 1;
+  added_j_[std::to_string(0)]["total"] = counter_teach_;
 
-  std::string s = "ADD No. " + std::to_string(counter_) + " Waypoint.";
-  showInformation(s);
+  std::string s = "ADD No. " + std::to_string(counter_teach_) + " Waypoint.";
+  showString(s);
 }
 
 void Autonomy::saveAllWaypoints() {
   std::string path_package = ros::package::getPath("autonomy");
   // LOOP CLOSURE
-  added_j_[std::to_string(counter_)]["next"] = 1;
+  added_j_[std::to_string(counter_teach_)]["next"] = 1;
   std::string path_file = path_package + "/data/waypoints.json";
   std::ofstream o(path_file);
   o << std::setw(4) << added_j_ << std::endl;
-  std::string s = "SAVED " + std::to_string(counter_) + " Waypoints.";
-  showInformation(s);
+  std::string s = "SAVED " + std::to_string(counter_teach_) + " Waypoints.";
+  showString(s);
 }
 
 void Autonomy::runAutonomy() {
@@ -125,19 +128,22 @@ void Autonomy::runAutonomy() {
   std::ifstream i(path_file);
   if (!i || (i.peek() == std::ifstream::traits_type::eof())) {
     std::string s = "ERROR: 0 Waypoint";
-    showInformation(s);
+    showString(s);
     exec_state_ = NO_WAY;
   } else {
     i >> fixed_j_;
+    std::cout << std::setw(4) << fixed_j_ << std::endl;
     int totol = fixed_j_["0"]["total"];
     std::string s = "LOADED " + std::to_string(totol) + " Waypoints.";
-    showInformation(s);
+    showString(s);
 
     added_j_.clear();
-    counter_ = 0;
-
-    std::cout << std::setw(4) << fixed_j_ << std::endl;
+    counter_teach_ = 0;
     exec_state_ = REPEAT;
+
+    while (!ac_.waitForServer(ros::Duration(5.0))) {
+      ROS_INFO("Waiting for the move_base action server to come up");
+    }
     // TODO BT
   }
 }
@@ -145,14 +151,14 @@ void Autonomy::runAutonomy() {
 void Autonomy::stopAutonomy() {
   exec_state_ = NORMAL;
   std::string s = "STOP!";
-  showInformation(s);
+  showString(s);
 }
 
-void Autonomy::showAllWaypoints() {
+void Autonomy::showWaypoints() {
   switch (exec_state_) {
     case NO_WAY:
       break;
-    case RECORD:
+    case TEACH:
       visualization(added_j_);
       break;
     default:
@@ -195,10 +201,18 @@ void Autonomy::visualization(const json& j) {
   }
 }
 
-void Autonomy::showInformation(const std::string& s) {
+void Autonomy::showString(const std::string& s) {
   QString q_s = QString::fromUtf8(s.c_str());
-  mid_gui_label_->clear();
-  mid_gui_label_->setText(q_s);
+  mid_label->clear();
+  mid_label->setText(q_s);
+}
+
+void Autonomy::tick() {
+  if (exec_state_ == REPEAT) {
+    ROS_INFO("TEACH");
+  } else {
+    ROS_INFO("...");
+  }
 }
 
 void Autonomy::save(rviz::Config config) const { rviz::Panel::save(config); }
