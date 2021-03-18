@@ -64,6 +64,7 @@ class Autonomy : public rviz::Panel {
   tf2_ros::TransformListener tf_listener_;
 
   MoveBaseClient ac_;
+  move_base_msgs::MoveBaseGoal goal_;
 
   enum FSM_EXEC_STATE { NO_WAY, NORMAL, TEACH, REPEAT };
   FSM_EXEC_STATE exec_state_;

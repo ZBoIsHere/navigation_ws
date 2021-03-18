@@ -3,6 +3,7 @@
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <ros/package.h>
+#include <tf2/LinearMath/Quaternion.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
@@ -139,10 +140,11 @@ void Autonomy::runAutonomy() {
     counter_teach_ = 0;
 
     if (!ac_.waitForServer(ros::Duration(5.0))) {
-      ROS_INFO("Waiting for the move_base action server!");
+      ROS_INFO("Please launch the move_base action server!");
       if (exec_state_ == TEACH) exec_state_ = NORMAL;
     } else {
       exec_state_ = REPEAT;
+      // TODO cancelGoal
     }
     // TODO BT
   }
@@ -188,7 +190,7 @@ void Autonomy::visualization(const json& j) {
     waypoints_list.markers[i].pose.orientation.y = 0.0;
     waypoints_list.markers[i].pose.orientation.z = 0.0;
     waypoints_list.markers[i].pose.orientation.w = 1.0;
-    waypoints_list.markers[i].scale.z = 0.5;
+    waypoints_list.markers[i].scale.z = 1.0;
     waypoints_list.markers[i].color.a = 1.0;
     waypoints_list.markers[i].color.r = 0.0;
     waypoints_list.markers[i].color.g = 0.0;
@@ -208,7 +210,44 @@ void Autonomy::showString(const std::string& s) {
 
 void Autonomy::tick() {
   if (exec_state_ == REPEAT) {
-    ROS_INFO("REPEAT");
+    // Step 1: Get goal
+    ROS_INFO("Get goal.");
+    std::cout << "try get goal No." << counter_repeat_ << std::endl;
+    goal_.target_pose.header.frame_id = "base_link";
+    goal_.target_pose.header.stamp = ros::Time::now();
+    goal_.target_pose.pose.position.x =
+        saved_j_[std::to_string(counter_repeat_)]["x"];
+    goal_.target_pose.pose.position.y =
+        saved_j_[std::to_string(counter_repeat_)]["y"];
+    double yaw = saved_j_[std::to_string(counter_repeat_)]["theta"];
+    tf2::Quaternion q;
+    q.setRPY(0, 0, yaw);
+    tf2::convert(q, goal_.target_pose.pose.orientation);
+    // Step 2: Send goal
+    auto state = ac_.getState();
+    if (state == actionlib::SimpleClientGoalState::LOST) {
+      ac_.sendGoal(goal_);
+      ROS_INFO("Send goal.");
+      return;
+    } else if (state == actionlib::SimpleClientGoalState::PENDING ||
+               state == actionlib::SimpleClientGoalState::ACTIVE) {
+      ROS_INFO("Running...");
+      return;
+    } else if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {
+      int total = saved_j_["0"]["total"];
+      counter_repeat_ = (++counter_repeat_ > total) ? counter_repeat_
+                                                    : (counter_repeat_ - total);
+      ROS_INFO("SUCCEEDED.");
+      return;
+    } else {
+      ROS_INFO("Failed!");
+    }
+  } else {
+    auto state = ac_.getState();
+    if (state != actionlib::SimpleClientGoalState::LOST) {
+      ROS_INFO("Stop navigation!");
+      ac_.cancelGoal();
+    }
   }
 }
 

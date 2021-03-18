@@ -13,6 +13,6 @@
 
   <!-- RViz -->
   <group if="$(arg enable_rviz)">
-    <node name="navigation_rviz" pkg="rviz" type="rviz" args=" -d $(find nav)/rviz/nav.rviz" />
+    <node name="navigation_rviz" pkg="rviz" type="rviz" args=" -d $(find nav)/rviz/nav.rviz" output="screen" />
   </group>
 </launch>

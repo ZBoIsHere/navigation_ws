@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   trajectory_msgs
   visualization_msgs
-  behaviortree_cpp_v3
   move_base_msgs
   actionlib
 )
@@ -39,6 +38,3 @@ add_definitions(-DQT_NO_KEYWORDS)
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(${PROJECT_NAME} src/autonomy.cpp include/autonomy/autonomy.h)
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES})
-
-add_executable(bt src/bt_example.cpp)
-target_link_libraries(bt ${catkin_LIBRARIES})
