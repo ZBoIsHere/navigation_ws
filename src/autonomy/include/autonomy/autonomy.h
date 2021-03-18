@@ -38,6 +38,8 @@ class Autonomy : public rviz::Panel {
   void runAutonomy();
   void stopAutonomy();
   void showAllWaypoints();
+  void visualization(const json&);
+  void showInformation(const std::string&);
 
  protected:
   QPushButton* button_add_;
@@ -46,9 +48,8 @@ class Autonomy : public rviz::Panel {
   QPushButton* button_stop_;
   QLabel* mid_gui_label_;
 
-  json added_j_;
   int counter_;
-
+  json added_j_;
   json fixed_j_;
 
   ros::NodeHandle nh_;
@@ -56,7 +57,7 @@ class Autonomy : public rviz::Panel {
   tf2_ros::Buffer tfBuffer_;
   tf2_ros::TransformListener tfListener_;
 
-  enum FSM_EXEC_STATE { INIT, RECORD, REPEAT, ERROR };
+  enum FSM_EXEC_STATE { NO_WAY, NORMAL, RECORD, REPEAT };
   FSM_EXEC_STATE exec_state_;
 };
 

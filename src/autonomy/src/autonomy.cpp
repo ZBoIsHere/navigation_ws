@@ -16,7 +16,7 @@ Autonomy::Autonomy(QWidget* parent)
     : rviz::Panel(parent),
       counter_(0),
       tfListener_(tfBuffer_),
-      exec_state_(INIT) {
+      exec_state_(NO_WAY) {
   added_j_[std::to_string(0)]["total"] = 0;
 
   button_add_ = new QPushButton(this);
@@ -27,7 +27,6 @@ Autonomy::Autonomy(QWidget* parent)
   button_run_->setText("Run");
   button_stop_ = new QPushButton(this);
   button_stop_->setText("Stop");
-
   connect(button_add_, SIGNAL(clicked()), this, SLOT(addOneWaypoint()));
   connect(button_save_, SIGNAL(clicked()), this, SLOT(saveAllWaypoints()));
   connect(button_run_, SIGNAL(clicked()), this, SLOT(runAutonomy()));
@@ -57,28 +56,23 @@ Autonomy::Autonomy(QWidget* parent)
 
   QTimer* output_timer = new QTimer(this);
   connect(output_timer, SIGNAL(timeout()), this, SLOT(showAllWaypoints()));
-  output_timer->start(1000);
+  output_timer->start(100);
 
   waypoints_publisher_ =
       nh_.advertise<visualization_msgs::MarkerArray>("waypoints", 1);
-
   std::string path_package = ros::package::getPath("autonomy");
   std::string path_file = path_package + "/data/waypoints.json";
   std::ifstream i(path_file);
   if (!i || (i.peek() == std::ifstream::traits_type::eof())) {
-    std::string error_id = "FIND Zero Waypoint";
-    QString error_str = QString::fromUtf8(error_id.c_str());
-    mid_gui_label_->clear();
-    mid_gui_label_->setText(error_str);
-    exec_state_ = ERROR;
+    std::string s = "FIND 0 Waypoint";
+    showInformation(s);
+    exec_state_ = NO_WAY;
   } else {
     i >> fixed_j_;
     int totol = fixed_j_["0"]["total"];
-    std::string total_id = "FIND " + std::to_string(totol) + " Waypoints.";
-    QString total_str = QString::fromUtf8(total_id.c_str());
-    mid_gui_label_->clear();
-    mid_gui_label_->setText(total_str);
-    exec_state_ = INIT;
+    std::string s = "FIND " + std::to_string(totol) + " Waypoints.";
+    showInformation(s);
+    exec_state_ = NORMAL;
   }
 }
 
@@ -104,167 +98,107 @@ void Autonomy::addOneWaypoint() {
       transformStamped.transform.translation.x;
   added_j_[std::to_string(counter_)]["y"] =
       transformStamped.transform.translation.y;
+  added_j_[std::to_string(counter_)]["z"] =
+      transformStamped.transform.translation.z;
   added_j_[std::to_string(counter_)]["theta"] = yaw;
   added_j_[std::to_string(counter_)]["next"] = counter_ + 1;
-
   added_j_[std::to_string(0)]["total"] = counter_;
 
-  std::string added_id = "ADD No. " + std::to_string(counter_) + " Waypoint.";
-  QString added_info = QString::fromUtf8(added_id.c_str());
-  mid_gui_label_->clear();
-  mid_gui_label_->setText(added_info);
+  std::string s = "ADD No. " + std::to_string(counter_) + " Waypoint.";
+  showInformation(s);
 }
 
 void Autonomy::saveAllWaypoints() {
-  exec_state_ = RECORD;
   std::string path_package = ros::package::getPath("autonomy");
   // LOOP CLOSURE
   added_j_[std::to_string(counter_)]["next"] = 1;
   std::string path_file = path_package + "/data/waypoints.json";
   std::ofstream o(path_file);
   o << std::setw(4) << added_j_ << std::endl;
-
-  std::string count_id = "SAVED " + std::to_string(counter_) + " Waypoints.";
-  QString count_info = QString::fromUtf8(count_id.c_str());
-  mid_gui_label_->clear();
-  mid_gui_label_->setText(count_info);
+  std::string s = "SAVED " + std::to_string(counter_) + " Waypoints.";
+  showInformation(s);
 }
 
 void Autonomy::runAutonomy() {
-  exec_state_ = REPEAT;
   std::string path_package = ros::package::getPath("autonomy");
   std::string path_file = path_package + "/data/waypoints.json";
   std::ifstream i(path_file);
   if (!i || (i.peek() == std::ifstream::traits_type::eof())) {
-    std::string error_id = "ERROR: Zero Waypoint";
-    QString error_str = QString::fromUtf8(error_id.c_str());
-    mid_gui_label_->clear();
-    mid_gui_label_->setText(error_str);
-    exec_state_ = ERROR;
+    std::string s = "ERROR: 0 Waypoint";
+    showInformation(s);
+    exec_state_ = NO_WAY;
   } else {
     i >> fixed_j_;
     int totol = fixed_j_["0"]["total"];
-    std::string total_id = "LOADED " + std::to_string(totol) + " Waypoints.";
-    QString total_str = QString::fromUtf8(total_id.c_str());
-    mid_gui_label_->clear();
-    mid_gui_label_->setText(total_str);
+    std::string s = "LOADED " + std::to_string(totol) + " Waypoints.";
+    showInformation(s);
 
     added_j_.clear();
     counter_ = 0;
 
     std::cout << std::setw(4) << fixed_j_ << std::endl;
+    exec_state_ = REPEAT;
     // TODO BT
   }
 }
 
-void Autonomy::stopAutonomy() { exec_state_ = REPEAT; }
+void Autonomy::stopAutonomy() {
+  exec_state_ = NORMAL;
+  std::string s = "STOP!";
+  showInformation(s);
+}
 
 void Autonomy::showAllWaypoints() {
-  visualization_msgs::MarkerArray waypoints_list;
   switch (exec_state_) {
-    case INIT: {
-      int length = fixed_j_["0"]["total"];
-      waypoints_list.markers.resize(length);
-
-      for (int i = 0; i < length; ++i) {
-        waypoints_list.markers[i].header.frame_id = "map";
-        waypoints_list.markers[i].header.stamp = ros::Time::now();
-
-        waypoints_list.markers[i].ns = "waypoints";
-        waypoints_list.markers[i].id = i;
-
-        waypoints_list.markers[i].type =
-            visualization_msgs::Marker::TEXT_VIEW_FACING;
-        waypoints_list.markers[i].action = visualization_msgs::Marker::ADD;
-        waypoints_list.markers[i].pose.position.x = 1.0 * i;
-        waypoints_list.markers[i].pose.position.y = 1;
-        waypoints_list.markers[i].pose.position.z = 1;
-        waypoints_list.markers[i].pose.orientation.x = 0.0;
-        waypoints_list.markers[i].pose.orientation.y = 0.0;
-        waypoints_list.markers[i].pose.orientation.z = 0.0;
-        waypoints_list.markers[i].pose.orientation.w = 1.0;
-        waypoints_list.markers[i].scale.x = 0.5;
-        waypoints_list.markers[i].scale.y = 0.5;
-        waypoints_list.markers[i].scale.z = 0.5;
-        waypoints_list.markers[i].color.a = 1.0;
-        waypoints_list.markers[i].color.r = 1.0;
-        waypoints_list.markers[i].color.g = 0.0;
-        waypoints_list.markers[i].color.b = 0.0;
-        waypoints_list.markers[i].text = std::to_string(i);
-      }
+    case NO_WAY:
       break;
-    }
-    case RECORD: {
-      int length = added_j_["0"]["total"];
-      waypoints_list.markers.resize(length);
-
-      for (int i = 0; i < length; ++i) {
-        waypoints_list.markers[i].header.frame_id = "map";
-        waypoints_list.markers[i].header.stamp = ros::Time::now();
-
-        waypoints_list.markers[i].ns = "waypoints";
-        waypoints_list.markers[i].id = i;
-
-        waypoints_list.markers[i].type =
-            visualization_msgs::Marker::TEXT_VIEW_FACING;
-        waypoints_list.markers[i].action = visualization_msgs::Marker::ADD;
-        waypoints_list.markers[i].pose.position.x = 1.0 * i;
-        waypoints_list.markers[i].pose.position.y = 1;
-        waypoints_list.markers[i].pose.position.z = 1;
-        waypoints_list.markers[i].pose.orientation.x = 0.0;
-        waypoints_list.markers[i].pose.orientation.y = 0.0;
-        waypoints_list.markers[i].pose.orientation.z = 0.0;
-        waypoints_list.markers[i].pose.orientation.w = 1.0;
-        waypoints_list.markers[i].scale.x = 0.5;
-        waypoints_list.markers[i].scale.y = 0.5;
-        waypoints_list.markers[i].scale.z = 0.5;
-        waypoints_list.markers[i].color.a = 1.0;
-        waypoints_list.markers[i].color.r = 1.0;
-        waypoints_list.markers[i].color.g = 0.0;
-        waypoints_list.markers[i].color.b = 0.0;
-        waypoints_list.markers[i].text = std::to_string(i);
-      }
+    case RECORD:
+      visualization(added_j_);
       break;
-    }
-    case REPEAT: {
-      int length = fixed_j_["0"]["total"];
-      waypoints_list.markers.resize(length);
-
-      for (int i = 0; i < length; ++i) {
-        waypoints_list.markers[i].header.frame_id = "map";
-        waypoints_list.markers[i].header.stamp = ros::Time::now();
-
-        waypoints_list.markers[i].ns = "waypoints";
-        waypoints_list.markers[i].id = i;
-
-        waypoints_list.markers[i].type =
-            visualization_msgs::Marker::TEXT_VIEW_FACING;
-        waypoints_list.markers[i].action = visualization_msgs::Marker::ADD;
-        waypoints_list.markers[i].pose.position.x = 1.0 * i;
-        waypoints_list.markers[i].pose.position.y = 1;
-        waypoints_list.markers[i].pose.position.z = 1;
-        waypoints_list.markers[i].pose.orientation.x = 0.0;
-        waypoints_list.markers[i].pose.orientation.y = 0.0;
-        waypoints_list.markers[i].pose.orientation.z = 0.0;
-        waypoints_list.markers[i].pose.orientation.w = 1.0;
-        waypoints_list.markers[i].scale.x = 0.5;
-        waypoints_list.markers[i].scale.y = 0.5;
-        waypoints_list.markers[i].scale.z = 0.5;
-        waypoints_list.markers[i].color.a = 1.0;
-        waypoints_list.markers[i].color.r = 1.0;
-        waypoints_list.markers[i].color.g = 0.0;
-        waypoints_list.markers[i].color.b = 0.0;
-        waypoints_list.markers[i].text = std::to_string(i);
-      }
+    default:
+      visualization(fixed_j_);
       break;
-    }
   }
+}
 
-  if (waypoints_publisher_.getNumSubscribers() < 1) {
-    return;
-  } else {
+void Autonomy::visualization(const json& j) {
+  visualization_msgs::MarkerArray waypoints_list;
+  int length = j["0"]["total"];
+  waypoints_list.markers.resize(length);
+
+  for (int i = 0; i < length; ++i) {
+    waypoints_list.markers[i].header.frame_id = "map";
+    waypoints_list.markers[i].header.stamp = ros::Time::now();
+
+    waypoints_list.markers[i].ns = "waypoints";
+    waypoints_list.markers[i].id = i + 1;
+
+    waypoints_list.markers[i].type =
+        visualization_msgs::Marker::TEXT_VIEW_FACING;
+    waypoints_list.markers[i].action = visualization_msgs::Marker::ADD;
+    waypoints_list.markers[i].pose.position.x = j[std::to_string(i + 1)]["x"];
+    waypoints_list.markers[i].pose.position.y = j[std::to_string(i + 1)]["y"];
+    waypoints_list.markers[i].pose.position.z = j[std::to_string(i + 1)]["z"];
+    waypoints_list.markers[i].pose.orientation.x = 0.0;
+    waypoints_list.markers[i].pose.orientation.y = 0.0;
+    waypoints_list.markers[i].pose.orientation.z = 0.0;
+    waypoints_list.markers[i].pose.orientation.w = 1.0;
+    waypoints_list.markers[i].scale.z = 0.5;
+    waypoints_list.markers[i].color.a = 1.0;
+    waypoints_list.markers[i].color.r = 0.0;
+    waypoints_list.markers[i].color.g = 0.0;
+    waypoints_list.markers[i].color.b = 1.0;
+    waypoints_list.markers[i].text = std::to_string(i + 1);
+  }
+  if (waypoints_publisher_.getNumSubscribers() > 0) {
     waypoints_publisher_.publish(waypoints_list);
   }
+}
+
+void Autonomy::showInformation(const std::string& s) {
+  QString q_s = QString::fromUtf8(s.c_str());
+  mid_gui_label_->clear();
+  mid_gui_label_->setText(q_s);
 }
 
 void Autonomy::save(rviz::Config config) const { rviz::Panel::save(config); }
