@@ -56,12 +56,12 @@ class Autonomy : public rviz::Panel {
   int counter_teach_;
   int counter_repeat_;
   json added_j_;
-  json fixed_j_;
+  json saved_j_;
 
   ros::NodeHandle nh_;
   ros::Publisher waypoints_publisher_;
-  tf2_ros::Buffer tfBuffer_;
-  tf2_ros::TransformListener tfListener_;
+  tf2_ros::Buffer tf_buffer_;
+  tf2_ros::TransformListener tf_listener_;
 
   MoveBaseClient ac_;
 

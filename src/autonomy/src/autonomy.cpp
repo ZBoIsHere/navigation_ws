@@ -16,7 +16,7 @@ Autonomy::Autonomy(QWidget* parent)
     : rviz::Panel(parent),
       counter_teach_(0),
       counter_repeat_(1),
-      tfListener_(tfBuffer_),
+      tf_listener_(tf_buffer_),
       exec_state_(NO_WAY),
       ac_("move_base", true) {
   added_j_[std::to_string(0)]["total"] = 0;
@@ -71,8 +71,8 @@ Autonomy::Autonomy(QWidget* parent)
     showString(s);
     exec_state_ = NO_WAY;
   } else {
-    i >> fixed_j_;
-    int totol = fixed_j_["0"]["total"];
+    i >> saved_j_;
+    int totol = saved_j_["0"]["total"];
     std::string s = "FIND " + std::to_string(totol) + " Waypoints.";
     showString(s);
     exec_state_ = NORMAL;
@@ -84,7 +84,7 @@ void Autonomy::addOneWaypoint() {
   geometry_msgs::TransformStamped transformStamped;
   try {
     transformStamped =
-        tfBuffer_.lookupTransform("map", "base_link", ros::Time(0));
+        tf_buffer_.lookupTransform("map", "base_link", ros::Time(0));
   } catch (tf2::TransformException& ex) {
     ROS_WARN("%s", ex.what());
     ros::Duration(1.0).sleep();
@@ -96,7 +96,7 @@ void Autonomy::addOneWaypoint() {
   double roll, pitch, yaw;
   m.getRPY(roll, pitch, yaw);
 
-  ++counter_teach_;
+  added_j_[std::to_string(0)]["total"] = ++counter_teach_;
   added_j_[std::to_string(counter_teach_)]["x"] =
       transformStamped.transform.translation.x;
   added_j_[std::to_string(counter_teach_)]["y"] =
@@ -105,8 +105,6 @@ void Autonomy::addOneWaypoint() {
       transformStamped.transform.translation.z;
   added_j_[std::to_string(counter_teach_)]["theta"] = yaw;
   added_j_[std::to_string(counter_teach_)]["next"] = counter_teach_ + 1;
-  added_j_[std::to_string(0)]["total"] = counter_teach_;
-
   std::string s = "ADD No. " + std::to_string(counter_teach_) + " Waypoint.";
   showString(s);
 }
@@ -131,38 +129,39 @@ void Autonomy::runAutonomy() {
     showString(s);
     exec_state_ = NO_WAY;
   } else {
-    i >> fixed_j_;
-    std::cout << std::setw(4) << fixed_j_ << std::endl;
-    int totol = fixed_j_["0"]["total"];
+    i >> saved_j_;
+    std::cout << std::setw(4) << saved_j_ << std::endl;
+    int totol = saved_j_["0"]["total"];
     std::string s = "LOADED " + std::to_string(totol) + " Waypoints.";
     showString(s);
 
     added_j_.clear();
     counter_teach_ = 0;
-    exec_state_ = REPEAT;
 
-    while (!ac_.waitForServer(ros::Duration(5.0))) {
-      ROS_INFO("Waiting for the move_base action server to come up");
+    if (!ac_.waitForServer(ros::Duration(5.0))) {
+      ROS_INFO("Waiting for the move_base action server!");
+      if (exec_state_ == TEACH) exec_state_ = NORMAL;
+    } else {
+      exec_state_ = REPEAT;
     }
     // TODO BT
   }
 }
 
 void Autonomy::stopAutonomy() {
-  exec_state_ = NORMAL;
+  exec_state_ = (exec_state_ == NO_WAY) ? NO_WAY : NORMAL;
   std::string s = "STOP!";
   showString(s);
 }
 
 void Autonomy::showWaypoints() {
   switch (exec_state_) {
-    case NO_WAY:
-      break;
     case TEACH:
       visualization(added_j_);
       break;
-    default:
-      visualization(fixed_j_);
+    case NORMAL:
+    case REPEAT:
+      visualization(saved_j_);
       break;
   }
 }
@@ -209,9 +208,7 @@ void Autonomy::showString(const std::string& s) {
 
 void Autonomy::tick() {
   if (exec_state_ == REPEAT) {
-    ROS_INFO("TEACH");
-  } else {
-    ROS_INFO("...");
+    ROS_INFO("REPEAT");
   }
 }
 
