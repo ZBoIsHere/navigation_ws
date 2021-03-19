@@ -233,10 +233,12 @@ void Autonomy::tick() {
     if (finished_before_timeout) {
       auto state = ac_.getState();
       ROS_INFO("Action finished: %s", state.toString().c_str());
-      int total = saved_j_["0"]["total"];
-      ++counter_repeat_;
-      counter_repeat_ = (counter_repeat_ <= total) ? counter_repeat_
-                                                   : counter_repeat_ - total;
+      if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {
+        int total = saved_j_["0"]["total"];
+        ++counter_repeat_;
+        counter_repeat_ = (counter_repeat_ <= total) ? counter_repeat_
+                                                     : counter_repeat_ - total;
+      }
     } else {
       ROS_INFO("Action did not finish before the time out.");
     }
