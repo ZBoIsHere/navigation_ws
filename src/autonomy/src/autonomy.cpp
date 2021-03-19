@@ -60,7 +60,7 @@ Autonomy::Autonomy(QWidget* parent)
   QTimer* output_timer = new QTimer(this);
   connect(output_timer, SIGNAL(timeout()), this, SLOT(showWaypoints()));
   connect(output_timer, SIGNAL(timeout()), this, SLOT(tick()));
-  output_timer->start(100);
+  output_timer->start(1500);
 
   waypoints_publisher_ =
       nh_.advertise<visualization_msgs::MarkerArray>("waypoints", 1);
@@ -143,8 +143,12 @@ void Autonomy::runAutonomy() {
       ROS_INFO("Please launch the move_base action server!");
       if (exec_state_ == TEACH) exec_state_ = NORMAL;
     } else {
+      auto state = ac_.getState();
+      if (state != actionlib::SimpleClientGoalState::LOST) {
+        ROS_INFO("Start REPEAT...");
+        ac_.cancelAllGoals();
+      }
       exec_state_ = REPEAT;
-      // TODO cancelGoal
     }
     // TODO BT
   }
@@ -211,9 +215,8 @@ void Autonomy::showString(const std::string& s) {
 void Autonomy::tick() {
   if (exec_state_ == REPEAT) {
     // Step 1: Get goal
-    ROS_INFO("Get goal.");
-    std::cout << "try get goal No." << counter_repeat_ << std::endl;
-    goal_.target_pose.header.frame_id = "base_link";
+    ROS_INFO_STREAM("Get goal of waypoint No." << counter_repeat_);
+    goal_.target_pose.header.frame_id = "map";
     goal_.target_pose.header.stamp = ros::Time::now();
     goal_.target_pose.pose.position.x =
         saved_j_[std::to_string(counter_repeat_)]["x"];
@@ -223,30 +226,25 @@ void Autonomy::tick() {
     tf2::Quaternion q;
     q.setRPY(0, 0, yaw);
     tf2::convert(q, goal_.target_pose.pose.orientation);
+
     // Step 2: Send goal
-    auto state = ac_.getState();
-    if (state == actionlib::SimpleClientGoalState::LOST) {
-      ac_.sendGoal(goal_);
-      ROS_INFO("Send goal.");
-      return;
-    } else if (state == actionlib::SimpleClientGoalState::PENDING ||
-               state == actionlib::SimpleClientGoalState::ACTIVE) {
-      ROS_INFO("Running...");
-      return;
-    } else if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {
+    ac_.sendGoal(goal_);
+    bool finished_before_timeout = ac_.waitForResult(ros::Duration(1.0));
+    if (finished_before_timeout) {
+      auto state = ac_.getState();
+      ROS_INFO("Action finished: %s", state.toString().c_str());
       int total = saved_j_["0"]["total"];
-      counter_repeat_ = (++counter_repeat_ > total) ? counter_repeat_
-                                                    : (counter_repeat_ - total);
-      ROS_INFO("SUCCEEDED.");
-      return;
+      ++counter_repeat_;
+      counter_repeat_ = (counter_repeat_ <= total) ? counter_repeat_
+                                                   : counter_repeat_ - total;
     } else {
-      ROS_INFO("Failed!");
+      ROS_INFO("Action did not finish before the time out.");
     }
   } else {
     auto state = ac_.getState();
     if (state != actionlib::SimpleClientGoalState::LOST) {
-      ROS_INFO("Stop navigation!");
-      ac_.cancelGoal();
+      ROS_INFO("Stop REPEAT!");
+      ac_.cancelAllGoals();
     }
   }
 }
