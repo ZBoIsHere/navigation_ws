@@ -70,6 +70,10 @@ class Autonomy : public rviz::Panel {
   FSM_EXEC_STATE exec_state_;
 };
 
+class RobotCommander {
+  // TODO UDP
+}
+
 }  // end namespace autonomy
 
 #endif  // AUTONOMY_H

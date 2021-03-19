@@ -36,5 +36,5 @@ endif()
 add_definitions(-DQT_NO_KEYWORDS)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_library(${PROJECT_NAME} src/autonomy.cpp include/autonomy/autonomy.h)
+add_library(${PROJECT_NAME} src/autonomy.cc include/autonomy/autonomy.h)
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES})
