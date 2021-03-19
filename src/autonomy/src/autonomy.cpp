@@ -180,10 +180,8 @@ void Autonomy::visualization(const json& j) {
   for (int i = 0; i < length; ++i) {
     waypoints_list.markers[i].header.frame_id = "map";
     waypoints_list.markers[i].header.stamp = ros::Time::now();
-
     waypoints_list.markers[i].ns = "waypoints";
     waypoints_list.markers[i].id = i + 1;
-
     waypoints_list.markers[i].type =
         visualization_msgs::Marker::TEXT_VIEW_FACING;
     waypoints_list.markers[i].action = visualization_msgs::Marker::ADD;
@@ -196,9 +194,11 @@ void Autonomy::visualization(const json& j) {
     waypoints_list.markers[i].pose.orientation.w = 1.0;
     waypoints_list.markers[i].scale.z = 1.0;
     waypoints_list.markers[i].color.a = 1.0;
-    waypoints_list.markers[i].color.r = 0.0;
+    waypoints_list.markers[i].color.r =
+        ((i + 1) == counter_repeat_) ? 1.0 : 0.0;
     waypoints_list.markers[i].color.g = 0.0;
-    waypoints_list.markers[i].color.b = 1.0;
+    waypoints_list.markers[i].color.b =
+        ((i + 1) == counter_repeat_) ? 0.0 : 1.0;
     waypoints_list.markers[i].text = std::to_string(i + 1);
   }
   if (waypoints_publisher_.getNumSubscribers() > 0) {
