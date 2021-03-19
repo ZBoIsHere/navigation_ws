@@ -19,7 +19,8 @@ Autonomy::Autonomy(QWidget* parent)
       counter_repeat_(1),
       tf_listener_(tf_buffer_),
       exec_state_(NO_WAY),
-      ac_("move_base", true) {
+      ac_("move_base", true),
+      rc_(43893, "192.168.1.120") {
   added_j_[std::to_string(0)]["total"] = 0;
 
   button_add = new QPushButton(this);
@@ -234,6 +235,14 @@ void Autonomy::tick() {
       auto state = ac_.getState();
       ROS_INFO("Action finished: %s", state.toString().c_str());
       if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {
+        if (counter_repeat_ == 1) {
+          ROS_INFO("changeGait.");
+          rc_.changeGait();
+        };
+        if (counter_repeat_ == 2) {
+          ROS_INFO("resetGait.");
+          rc_.resetGait();
+        };
         int total = saved_j_["0"]["total"];
         ++counter_repeat_;
         counter_repeat_ = (counter_repeat_ <= total) ? counter_repeat_
