@@ -106,6 +106,7 @@ void Autonomy::addOneWaypoint() {
   added_j_[std::to_string(counter_teach_)]["z"] =
       transformStamped.transform.translation.z;
   added_j_[std::to_string(counter_teach_)]["theta"] = yaw;
+  added_j_[std::to_string(counter_teach_)]["command"] = 0;
   added_j_[std::to_string(counter_teach_)]["next"] = counter_teach_ + 1;
   std::string s = "ADD No. " + std::to_string(counter_teach_) + " Waypoint.";
   showString(s);
@@ -235,14 +236,8 @@ void Autonomy::tick() {
       auto state = ac_.getState();
       ROS_INFO("Action finished: %s", state.toString().c_str());
       if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {
-        if (counter_repeat_ == 1) {
-          ROS_INFO("changeGait.");
-          rc_.changeGait();
-        };
-        if (counter_repeat_ == 2) {
-          ROS_INFO("resetGait.");
-          rc_.resetGait();
-        };
+        if (saved_j_[std::to_string(counter_repeat_)]["command"] > 0)
+          rc_.sendCommand(saved_j_[std::to_string(counter_repeat_)]["command"]);
         int total = saved_j_["0"]["total"];
         ++counter_repeat_;
         counter_repeat_ = (counter_repeat_ <= total) ? counter_repeat_

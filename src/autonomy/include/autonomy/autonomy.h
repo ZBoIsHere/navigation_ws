@@ -42,30 +42,13 @@ class RobotCommander {
     remote_addr_.sin_addr.s_addr = inet_addr(remote_ip.c_str());
   }
 
-  void changeGait() {
+  void sendCommand(int command) {
     Command data;
-    data.command_code = 26;
+    data.command_code = command;
     data.command_value = 0;
     data.command_type = 0;
-    ssize_t nbytes;
-    nbytes = sendto(sockfd_, (uint8_t*)&data, sizeof(data), 0,
-                    (struct sockaddr*)&remote_addr_, sizeof(remote_addr_));
-    if (nbytes < 0) {
-      perror("sendfail");
-      ROS_INFO("sendfail");
-    }
-  }
-
-  void resetGait() {
-    Command data;
-    data.command_code = 26;
-    data.command_value = 0;
-    data.command_type = 0;
-    ssize_t nbytes;
-    nbytes = sendto(sockfd_, (uint8_t*)&data, sizeof(data), 0,
-                    (struct sockaddr*)&remote_addr_, sizeof(remote_addr_));
-    if (nbytes < 0) {
-      perror("sendfail");
+    if (sendto(sockfd_, (uint8_t*)&data, sizeof(data), 0,
+               (struct sockaddr*)&remote_addr_, sizeof(remote_addr_)) < 0) {
       ROS_INFO("sendfail");
     }
   }
