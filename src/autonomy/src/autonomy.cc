@@ -7,6 +7,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
+#include <QThread>
 #include <QTimer>
 #include <fstream>
 #include <iostream>
@@ -58,10 +59,18 @@ Autonomy::Autonomy(QWidget* parent)
   button_run->setEnabled(true);
   button_stop->setEnabled(true);
 
-  QTimer* output_timer = new QTimer(this);
-  connect(output_timer, SIGNAL(timeout()), this, SLOT(showWaypoints()));
-  connect(output_timer, SIGNAL(timeout()), this, SLOT(tick()));
-  output_timer->start(1500);
+  QTimer* timer_vis = new QTimer(this);
+  connect(timer_vis, SIGNAL(timeout()), this, SLOT(showWaypoints()));
+  timer_vis->start(100);
+
+  QTimer* timer_tick = new QTimer(0);
+  QThread* thread_tick = new QThread(this);
+  timer_tick->setInterval(1);
+  timer_tick->moveToThread(thread_tick);
+  connect(timer_tick, SIGNAL(timeout()), SLOT(tick()), Qt::DirectConnection);
+  timer_tick->connect(thread_tick, SIGNAL(started()), SLOT(start()));
+  timer_tick->start(1500);
+  thread_tick->start();
 
   waypoints_publisher_ =
       nh_.advertise<visualization_msgs::MarkerArray>("waypoints", 1);
