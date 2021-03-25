@@ -4,12 +4,12 @@ TebLocalPlannerROS:
 
   # Trajectory
   teb_autosize: true
-  dt_ref: 0.7
+  dt_ref: 0.5
   dt_hysteresis: 0.1
   min_samples: 3
-  global_plan_overwrite_orientation: true
+  global_plan_overwrite_orientation: false
   allow_init_with_backwards_motion: false
-  global_plan_viapoint_sep: 0.4
+  global_plan_viapoint_sep: 0.2
   max_global_plan_lookahead_dist: 3.0
   exact_arc_length: false
   force_reinit_new_goal_dist: 1.0
@@ -18,25 +18,25 @@ TebLocalPlannerROS:
   control_look_ahead_poses: 2
 
   # Robot 全向速度 & 加速度参数配置
-  max_vel_x: 0.5
-  max_vel_x_backwards: 0.101
+  max_vel_x: 0.7
+  max_vel_x_backwards: 0.2
   max_vel_y: 0.2
   max_vel_theta: 0.5
-  acc_lim_x: 0.2
-  acc_lim_y: 0.11
+  acc_lim_x: 0.4
+  acc_lim_y: 0.1
   acc_lim_theta: 0.3
   use_proportional_saturation: true
   footprint_model:
     type: "polygon"
-    vertices: [[0.45,-0.225], [0.45,0.225], [-0.45,0.225], [-0.45,-0.225]] # JYL
+    vertices: [[0.40,0.225], [0.40,-0.225], [-0.50,-0.225], [-0.50,0.225]] # JYL
 
   # GoalTolerance
-  yaw_goal_tolerance: 0.02
-  xy_goal_tolerance: 0.02
+  yaw_goal_tolerance: 0.1
+  xy_goal_tolerance: 0.1
   free_goal_vel: false
 
   # Obstacles
-  min_obstacle_dist: 0.03
+  min_obstacle_dist: 0.2
   inflation_dist: 0.3
   include_costmap_obstacles: true
   costmap_obstacles_behind_robot_dist: 2.0
@@ -46,7 +46,7 @@ TebLocalPlannerROS:
   obstacle_association_cutoff_factor: 5.0
   costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
   costmap_converter_spin_thread: true
-  costmap_converter_rate: 5
+  costmap_converter_rate: 10
 
   # Optimization
   no_inner_iterations: 5
@@ -65,9 +65,9 @@ TebLocalPlannerROS:
   weight_kinematics_forward_drive: 10
   weight_optimaltime: 1
   weight_shortest_path: 1
-  weight_obstacle: 0.9
+  weight_obstacle: 3
   weight_inflation: 5
-  weight_viapoint: 7
+  weight_viapoint: 2
   weight_adapt_factor: 2
 
   # Homotopy Class Planner
