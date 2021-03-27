@@ -3,7 +3,7 @@ global_costmap:
   robot_base_frame: base_link
   transform_tolerance: 2
   update_frequency: 5
-  publish_frequency: 2
+  publish_frequency: 1
   static_map: true
   rolling_window: false
 

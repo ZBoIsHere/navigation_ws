@@ -66,7 +66,7 @@
       <!-- 轨迹优化 -->
       <rosparam file="$(find nav)/config/teb_local_planner_params_mini.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="20" />
+      <param name="controller_frequency" value="10" />
       <param name="controller_patience" value ="60" />
       <!-- 异常处理 -->
       <param name="recovery_behavior_enabled" value="false" />
@@ -99,7 +99,7 @@
       <!-- 轨迹优化 -->
       <rosparam file="$(find nav)/config/teb_local_planner_params_deep.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="20" />
+      <param name="controller_frequency" value="10" />
       <param name="controller_patience" value ="60" />
       <!-- 异常处理 -->
       <param name="recovery_behavior_enabled" value="false" />
@@ -130,7 +130,7 @@
       <!-- 轨迹优化 -->
       <rosparam file="$(find nav)/config/teb_local_planner_params_lite.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="20" />
+      <param name="controller_frequency" value="10" />
       <param name="controller_patience" value ="60" />
       <!-- 异常处理 -->
       <param name="recovery_behavior_enabled" value="false" />
