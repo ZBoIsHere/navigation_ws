@@ -4,15 +4,15 @@ TebLocalPlannerROS:
 
   # Trajectory
   teb_autosize: true
-  dt_ref: 0.3
-  dt_hysteresis: 0.05
+  dt_ref: 0.4
+  dt_hysteresis: 0.10
   min_samples: 3
   global_plan_overwrite_orientation: false
   allow_init_with_backwards_motion: false
-  global_plan_viapoint_sep: 0.05
+  global_plan_viapoint_sep: 0.20
   max_global_plan_lookahead_dist: 3.0
   exact_arc_length: false
-  force_reinit_new_goal_dist: 0.5
+  force_reinit_new_goal_dist: 0.8
   feasibility_check_no_poses: 3
   publish_feedback: false
   control_look_ahead_poses: 2
