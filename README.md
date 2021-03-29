@@ -12,16 +12,11 @@
 
 注：考虑到运行性能与可靠性，强烈建议用[**主从机方式**](https://blog.csdn.net/Spacegene/article/details/86499467)调试
 
-1. 安装编译 (如果无源码请忽略此步骤)
-   ```bash
-   $ sudo apt-get install ros-$ROS_DISTRO-navigation ros-$ROS_DISTRO-teb-local-planner ros-$ROS_DISTRO-spatio-temporal-voxel-layer libproj-dev libpcap-dev
-   $ cd ~/navigation_ws && catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
-   ```
-2. 配置参数
+1. 配置参数
    
    打开 `navigation_ws/src/navigation/nav/launch/robot.launch` 文件，参考配置：
 
-   ```yaml
+   ```xml
    <launch>
      <!-- 绝影型号 MINI/JYL/LITE -->
      <arg name="robot_type" default="MINI" />
@@ -36,25 +31,42 @@
      ...
    </launch>
    ```
-3. 调节导航参数，参数文件位于 `navigation_ws/src/navigation/nav/config`，请务必在**理解参数意义**的前提下修改
+
+2. 安装编译 (如果无源码请忽略此步骤)
+   
+   如果采用导航自带的定位程序且启用 velodyne 激光雷达，需要执行一次：
+
+   ```bash
+   $ cd ~/navigation_ws && mv src/driver/velodyne/CATKIN_IGNORE src/driver/ros_rslidar
+   ```
+   否则直接执行：
+
+   ```bash
+   $ sudo apt-get install ros-$ROS_DISTRO-navigation ros-$ROS_DISTRO-teb-local-planner ros-$ROS_DISTRO-spatio-temporal-voxel-layer libproj-dev libpcap-dev
+   $ cd ~/navigation_ws && catkin_make -DCMAKE_BUILD_TYPE=Release -DCATKIN_WHITELIST_PACKAGES=""
+   ```
+
+3. 调节导航参数，参数文件位于 `navigation_ws/src/navigation/nav/config`，修改时务必**理解参数意义**
 4. 启动导航程序
    
-   如果采用 **TeamViewer 调试**，机器人端执行命令
+   如果采用 **TeamViewer 调试**，机器人端执行：
+   
    ```bash
-   $ cd ~/navigation_ws
-   $ source devel/setup.bash
+   $ cd ~/navigation_ws && source devel/setup.bash
    $ roslaunch nav robot.launch
    ```
-   如果采用 **ROS 主从机调试**，机器人端执行命令
+   
+   如果采用 **ROS 主从机调试**，机器人端执行：
+   
    ```bash
-   $ cd ~/navigation_ws
-   $ source devel/setup.bash
+   $ cd ~/navigation_ws && source devel/setup.bash
    $ roslaunch nav robot.launch
    ```
-   调试端执行
+   
+   PC 端执行：
+   
    ```bash
-   $ cd ~/navigation_ws
-   $ source devel/setup.bash
+   $ cd ~/navigation_ws && source devel/setup.bash
    $ roslaunch nav pc.launch
    ```
 ## 版本说明
