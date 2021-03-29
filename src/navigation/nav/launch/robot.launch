@@ -10,7 +10,7 @@
   <!-- 全局地图 -->
   <arg name="map_id" default="map" />
   
-  <!-- 驱动 -->
+
   <group if="$(arg enable_lidar_localization)">
     <!-- LIDAR -->
     <group if="$(eval arg('lidar_type') == 'velodyne')">
@@ -23,23 +23,23 @@
         <arg name="device_ip" value="192.168.1.201" />
       </include>
     </group>
-    <!-- 定位 -->
+    <!-- 全局定位 -->
     <include file="$(find hdl_localization)/launch/hdl_localization.launch">
       <arg name="map_id" value="$(arg map_id)" />
       <arg name="lidar_type" value="$(arg lidar_type)" />
     </include>
-    <!-- 地图 -->
+    <!-- 全局地图 -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(find nav)/map/$(arg map_id).yaml"/>
   </group>
 
-  <!-- 通信 -->
+  <!-- 运动驱动 -->
   <include file="$(find message_transformer_cpp)/launch/message_transformer_cpp.launch"/>
+
 
   <!-- MINI 参数 -->
   <group if="$(eval arg('robot_type') == 'MINI')">
     <!-- TF 参数 -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_lidar_tf" args="0.243 0 0.098 0 0 0 base_link $(arg lidar_type)" />
-
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf"  args="0.309 0 0.033 0 0.36 0 base_link camera_link" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf"    args="0.243 0 0.13 -1.5708 0 0 base_link body" />
     <!-- URDF -->
@@ -47,88 +47,44 @@
       <param name="robot_description" textfile="$(find mini)/urdf/mini.urdf" />
       <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
     </group>
-    <!-- 导航 -->
-    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-      <!-- 导航参数 -->
-      <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="global_costmap" />
-      <param name="global_costmap/stvl_obstacle_layer/observation_sources" value="lidar_mark lidar_clear"/>
-      <param name="global_costmap/stvl_obstacle_layer/lidar_mark/topic" value="$(arg lidar_type)_points"/>
-      <param name="global_costmap/stvl_obstacle_layer/lidar_clear/topic" value="$(arg lidar_type)_points"/>
-      <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
-
-      <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="local_costmap" />
-      <param name="local_costmap/stvl_obstacle_layer/observation_sources" value="lidar_mark lidar_clear"/>
-      <param name="local_costmap/stvl_obstacle_layer/lidar_mark/topic" value="$(arg lidar_type)_points"/>
-      <param name="local_costmap/stvl_obstacle_layer/lidar_clear/topic" value="$(arg lidar_type)_points"/>
-      <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
-      <!-- 路径搜索 -->
-      <rosparam file="$(find nav)/config/global_planner_params.yaml" command="load" />
-      <param name="base_global_planner" value="global_planner/GlobalPlanner" />
-      <param name="planner_frequency" value="5" />
-      <param name="planner_patience" value ="60" />
-      <!-- 轨迹优化 -->
-      <rosparam file="$(find nav)/config/teb_local_planner_params_mini.yaml" command="load" />
-      <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="10" />
-      <param name="controller_patience" value ="60" />
-      <!-- 异常处理 -->
-      <param name="recovery_behavior_enabled" value="false" />
-    </node>
   </group>
-
-
   <!-- JYL 参数 -->
   <group if="$(eval arg('robot_type') == 'JYL')">
-    <!-- TF 参数 -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_lidar_tf" args="0.327 0 0.075 0 0 0 base_link $(arg lidar_type)" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf" args="0.372 0 -0.018 0 0.4 0 base_link camera_link" />
-    <!-- 导航 -->
-    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-      <!-- 导航参数 -->
-      <rosparam file="$(find nav)/config/costmap_common_params_deep.yaml" command="load" ns="global_costmap" />
-      <rosparam file="$(find nav)/config/costmap_common_params_deep.yaml" command="load" ns="local_costmap" />
-      <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
-      <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
-      <!-- 路径搜索 -->
-      <rosparam file="$(find nav)/config/global_planner_params.yaml" command="load" />
-      <param name="base_global_planner" value="global_planner/GlobalPlanner" />
-      <param name="planner_frequency" value="5" />
-      <param name="planner_patience" value ="60" />
-      <!-- 轨迹优化 -->
-      <rosparam file="$(find nav)/config/teb_local_planner_params_deep.yaml" command="load" />
-      <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="10" />
-      <param name="controller_patience" value ="60" />
-      <!-- 异常处理 -->
-      <param name="recovery_behavior_enabled" value="false" />
-    </node>
   </group>
-
   <!-- LITE 参数 -->
   <group if="$(eval arg('robot_type') == 'LITE')">
-    <!-- TF 参数 -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_lidar_tf" args="0.175 0 0.102 0 0 0 base_link $(arg lidar_type)" />
-    <!-- 导航 -->
-    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-      <!-- 导航参数 -->
-      <rosparam file="$(find nav)/config/costmap_common_params_lite.yaml" command="load" ns="global_costmap" />
-      <rosparam file="$(find nav)/config/costmap_common_params_lite.yaml" command="load" ns="local_costmap" />
-      <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
-      <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
-      <!-- 路径搜索 -->
-      <rosparam file="$(find nav)/config/global_planner_params.yaml" command="load" />
-      <param name="base_global_planner" value="global_planner/GlobalPlanner" />
-      <param name="planner_frequency" value="5" />
-      <param name="planner_patience" value ="60" />
-      <!-- 轨迹优化 -->
-      <rosparam file="$(find nav)/config/teb_local_planner_params_lite.yaml" command="load" />
-      <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-      <param name="controller_frequency" value="10" />
-      <param name="controller_patience" value ="60" />
-      <!-- 异常处理 -->
-      <param name="recovery_behavior_enabled" value="false" />
-    </node>
   </group>
+
+  <!-- 导航 -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <!-- 导航参数 -->
+    <rosparam file="$(find nav)/config/costmap_common_params_$(arg robot_type).yaml" command="load" ns="global_costmap" />
+    <param name="global_costmap/stvl_obstacle_layer/observation_sources" value="lidar_mark lidar_clear"/>
+    <param name="global_costmap/stvl_obstacle_layer/lidar_mark/topic" value="$(arg lidar_type)_points"/>
+    <param name="global_costmap/stvl_obstacle_layer/lidar_clear/topic" value="$(arg lidar_type)_points"/>
+    <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
+
+    <rosparam file="$(find nav)/config/costmap_common_params_$(arg robot_type).yaml" command="load" ns="local_costmap" />
+    <param name="local_costmap/stvl_obstacle_layer/observation_sources" value="lidar_mark lidar_clear"/>
+    <param name="local_costmap/stvl_obstacle_layer/lidar_mark/topic" value="$(arg lidar_type)_points"/>
+    <param name="local_costmap/stvl_obstacle_layer/lidar_clear/topic" value="$(arg lidar_type)_points"/>
+    <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
+    <!-- 路径搜索 -->
+    <rosparam file="$(find nav)/config/global_planner_params.yaml" command="load" />
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+    <param name="planner_frequency" value="5" />
+    <param name="planner_patience" value ="60" />
+    <!-- 轨迹优化 -->
+    <rosparam file="$(find nav)/config/teb_local_planner_params_$(arg robot_type).yaml" command="load" />
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+    <param name="controller_frequency" value="10" />
+    <param name="controller_patience" value ="60" />
+    <!-- 异常处理 -->
+    <param name="recovery_behavior_enabled" value="false" />
+  </node>
 
   <!-- RViz -->
   <group if="$(arg enable_rviz)">
