@@ -1,12 +1,12 @@
 - [自主导航程序使用说明](#自主导航程序使用说明)
 - [版本说明](#版本说明)
-  - [常用指令](#常用指令)
-  - [如何生成 ROS 安装包文件](#如何生成-ros-安装包文件)
-    - [如何安装可执行文件、动态库或静态库等二进制文件](#如何安装可执行文件动态库或静态库等二进制文件)
-    - [如何安装库的头文件](#如何安装库的头文件)
-    - [安装 launch、YAML、RViz、地图等普通文本文件](#安装-launchyamlrviz地图等普通文本文件)
-    - [安装 Python 程序](#安装-python-程序)
-    - [打包 deb 文件](#打包-deb-文件)
+- [常用指令](#常用指令)
+- [如何生成 ROS 安装包文件](#如何生成-ros-安装包文件)
+  - [如何安装可执行文件、动态库或静态库等二进制文件](#如何安装可执行文件动态库或静态库等二进制文件)
+  - [如何安装库的头文件](#如何安装库的头文件)
+  - [安装 launch、YAML、RViz、地图等普通文本文件](#安装-launchyamlrviz地图等普通文本文件)
+  - [安装 Python 程序](#安装-python-程序)
+  - [打包 deb 文件](#打包-deb-文件)
 
 ## 自主导航程序使用说明
 
@@ -77,7 +77,7 @@
   - 融合 LIDAR 与 D435 避障
   - 导航点误差小于 0.1m
 
-### 常用指令
+## 常用指令
 
 ```bash
 $ rosrun rqt_tf_tree rqt_tf_tree
@@ -101,26 +101,10 @@ $ shutdown
 $ sudo apt-get install ros-$ROS_DISTRO-plotjuggler python-catkin-tools vim htop
 ```
 
-### [如何生成 ROS 安装包文件](http://wiki.ros.org/catkin/CMakeLists.txt#Optional_Step:_Specifying_Installable_Targets)
-
-文件类型：
-
-* TARGETS **二进制文件**
-* DIRECTORY **头文件夹/launch文件夹/参数文件夹**
-* FILES **头文件/launch文件/参数文件**
-* PROGRAMS **脚本文件**
-
-安装路径：
-
-* CATKIN_PACKAGE_BIN_DESTINATION
-* CATKIN_PACKAGE_LIB_DESTINATION
-* CATKIN_PACKAGE_INCLUDE_DESTINATION
-  * CATKIN_GLOBAL_INCLUDE_DESTINATION
-* CATKIN_PACKAGE_SHARE_DESTINATION
-* CATKIN_PACKAGE_PYTHON_DESTINATION
+## [如何生成 ROS 安装包文件](http://wiki.ros.org/catkin/CMakeLists.txt#Optional_Step:_Specifying_Installable_Targets)
 
 下面通过修改 `CMakeLists.txt` 指定 deb 安装包所含内容：
-#### 如何安装可执行文件、动态库或静态库等二进制文件
+### 如何安装可执行文件、动态库或静态库等二进制文件
 
 ```cmake
 install(TARGETS ${PROJECT_NAME}
@@ -134,7 +118,7 @@ install(TARGETS ${PROJECT_NAME}_node
 )
 ```
 
-#### 如何安装库的头文件
+### 如何安装库的头文件
 
 ```cmake
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -147,7 +131,7 @@ install(DIRECTORY include/
 )
 ```
 
-#### 安装 launch、YAML、RViz、地图等普通文本文件
+### 安装 launch、YAML、RViz、地图等普通文本文件
 
 ```cmake
 install(DIRECTORY launch/
@@ -157,7 +141,7 @@ install(FILES nodelet_velodyne.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 ```
 
-#### 安装 Python 程序
+### 安装 Python 程序
 
 ```cmake
 install(TARGETS python_module_library
@@ -169,7 +153,7 @@ catkin_install_python(PROGRAMS scripts/myscript
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 ```
 
-#### 打包 deb 文件
+### 打包 deb 文件
 
 ```bash
 $ sudo apt-get install python-bloom
