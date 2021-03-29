@@ -2,11 +2,11 @@
   <!-- 绝影型号 MINI/JYL/LITE -->
   <arg name="robot_type" default="MINI" />
   <!-- 雷达型号 velodyne/rslidar -->
-  <arg name="lidar_type" default="velodyne" />
+  <arg name="lidar_type" default="rslidar" />
   <!-- 雷达定位 -->
-  <arg name="enable_lidar_localization" default="true" />
+  <arg name="enable_lidar_localization" default="false" />
   <!-- 开启 RViz -->
-  <arg name="enable_rviz" default="false" />
+  <arg name="enable_rviz" default="true" />
   <!-- 全局地图 -->
   <arg name="map_id" default="map" />
   
@@ -38,14 +38,10 @@
   <!-- MINI 参数 -->
   <group if="$(eval arg('robot_type') == 'MINI')">
     <!-- TF 参数 -->
-    <group if="$(eval arg('lidar_type') == 'velodyne')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.098 0 0 0 base_link velodyne" />
-    </group>
-    <group if="$(eval arg('lidar_type') == 'rslidar')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_laser_tf_broadcaster" args="0.243 0 0.098 0 0 0 base_link rslidar" />
-    </group>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster"  args="0.309 0 0.033 0 0.36 0 base_link camera_link" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf_broadcaster"    args="0.243 0 0.13 -1.5708 0 0 base_link body" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_lidar_tf" args="0.243 0 0.098 0 0 0 base_link $(arg lidar_type)" />
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf"  args="0.309 0 0.033 0 0.36 0 base_link camera_link" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_body_tf"    args="0.243 0 0.13 -1.5708 0 0 base_link body" />
     <!-- URDF -->
     <group if="$(arg enable_rviz)">
       <param name="robot_description" textfile="$(find mini)/urdf/mini.urdf" />
@@ -55,9 +51,16 @@
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <!-- 导航参数 -->
       <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="global_costmap" />
-      <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="local_costmap" />
-      <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
+      <param name="global_costmap/stvl_obstacle_layer/observation_sources" value="lidar_mark lidar_clear"/>
+      <param name="global_costmap/stvl_obstacle_layer/lidar_mark/topic" value="$(arg lidar_type)_points"/>
+      <param name="global_costmap/stvl_obstacle_layer/lidar_clear/topic" value="$(arg lidar_type)_points"/>
       <rosparam file="$(find nav)/config/global_costmap_params.yaml" command="load" />
+
+      <rosparam file="$(find nav)/config/costmap_common_params_mini.yaml" command="load" ns="local_costmap" />
+      <param name="local_costmap/stvl_obstacle_layer/observation_sources" value="lidar_mark lidar_clear"/>
+      <param name="local_costmap/stvl_obstacle_layer/lidar_mark/topic" value="$(arg lidar_type)_points"/>
+      <param name="local_costmap/stvl_obstacle_layer/lidar_clear/topic" value="$(arg lidar_type)_points"/>
+      <rosparam file="$(find nav)/config/local_costmap_params.yaml" command="load" />
       <!-- 路径搜索 -->
       <rosparam file="$(find nav)/config/global_planner_params.yaml" command="load" />
       <param name="base_global_planner" value="global_planner/GlobalPlanner" />
@@ -77,13 +80,8 @@
   <!-- JYL 参数 -->
   <group if="$(eval arg('robot_type') == 'JYL')">
     <!-- TF 参数 -->
-    <group if="$(eval arg('lidar_type') == 'velodyne')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.327 0 0.075 0 0 0 base_link velodyne" />
-    </group>
-    <group if="$(eval arg('lidar_type') == 'rslidar')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.327 0 0.075 0 0 0 base_link rslidar" />
-    </group>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf_broadcaster" args="0.372 0 -0.018 0 0.4 0 base_link camera_link" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_lidar_tf" args="0.327 0 0.075 0 0 0 base_link $(arg lidar_type)" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_camera_tf" args="0.372 0 -0.018 0 0.4 0 base_link camera_link" />
     <!-- 导航 -->
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <!-- 导航参数 -->
@@ -109,12 +107,7 @@
   <!-- LITE 参数 -->
   <group if="$(eval arg('robot_type') == 'LITE')">
     <!-- TF 参数 -->
-    <group if="$(eval arg('lidar_type') == 'velodyne')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.175 0 0.102 0 0 0 base_link velodyne" />
-    </group>
-    <group if="$(eval arg('lidar_type') == 'rslidar')">
-      <node pkg="tf2_ros" type="static_transform_publisher" name="base_velodyne_tf_broadcaster" args="0.175 0 0.102 0 0 0 base_link rslidar" />
-    </group>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_lidar_tf" args="0.175 0 0.102 0 0 0 base_link $(arg lidar_type)" />
     <!-- 导航 -->
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <!-- 导航参数 -->

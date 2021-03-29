@@ -5,12 +5,14 @@
   <arg name="lidar_type" />
 
   <arg name="nodelet_manager" default="$(arg lidar_type)_nodelet_manager" />
-  <arg name="points_topic" default="/$(arg lidar_type)_points" />
+  <arg name="points_topic" default="$(arg lidar_type)_points" />
   <arg name="imu_topic" default="/imu" />
   <arg name="odom_child_frame_id" default="base_link" />
 
   <!-- in case you use velodyne_driver, comment out the following line -->
-  <!-- <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/> -->
+  <group if="$(eval arg('lidar_type') == 'rslidar')">
+    <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
+  </group>
 
     <!-- globalmap_server_nodelet -->
     <node pkg="nodelet" type="nodelet" name="globalmap_server_nodelet" args="load hdl_localization/GlobalmapServerNodelet $(arg nodelet_manager)">
