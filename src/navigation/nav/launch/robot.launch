@@ -1,13 +1,13 @@
 <launch>
   <!-- 绝影型号 MINI/JYL/LITE -->
   <arg name="robot_type" default="MINI" />
-  <!-- 雷达型号 velodyne/rslidar -->
+  <!-- 雷达型号 rslidar(默认)/velodyne -->
   <arg name="lidar_type" default="rslidar" />
-  <!-- 雷达定位 -->
+  <!-- 开启定位 false(默认定位程序与导航程序单独开启)/true(采用导航自带的定位程序) -->
   <arg name="enable_lidar_localization" default="false" />
-  <!-- 开启 RViz -->
+  <!-- 开启RViz true(默认)/false -->
   <arg name="enable_rviz" default="true" />
-  <!-- 全局地图 -->
+  <!-- 点云/占据栅格地图名称 map(默认) -->
   <arg name="map_id" default="map" />
   
 
