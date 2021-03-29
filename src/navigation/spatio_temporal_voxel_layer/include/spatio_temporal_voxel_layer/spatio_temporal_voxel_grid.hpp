@@ -51,12 +51,9 @@
 #include <ctime>
 #include <iostream>
 #include <utility>
-#include <vector>
 // msgs
 #include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/point_cloud2_iterator.h>
 #include <visualization_msgs/Marker.h>
-#include <geometry_msgs/Point.h>
 // TBB
 #include <tbb/parallel_do.h>
 // OpenVDB
@@ -124,7 +121,7 @@ public:
   typedef openvdb::math::Ray<openvdb::Real>::Vec3T Vec3Type;
 
   SpatioTemporalVoxelGrid(const float& voxel_size, const double& background_value,
-                          const int& decay_model, const double& voxel_decay,
+                          const GlobalDecayModel& decay_model, const double& voxel_decay,
                           const bool& pub_voxels);
   ~SpatioTemporalVoxelGrid(void);
 
@@ -134,7 +131,7 @@ public:
   void ClearFrustums(const std::vector<observation::MeasurementReading>& clearing_observations);
 
   // Get the pointcloud of the underlying occupancy grid
-  void GetOccupancyPointCloud(sensor_msgs::PointCloud2::Ptr& pc2);
+  void GetOccupancyPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr& pc);
   std::unordered_map<occupany_cell, uint>* GetFlattenedCostmap();
 
   // Clear the grid
@@ -168,10 +165,10 @@ protected:
   openvdb::Vec3d IndexToWorld(const openvdb::Coord& coord) const;
 
   mutable openvdb::DoubleGrid::Ptr _grid;
-  int                             _decay_model;
+  GlobalDecayModel                _decay_model;
   double                          _background_value, _voxel_size, _voxel_decay;
   bool                            _pub_voxels;
-  std::vector<geometry_msgs::Point32>*   _grid_points;
+  pcl::PointCloud<pcl::PointXYZ>::Ptr     _pc;
   std::unordered_map<occupany_cell, uint>* _cost_map;
   boost::mutex                            _grid_lock;
 };

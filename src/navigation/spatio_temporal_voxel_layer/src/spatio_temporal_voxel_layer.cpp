@@ -147,10 +147,8 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
     double observation_keep_time, expected_update_rate, min_obstacle_height;
     double max_obstacle_height, min_z, max_z, vFOV, vFOVPadding;
     double hFOV, decay_acceleration;
-    std::string topic, sensor_frame, data_type, filter_str;
-    bool inf_is_valid, clearing, marking, clear_after_reading, enabled;
-    int voxel_min_points;
-    buffer::Filters filter;
+    std::string topic, sensor_frame, data_type;
+    bool inf_is_valid, clearing, marking, voxel_filter, clear_after_reading, enabled;
 
     source_node.param("topic", topic, source);
     source_node.param("sensor_frame", sensor_frame, std::string(""));
@@ -174,34 +172,17 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
     source_node.param("horizontal_fov_angle", hFOV, 1.04);
     // acceleration scales the model's decay in presence of readings
     source_node.param("decay_acceleration", decay_acceleration, 0.);
-    // Apply a PCL filter (Approximate VoxeGrid or PassThrough) or skip
-    source_node.param("filter", filter_str, std::string("passthrough"));
-    // minimum points per voxel for voxel filter
-    source_node.param("voxel_min_points", voxel_min_points, 0);
+    // performs an approximate voxel filter over the data to reduce
+    source_node.param("voxel_filter", voxel_filter, false);
     // clears measurement buffer after reading values from it
     source_node.param("clear_after_reading", clear_after_reading, false);
     // Whether the frustum is enabled on startup. Can be toggled with service
     source_node.param("enabled", enabled, true);
+
     // model type - default depth camera frustum model
     int model_type_int;
     source_node.param("model_type", model_type_int, 0);
     ModelType model_type = static_cast<ModelType>(model_type_int);
-
-    if (filter_str == "passthrough")
-    {
-      ROS_INFO("Passthough filter activated.");
-      filter = buffer::Filters::PASSTHROUGH;
-    }
-    else if (filter_str == "voxel")
-    {
-      ROS_INFO("Voxel filter activated.");
-      filter = buffer::Filters::VOXEL;
-    }
-    else
-    {
-      ROS_INFO("No filters activated.");
-      filter = buffer::Filters::NONE;
-    }
 
     if (!sensor_frame.empty())
     {
@@ -229,8 +210,7 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
         obstacle_range, *tf_, _global_frame, sensor_frame,                \
         transform_tolerance, min_z, max_z, vFOV, vFOVPadding, hFOV,       \
         decay_acceleration, marking, clearing, _voxel_size,               \
-        filter, voxel_min_points, enabled, clear_after_reading,           \
-        model_type)));
+        voxel_filter, enabled, clear_after_reading, model_type)));
 
     // Add buffer to marking observation buffers
     if (marking == true)
@@ -252,9 +232,9 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
                                                                    topic, 50));
       _observation_subscribers.push_back(sub);
 
-      boost::shared_ptr < tf2_ros::MessageFilter<sensor_msgs::LaserScan>
-          > filter(new tf2_ros::MessageFilter<sensor_msgs::LaserScan>(*sub, \
-                                                     *tf_, _global_frame, 50,0));
+      boost::shared_ptr < tf::MessageFilter<sensor_msgs::LaserScan>
+          > filter(new tf::MessageFilter<sensor_msgs::LaserScan>(*sub, \
+                                                     *tf_, _global_frame, 50));
 
       if (inf_is_valid)
       {
@@ -280,29 +260,28 @@ void SpatioTemporalVoxelLayer::onInitialize(void)
                                                                      topic, 50));
       _observation_subscribers.push_back(sub);
 
-      boost::shared_ptr < tf2_ros::MessageFilter<sensor_msgs::PointCloud2>
-          > filter(new tf2_ros::MessageFilter<sensor_msgs::PointCloud2>(*sub, \
-                                                  *tf_, _global_frame, 50,0));
+      boost::shared_ptr < tf::MessageFilter<sensor_msgs::PointCloud2>
+          > filter(new tf::MessageFilter<sensor_msgs::PointCloud2>(*sub, \
+                                                  *tf_, _global_frame, 50));
       filter->registerCallback(
           boost::bind(&SpatioTemporalVoxelLayer::PointCloud2Callback, this, _1, \
                                                    _observation_buffers.back()));
 
+      ros::ServiceServer server;
+      boost::function < bool(std_srvs::SetBool::Request&, \
+                             std_srvs::SetBool::Response&) > serv_callback;
+
+      serv_callback = boost::bind(&SpatioTemporalVoxelLayer::BufferEnablerCallback, \
+                                  this, _1, _2, _observation_buffers.back(),  \
+                                  _observation_subscribers.back());
+
+      std::string topic = source +  "/toggle_enabled";
+      server = nh.advertiseService(topic, serv_callback);
+
+      _buffer_enabler_servers.push_back(server);
       _observation_subscribers.push_back(sub);
       _observation_notifiers.push_back(filter);
     }
-
-    ros::ServiceServer server;
-    boost::function < bool(std_srvs::SetBool::Request&, \
-                           std_srvs::SetBool::Response&) > serv_callback;
-
-    serv_callback = boost::bind(&SpatioTemporalVoxelLayer::BufferEnablerCallback, \
-                                this, _1, _2, _observation_buffers.back(),  \
-                                _observation_subscribers.back());
-
-    std::string toggle_topic = source +  "/toggle_enabled";
-    server = nh.advertiseService(toggle_topic, serv_callback);
-
-    _buffer_enabler_servers.push_back(server);
 
     if (sensor_frame != "")
     {
@@ -510,7 +489,6 @@ bool SpatioTemporalVoxelLayer::updateFootprint(double robot_x, double robot_y, \
     touch(_transformed_footprint[i].x, _transformed_footprint[i].y, \
           min_x, min_y, max_x, max_y);
   }
-  return true;
 }
 
 /*****************************************************************************/
@@ -606,6 +584,24 @@ void SpatioTemporalVoxelLayer::DynamicReconfigureCallback( \
 /*****************************************************************************/
 {
   boost::recursive_mutex::scoped_lock lock(_voxel_grid_lock);
+  bool update_grid(false);
+  auto updateFlagIfChanged = [&update_grid](auto& own, const auto& reference)
+  {
+    if (static_cast<float>(std::abs(own - reference)) >= FLT_EPSILON)
+    {
+      own = reference;
+      update_grid = true;
+    }
+  };
+
+  auto default_value = (config.track_unknown_space) ? \
+                          costmap_2d::NO_INFORMATION : costmap_2d::FREE_SPACE;
+  updateFlagIfChanged(default_value_, default_value);
+  updateFlagIfChanged(_voxel_size, config.voxel_size);
+  updateFlagIfChanged(_voxel_decay, config.voxel_decay);
+  int decay_model_int = (int)_decay_model;
+  updateFlagIfChanged(decay_model_int, config.decay_model);
+  updateFlagIfChanged(_publish_voxels, config.publish_voxel_map);
 
   _enabled = config.enabled;
   _combination_method = config.combination_method;
@@ -613,17 +609,10 @@ void SpatioTemporalVoxelLayer::DynamicReconfigureCallback( \
   _update_footprint_enabled = config.update_footprint_enabled;
   _mapping_mode = config.mapping_mode;
   _map_save_duration = ros::Duration(config.map_save_duration);
+  _decay_model = static_cast<volume_grid::GlobalDecayModel>(decay_model_int);
 
-  if (level >=1) //update grid
+  if (update_grid)
   {
-    auto default_value = (config.track_unknown_space) ? \
-                            costmap_2d::NO_INFORMATION : costmap_2d::FREE_SPACE;
-    default_value_ = default_value;
-    _voxel_size = config.voxel_size;
-    _voxel_decay = config.voxel_decay;
-    _decay_model = static_cast<volume_grid::GlobalDecayModel>(config.decay_model);
-    _publish_voxels = config.publish_voxel_map;
-
     delete _voxel_grid;
     _voxel_grid = new volume_grid::SpatioTemporalVoxelGrid(_voxel_size, \
       static_cast<double>(default_value_), _decay_model, \
@@ -762,11 +751,13 @@ void SpatioTemporalVoxelLayer::updateBounds( \
   // publish point cloud in navigation mode
   if (_publish_voxels && !_mapping_mode)
   {
-    sensor_msgs::PointCloud2::Ptr pc2(new sensor_msgs::PointCloud2());
-    _voxel_grid->GetOccupancyPointCloud(pc2);
-    pc2->header.frame_id = _global_frame;
-    pc2->header.stamp = ros::Time::now();
-    _voxel_pub.publish(*pc2);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr pc(new pcl::PointCloud<pcl::PointXYZ>);
+    _voxel_grid->GetOccupancyPointCloud(pc);
+    sensor_msgs::PointCloud2 pc2;
+    pcl::toROSMsg(*pc, pc2);
+    pc2.header.frame_id = _global_frame;
+    pc2.header.stamp = ros::Time::now();
+    _voxel_pub.publish(pc2);
   }
 
   // update footprint

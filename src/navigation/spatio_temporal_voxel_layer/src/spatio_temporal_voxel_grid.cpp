@@ -42,14 +42,15 @@ namespace volume_grid
 
 /*****************************************************************************/
 SpatioTemporalVoxelGrid::SpatioTemporalVoxelGrid(const float& voxel_size, \
-                   const double& background_value, const int& decay_model,\
+                   const double& background_value,                        \
+                   const GlobalDecayModel& decay_model,                   \
                    const double& voxel_decay, const bool& pub_voxels) :
                    _background_value(background_value),                   \
                    _voxel_size(voxel_size),                               \
                    _decay_model(decay_model),                             \
                    _voxel_decay(voxel_decay),                             \
                    _pub_voxels(pub_voxels),                               \
-                   _grid_points(new std::vector<geometry_msgs::Point32>),   \
+                   _pc(new pcl::PointCloud<pcl::PointXYZ>),               \
                    _cost_map(new std::unordered_map<occupany_cell, uint>)
 /*****************************************************************************/
 {
@@ -64,11 +65,6 @@ SpatioTemporalVoxelGrid::~SpatioTemporalVoxelGrid(void)
   if (_cost_map)
   {
     delete _cost_map;    
-  }
-
-  if (_grid_points)
-  {
-    delete _grid_points;
   }
 }
 
@@ -93,7 +89,6 @@ void SpatioTemporalVoxelGrid::InitializeGrid(void)
   _grid->setName("SpatioTemporalVoxelLayer");
   _grid->insertMeta("Voxel Size", openvdb::FloatMetadata( _voxel_size ));
   _grid->setGridClass(openvdb::GRID_LEVEL_SET);
-
   return;
 }
 
@@ -110,7 +105,7 @@ void SpatioTemporalVoxelGrid::ClearFrustums(const \
     return;
   }
 
-  _grid_points->clear();
+  _pc->clear();
   _cost_map->clear();
 
   std::vector<frustum_model> obs_frustums;
@@ -246,11 +241,8 @@ void SpatioTemporalVoxelGrid::PopulateCostmapAndPointcloud(const \
 
   if (_pub_voxels)
   {
-    geometry_msgs::Point32 point;
-    point.x = pose_world[0];
-    point.y = pose_world[1];
-    point.z = pose_world[2];
-    _grid_points->push_back(point);
+    _pc->push_back(pcl::PointXYZ(pose_world[0], pose_world[1], \
+                                 pose_world[2]));
   }
 
   std::unordered_map<occupany_cell, uint>::iterator cell;
@@ -295,24 +287,18 @@ void SpatioTemporalVoxelGrid::operator()(const \
     float mark_range_2 = obs._obstacle_range_in_m * obs._obstacle_range_in_m;
     const double cur_time = ros::WallTime::now().toSec();
 
-    const sensor_msgs::PointCloud2& cloud = *(obs._cloud);
-    sensor_msgs::PointCloud2ConstIterator<float> iter_x(cloud, "x");
-    sensor_msgs::PointCloud2ConstIterator<float> iter_y(cloud, "y");
-    sensor_msgs::PointCloud2ConstIterator<float> iter_z(cloud, "z");
-
-    for (iter_x, iter_y, iter_z; iter_x !=iter_x.end(); \
-         ++iter_x, ++iter_y, ++iter_z)
+    pcl::PointCloud<pcl::PointXYZ>::const_iterator it;
+    for (it = obs._cloud->points.begin(); it < obs._cloud->points.end(); ++it)
     {
-      float distance_2 = \
-          (*iter_x - obs._origin.x) * (*iter_x - obs._origin.x) \
-          + (*iter_y - obs._origin.y) * (*iter_y - obs._origin.y) \
-          + (*iter_z - obs._origin.z) * (*iter_z - obs._origin.z);
+      float distance_2 = (it->x - obs._origin.x) * (it->x - obs._origin.x) \
+                        + (it->y - obs._origin.y) * (it->y - obs._origin.y) \
+                        + (it->z - obs._origin.z) * (it->z - obs._origin.z);
       if (distance_2 > mark_range_2 || distance_2 < 0.0001)
       {
         continue;
       }
       openvdb::Vec3d mark_grid(this->WorldToIndex( \
-                                 openvdb::Vec3d(*iter_x, *iter_y, *iter_z)));
+                                       openvdb::Vec3d(it->x, it->y, it->z)));
 
       if(!this->MarkGridPoint(openvdb::Coord(mark_grid[0], mark_grid[1], \
                                              mark_grid[2]), cur_time))
@@ -337,11 +323,11 @@ double SpatioTemporalVoxelGrid::GetTemporalClearingDuration(const double& time_d
 /*****************************************************************************/
 {
   // use configurable model to get desired decay time
-  if (_decay_model == 0) // linear
+  if (_decay_model == LINEAR)
   {
     return _voxel_decay - time_delta;
   }
-  else if (_decay_model == 1) // exponential
+  else if (_decay_model == EXPONENTIAL)
   {
     return _voxel_decay * std::exp(-time_delta);
   }
@@ -361,36 +347,11 @@ double SpatioTemporalVoxelGrid::GetFrustumAcceleration( \
 
 /*****************************************************************************/
 void SpatioTemporalVoxelGrid::GetOccupancyPointCloud( \
-                                            sensor_msgs::PointCloud2::Ptr& pc2)
+                                       pcl::PointCloud<pcl::PointXYZ>::Ptr& pc)
 /*****************************************************************************/
 {
-  // convert the grid points stored in a PointCloud2
-  pc2->width  = _grid_points->size();
-  pc2->height = 1;
-  pc2->is_dense = true;
-
-  sensor_msgs::PointCloud2Modifier modifier(*pc2);
-
-  modifier.setPointCloud2Fields(3,
-                                "x", 1, sensor_msgs::PointField::FLOAT32,
-                                "y", 1, sensor_msgs::PointField::FLOAT32,
-                                "z", 1, sensor_msgs::PointField::FLOAT32);
-  modifier.setPointCloud2FieldsByString(1, "xyz");
-
-  sensor_msgs::PointCloud2Iterator<float>iter_x(*pc2, "x");
-  sensor_msgs::PointCloud2Iterator<float>iter_y(*pc2, "y");
-  sensor_msgs::PointCloud2Iterator<float>iter_z(*pc2, "z");
-
-  for(std::vector<geometry_msgs::Point32>::iterator it = _grid_points->begin(); \
-      it != _grid_points->end(); ++it)
-  {
-    const geometry_msgs::Point32& pt = *it;
-    *iter_x = pt.x;
-    *iter_y = pt.y;
-    *iter_z = pt.z;
-    ++iter_x; ++iter_y; ++iter_z;
-  }
-
+  // return the pointcloud stored
+  pc = _pc;
   return;
 }
 

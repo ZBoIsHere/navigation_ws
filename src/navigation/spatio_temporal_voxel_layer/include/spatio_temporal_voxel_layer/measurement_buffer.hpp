@@ -1,4 +1,4 @@
-/********************************************************************
+/*********************************************************************
  *
  * Software License Agreement
  *
@@ -43,9 +43,7 @@
 #include <spatio_temporal_voxel_layer/measurement_reading.h>
 // PCL
 #include <pcl_ros/transforms.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl/filters/passthrough.h>
+#include <pcl/filters/approximate_voxel_grid.h>
 // STL
 #include <vector>
 #include <list>
@@ -54,29 +52,20 @@
 #include <ros/ros.h>
 #include <ros/time.h>
 // TF
-#include <tf2_ros/buffer.h>
-#include "message_filters/subscriber.h"
+#include <tf/transform_listener.h>
+#include <tf/transform_datatypes.h>
 // msgs
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/Quaternion.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TransformStamped.h>
 // Mutex
 #include <boost/thread.hpp>
 
 namespace buffer
 {
 
-enum class Filters
-{
-  NONE = 0,
-  VOXEL = 1,
-  PASSTHROUGH = 2
-};
-
 // conveniences for line lengths
 typedef std::list<observation::MeasurementReading>::iterator readings_iter;
-typedef sensor_msgs::PointCloud2::Ptr point_cloud_ptr;
+typedef pcl::PointCloud<pcl::PointXYZ>::Ptr point_cloud_ptr;
 
 // Measurement buffer
 class MeasurementBuffer
@@ -88,7 +77,7 @@ public:
                     const double& min_obstacle_height,      \
                     const double& max_obstacle_height,      \
                     const double& obstacle_range,           \
-                    tf2_ros::Buffer& tf,                    \
+                    tf::TransformListener& tf,              \
                     const std::string& global_frame,        \
                     const std::string& sensor_frame,        \
                     const double& tf_tolerance,             \
@@ -101,8 +90,7 @@ public:
                     const bool& marking,                    \
                     const bool& clearing,                   \
                     const double& voxel_size,               \
-                    const Filters& filter,                  \
-                    const int& voxel_min_points,            \
+                    const bool& voxel_filter,               \
                     const bool& enabled,                    \
                     const bool& clear_buffer_after_reading, \
                     const ModelType& model_type);
@@ -111,6 +99,7 @@ public:
 
   // Buffers for different types of pointclouds
   void BufferROSCloud(const sensor_msgs::PointCloud2& cloud);
+  void BufferPCLCloud(const pcl::PointCloud<pcl::PointXYZ>& cloud);
 
   // Get measurements from the buffer
   void GetReadings(std::vector<observation::MeasurementReading>& observations);
@@ -133,7 +122,7 @@ private:
   // Removing old observations from buffer
   void RemoveStaleObservations(void);
 
-  tf2_ros::Buffer& _buffer;
+  tf::TransformListener& _tf;
   const ros::Duration _observation_keep_time, _expected_update_rate;
   boost::recursive_mutex _lock;
   ros::Time _last_updated;
@@ -142,9 +131,7 @@ private:
   double _min_obstacle_height, _max_obstacle_height, _obstacle_range, _tf_tolerance;
   double _min_z, _max_z, _vertical_fov, _vertical_fov_padding, _horizontal_fov;
   double  _decay_acceleration, _voxel_size;
-  bool _marking, _clearing, _clear_buffer_after_reading, _enabled;
-  Filters _filter;
-  int _voxel_min_points;
+  bool _marking, _clearing, _voxel_filter, _clear_buffer_after_reading, _enabled;
   ModelType _model_type;
 };
 

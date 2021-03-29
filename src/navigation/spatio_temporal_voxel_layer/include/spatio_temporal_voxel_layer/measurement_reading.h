@@ -39,10 +39,12 @@
 
 #ifndef MEASUREMENT_READING_H_
 #define MEASUREMENT_READING_H_
+// PCL
+#include <pcl/point_cloud.h>
+#include <pcl_ros/point_cloud.h>
 // msgs
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Quaternion.h>
-#include <sensor_msgs/PointCloud2.h>
 
 enum ModelType
 {
@@ -57,19 +59,19 @@ namespace observation
 struct MeasurementReading
 {
   /*****************************************************************************/
-  MeasurementReading() : _cloud(new sensor_msgs::PointCloud2())
+  MeasurementReading() : _cloud(new pcl::PointCloud<pcl::PointXYZ>)
   /*****************************************************************************/
   {
   }
 
   /*****************************************************************************/
-  MeasurementReading(geometry_msgs::Point& origin, sensor_msgs::PointCloud2 cloud,       \
-            double obstacle_range, double min_z, double max_z, double vFOV,              \
-            double vFOVPadding, double hFOV, double decay_acceleration, bool marking,    \
+  MeasurementReading(geometry_msgs::Point& origin, pcl::PointCloud<pcl::PointXYZ> cloud, \
+            double obstacle_range, double min_z, double max_z, double vFOV,
+            double vFOVPadding, double hFOV, double decay_acceleration, bool marking,
             bool clearing, ModelType model_type) :
   /*****************************************************************************/
                                       _origin(origin),                                   \
-                                      _cloud(new sensor_msgs::PointCloud2(cloud)),       \
+                                      _cloud(new pcl::PointCloud<pcl::PointXYZ>(cloud)), \
                                       _obstacle_range_in_m(obstacle_range),              \
                                       _min_z_in_m(min_z),                                \
                                       _max_z_in_m(max_z),                                \
@@ -84,10 +86,10 @@ struct MeasurementReading
   }
 
   /*****************************************************************************/
-  MeasurementReading(sensor_msgs::PointCloud2 cloud, double obstacle_range) :
+  MeasurementReading(pcl::PointCloud<pcl::PointXYZ> cld, double obstacle_range) :
+                               _cloud(new pcl::PointCloud<pcl::PointXYZ>(cld)),
+                               _obstacle_range_in_m(obstacle_range)
   /*****************************************************************************/
-                                    _cloud(new sensor_msgs::PointCloud2(cloud)), \
-                                    _obstacle_range_in_m(obstacle_range)
   {
   }
 
@@ -95,7 +97,7 @@ struct MeasurementReading
   MeasurementReading(const MeasurementReading& obs) :
   /*****************************************************************************/
                              _origin(obs._origin),                                      \
-                             _cloud(new sensor_msgs::PointCloud2(*(obs._cloud))), \
+                             _cloud(new pcl::PointCloud<pcl::PointXYZ>(*(obs._cloud))), \
                              _obstacle_range_in_m(obs._obstacle_range_in_m),            \
                              _min_z_in_m(obs._min_z_in_m),                              \
                              _max_z_in_m(obs._max_z_in_m),                              \
@@ -112,7 +114,7 @@ struct MeasurementReading
 
   geometry_msgs::Point _origin;
   geometry_msgs::Quaternion _orientation;
-  sensor_msgs::PointCloud2::Ptr _cloud;
+  pcl::PointCloud<pcl::PointXYZ>::Ptr _cloud;
   double _obstacle_range_in_m, _min_z_in_m, _max_z_in_m;
   double _vertical_fov_in_rad, _vertical_fov_padding_in_m, _horizontal_fov_in_rad;
   double _marking, _clearing, _decay_acceleration;

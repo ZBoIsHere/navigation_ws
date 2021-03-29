@@ -16,8 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_conversions
   pcl_ros
   roscpp
-  tf2_ros
-  tf2_geometry_msgs
+  tf
   visualization_msgs
   message_generation
   dynamic_reconfigure
@@ -39,22 +38,6 @@ generate_messages(
 )
 
 find_package(PCL REQUIRED)
-if(NOT "${PCL_LIBRARIES}" STREQUAL "")
-  # This package fails to build on Debian Stretch with a linking error against
-  # 'Qt5::Widgets'.  This is a transitive dependency that comes in to PCL via
-  # the PCL dependency on VTK.  However, we don't actually care about the Qt
-  # dependencies for this package, so just remove them.  This is similar to the
-  # workaround in https://github.com/ros-perception/perception_pcl/pull/151,
-  # and can be removed when Stretch goes out of support.
-  list(REMOVE_ITEM PCL_LIBRARIES
-    "vtkGUISupportQt"
-    "vtkGUISupportQtOpenGL"
-    "vtkGUISupportQtSQL"
-    "vtkGUISupportQtWebkit"
-    "vtkViewsQt"
-    "vtkRenderingQt")
-endif()
-
 find_package(OpenVDB REQUIRED)
 find_package(TBB REQUIRED)
 remove_definitions(-DDISABLE_LIBUSB-1.0)
@@ -93,8 +76,7 @@ catkin_package(
         sensor_msgs
         std_msgs
         costmap_2d
-        tf2_ros
-        tf2_geometry_msgs
+        tf
         visualization_msgs
         dynamic_reconfigure
     DEPENDS
@@ -123,20 +105,19 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-# For testing on standalone, don't want to ship with production builds
-#add_executable(minimal_test
-#            test/minimal_test.cpp
-#)
-#target_link_libraries(minimal_test
-#  ${Boost_LIBRARIES}
-#  ${EIGEN3_LIBRARIES}
-#  ${PCL_LIBRARIES}
-#  ${OpenVDB_LIBRARIES}
-#  ${TBB_LIBRARIES}
-#  ${catkin_LIBRARIES}
-#)
+add_executable(minimal_test
+            test/minimal_test.cpp
+)
+target_link_libraries(minimal_test
+  ${Boost_LIBRARIES}
+  ${EIGEN3_LIBRARIES}
+  ${PCL_LIBRARIES}
+  ${OpenVDB_LIBRARIES}
+  ${TBB_LIBRARIES}
+  ${catkin_LIBRARIES}
+)
 
-install(TARGETS ${PROJECT_NAME} #minimal_test
+install(TARGETS ${PROJECT_NAME} minimal_test
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
