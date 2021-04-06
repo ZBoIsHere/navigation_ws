@@ -11,7 +11,7 @@
   <arg name="map_id" default="map" />
   
 
-  <group if="$(arg enable_lidar_localization)">
+  <group if="$(arg enable_within_localization)">
     <!-- LIDAR -->
     <group if="$(eval arg('lidar_type') == 'velodyne')">
       <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch">
