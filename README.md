@@ -23,7 +23,7 @@
      <!-- 雷达型号 rslidar(默认)/velodyne -->
      <arg name="lidar_type" default="rslidar" />
      <!-- 开启定位 false(默认)/true(启用自带定位算法) -->
-     <arg name="enable_lidar_localization" default="false" />
+     <arg name="enable_within_localization" default="false" />
      <!-- 开启RViz true(默认)/false -->
      <arg name="enable_rviz" default="true" />
      <!-- 地图名称 map(默认) -->
